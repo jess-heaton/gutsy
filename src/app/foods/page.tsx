@@ -7,59 +7,46 @@ import { FoodItem } from '@/lib/types';
 import FODMAPBadge, { FODMAPCategoryGrid } from '@/components/FODMAPBadge';
 import clsx from 'clsx';
 
-const filterOptions = [
-  { value: 'all', label: 'All' },
-  { value: 'low', label: '🟢 Low' },
-  { value: 'moderate', label: '🟡 Moderate' },
-  { value: 'high', label: '🔴 High' },
+const FODMAP_FILTERS = [
+  { value: 'all',      label: 'All foods' },
+  { value: 'low',      label: 'Low FODMAP' },
+  { value: 'moderate', label: 'Moderate'   },
+  { value: 'high',     label: 'High FODMAP' },
 ];
 
-const categoryList = ['all', 'fruit', 'vegetable', 'grain', 'dairy', 'protein', 'legume', 'nut', 'condiment', 'drink'];
+const CATEGORIES = ['all', 'fruit', 'vegetable', 'grain', 'dairy', 'protein', 'legume', 'nut', 'condiment', 'drink'];
 
-function FoodCard({ food }: { food: FoodItem }) {
-  const [expanded, setExpanded] = useState(false);
+function FoodRow({ food }: { food: FoodItem }) {
+  const [open, setOpen] = useState(false);
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-card overflow-hidden">
+    <div className="border-b border-gray-100 last:border-0">
       <button
-        onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center gap-3 px-3.5 py-3 text-left active:bg-gray-50 transition-colors"
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center gap-3 py-3 text-left hover:bg-gray-50 transition-colors rounded-lg px-2 -mx-2"
       >
-        <span className="text-2xl w-8 text-center flex-shrink-0">{food.emoji || '🍽️'}</span>
+        <span className="text-lg w-7 text-center flex-shrink-0">{food.emoji ?? '—'}</span>
         <div className="flex-1 min-w-0">
-          <span className="text-sm font-semibold text-gray-800 block">{food.name}</span>
-          <span className="text-xs text-gray-400">{food.serving.description}</span>
+          <p className="text-sm font-medium text-gray-900">{food.name}</p>
+          <p className="text-xs text-gray-400 mt-0.5">{food.serving.description}</p>
         </div>
-        <div className="flex items-center gap-2 flex-shrink-0">
+        <div className="flex items-center gap-2.5 flex-shrink-0">
           <FODMAPBadge level={food.fodmap.overall} size="sm" />
-          {expanded ? (
-            <ChevronUp className="w-4 h-4 text-gray-400" />
-          ) : (
-            <ChevronDown className="w-4 h-4 text-gray-400" />
-          )}
+          {open ? <ChevronUp className="w-4 h-4 text-gray-300" /> : <ChevronDown className="w-4 h-4 text-gray-300" />}
         </div>
       </button>
 
-      {expanded && (
-        <div className="px-3.5 pb-3.5 space-y-3 border-t border-gray-50 pt-3 animate-fade-in">
+      {open && (
+        <div className="pb-4 px-2 space-y-3 animate-fade-in">
           <FODMAPCategoryGrid fodmap={food.fodmap} />
           {food.notes && (
-            <div className="flex gap-2 bg-blue-50 rounded-xl p-2.5">
+            <div className="flex gap-2 bg-blue-50 border border-blue-100 rounded-lg p-3">
               <Info className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
-              <p className="text-xs text-blue-700">{food.notes}</p>
+              <p className="text-xs text-blue-700 leading-relaxed">{food.notes}</p>
             </div>
           )}
           {food.fodmap.overall === 'high' && (
-            <div className="flex gap-2 bg-red-50 rounded-xl p-2.5">
-              <span className="text-sm flex-shrink-0">🚫</span>
-              <p className="text-xs text-red-700 font-medium">Avoid during the elimination phase.</p>
-            </div>
-          )}
-          {food.fodmap.overall === 'low' && (
-            <div className="flex gap-2 bg-emerald-50 rounded-xl p-2.5">
-              <span className="text-sm flex-shrink-0">✅</span>
-              <p className="text-xs text-emerald-700 font-medium">Safe for the elimination phase at this serve size.</p>
-            </div>
+            <p className="text-xs text-high font-medium px-1">Avoid during the elimination phase.</p>
           )}
         </div>
       )}
@@ -68,51 +55,45 @@ function FoodCard({ food }: { food: FoodItem }) {
 }
 
 export default function FoodsPage() {
-  const [query, setQuery] = useState('');
-  const [fodmapFilter, setFodmapFilter] = useState<'all' | 'low' | 'moderate' | 'high'>('all');
-  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [query,    setQuery]    = useState('');
+  const [fodmap,   setFodmap]   = useState<'all'|'low'|'moderate'|'high'>('all');
+  const [category, setCategory] = useState('all');
 
   let results = query ? searchFoods(query) : foods;
+  if (fodmap !== 'all')    results = results.filter(f => f.fodmap.overall === fodmap);
+  if (category !== 'all')  results = results.filter(f => f.category === category);
 
-  if (fodmapFilter !== 'all') {
-    results = results.filter((f) => f.fodmap.overall === fodmapFilter);
-  }
-  if (categoryFilter !== 'all') {
-    results = results.filter((f) => f.category === categoryFilter);
-  }
-
-  const lowCount = foods.filter((f) => f.fodmap.overall === 'low').length;
-  const highCount = foods.filter((f) => f.fodmap.overall === 'high').length;
+  const lowCount  = foods.filter(f => f.fodmap.overall === 'low').length;
+  const highCount = foods.filter(f => f.fodmap.overall === 'high').length;
 
   return (
-    <div className="px-4 pt-6 space-y-4">
+    <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">FODMAP Foods</h1>
+        <h1 className="text-2xl font-bold text-gray-900">FODMAP food guide</h1>
         <p className="text-sm text-gray-500 mt-1">
-          {lowCount} safe foods · {highCount} to avoid · Based on Monash University research
+          {lowCount} safe foods, {highCount} to avoid. Based on Monash University research.
         </p>
       </div>
 
-      {/* Legend */}
+      {/* Traffic light filter */}
       <div className="grid grid-cols-3 gap-2">
         {[
-          { level: 'low' as const, label: 'Low FODMAP', sub: 'Safe to eat', bg: 'bg-emerald-50 border-emerald-200' },
-          { level: 'moderate' as const, label: 'Moderate', sub: 'Eat in small amounts', bg: 'bg-amber-50 border-amber-200' },
-          { level: 'high' as const, label: 'High FODMAP', sub: 'Avoid', bg: 'bg-red-50 border-red-200' },
-        ].map(({ level, label, sub, bg }) => (
+          { level: 'low'      as const, label: 'Low',      sub: 'Safe at listed serve',   border: 'border-low/30',      bg: 'bg-emerald-50',   text: 'text-low'      },
+          { level: 'moderate' as const, label: 'Moderate', sub: 'Small amounts only',     border: 'border-moderate/30', bg: 'bg-amber-50',     text: 'text-moderate' },
+          { level: 'high'     as const, label: 'High',     sub: 'Avoid in elimination',   border: 'border-high/30',     bg: 'bg-red-50',       text: 'text-high'     },
+        ].map(({ level, label, sub, border, bg, text }) => (
           <button
             key={level}
-            onClick={() => setFodmapFilter(fodmapFilter === level ? 'all' : level)}
+            onClick={() => setFodmap(fodmap === level ? 'all' : level)}
             className={clsx(
-              'rounded-xl border-2 p-2 text-center transition-all active:scale-95',
-              bg,
-              fodmapFilter === level ? 'ring-2 ring-offset-1 ring-indigo-400' : '',
+              'rounded-xl border-2 py-3 px-2 text-center transition-all active:scale-98',
+              bg, border,
+              fodmap === level && 'ring-2 ring-offset-1 ring-brand-500',
             )}
           >
-            <FODMAPBadge level={level} size="sm" showLabel={false} />
-            <p className="text-xs font-semibold text-gray-700 mt-1">{label}</p>
-            <p className="text-xs text-gray-400">{sub}</p>
+            <div className={clsx('text-xs font-bold', text)}>{label}</div>
+            <div className="text-2xs text-gray-500 mt-0.5 leading-tight">{sub}</div>
           </button>
         ))}
       </div>
@@ -122,62 +103,59 @@ export default function FoodsPage() {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
         <input
           type="text"
-          placeholder="Search any food..."
+          placeholder="Search foods…"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          className="w-full pl-9 pr-9 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-transparent shadow-card"
+          onChange={e => setQuery(e.target.value)}
+          className="w-full pl-9 pr-9 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
         />
         {query && (
-          <button onClick={() => setQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
-            <X className="w-4 h-4" />
+          <button onClick={() => setQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2">
+            <X className="w-4 h-4 text-gray-400" />
           </button>
         )}
       </div>
 
-      {/* Category filter */}
-      <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
-        {categoryList.map((cat) => (
+      {/* Category pills */}
+      <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1 -mx-4 px-4">
+        {CATEGORIES.map(cat => (
           <button
             key={cat}
-            onClick={() => setCategoryFilter(cat)}
+            onClick={() => setCategory(cat)}
             className={clsx(
-              'flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all flex-shrink-0',
-              categoryFilter === cat
-                ? 'bg-indigo-600 text-white'
-                : 'bg-white text-gray-600 border border-gray-200',
+              'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0 border transition-colors',
+              category === cat
+                ? 'bg-brand-700 text-white border-brand-700'
+                : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300',
             )}
           >
-            {cat !== 'all' && categoryEmojis[cat]} {cat === 'all' ? 'All categories' : categoryLabels[cat]}
+            {cat !== 'all' && <span>{categoryEmojis[cat]}</span>}
+            {cat === 'all' ? 'All' : categoryLabels[cat]}
           </button>
         ))}
       </div>
 
-      {/* Results count */}
-      <p className="text-xs text-gray-400 font-medium">
-        {results.length} food{results.length !== 1 ? 's' : ''} found
-      </p>
+      {/* Results */}
+      <div>
+        <p className="text-xs text-gray-400 font-medium mb-3">
+          {results.length} food{results.length !== 1 ? 's' : ''}
+        </p>
 
-      {/* Food list */}
-      <div className="space-y-2">
         {results.length === 0 ? (
-          <div className="text-center py-10">
-            <p className="text-4xl mb-2">🔍</p>
-            <p className="text-gray-500 text-sm font-medium">No foods found</p>
-            <p className="text-gray-400 text-xs mt-1">Try a different search term</p>
+          <div className="text-center py-12 bg-white border border-gray-200 rounded-xl">
+            <p className="text-gray-500 text-sm">No foods found</p>
+            <p className="text-gray-400 text-xs mt-1">Try a different search or clear the filters</p>
           </div>
         ) : (
-          results.map((food) => <FoodCard key={food.id} food={food} />)
+          <div className="bg-white border border-gray-200 rounded-xl px-4">
+            {results.map(food => <FoodRow key={food.id} food={food} />)}
+          </div>
         )}
       </div>
 
-      {/* Monash note */}
-      <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100">
-        <p className="text-xs text-gray-500">
-          📚 Data based on Monash University research. Their official app has the full database — worth having alongside this one.
-        </p>
-      </div>
-
-      <div className="h-4" />
+      {/* Source note */}
+      <p className="text-xs text-gray-400 text-center">
+        Data based on Monash University FODMAP research. The official Monash app has the full database.
+      </p>
     </div>
   );
 }

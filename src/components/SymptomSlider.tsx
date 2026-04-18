@@ -9,67 +9,39 @@ interface SymptomSliderProps {
   onChange: (v: number) => void;
 }
 
-const severityLabel = (v: number) => {
-  if (v === 0) return 'None';
-  if (v <= 3) return 'Mild';
-  if (v <= 6) return 'Moderate';
-  if (v <= 8) return 'Severe';
-  return 'Very severe';
-};
+const label = (v: number) => v === 0 ? 'None' : v <= 3 ? 'Mild' : v <= 6 ? 'Moderate' : v <= 8 ? 'Severe' : 'Very severe';
+const textColor  = (v: number) => v === 0 ? 'text-gray-400' : v <= 3 ? 'text-low' : v <= 6 ? 'text-moderate' : 'text-high';
+const trackColor = (v: number) => v === 0 ? 'bg-gray-200' : v <= 3 ? 'bg-low' : v <= 6 ? 'bg-moderate' : 'bg-high';
 
-const severityColor = (v: number) => {
-  if (v === 0) return 'text-gray-400';
-  if (v <= 3) return 'text-emerald-600';
-  if (v <= 6) return 'text-amber-600';
-  return 'text-red-600';
-};
-
-const trackColor = (v: number) => {
-  if (v === 0) return 'bg-gray-200';
-  if (v <= 3) return 'bg-emerald-400';
-  if (v <= 6) return 'bg-amber-400';
-  return 'bg-red-400';
-};
-
-export default function SymptomSlider({ label, emoji, value, onChange }: SymptomSliderProps) {
+export default function SymptomSlider({ label: l, emoji, value, onChange }: SymptomSliderProps) {
   return (
-    <div className="bg-gray-50 rounded-xl px-3.5 py-3">
-      <div className="flex items-center justify-between mb-2">
-        <span className="text-sm font-semibold text-gray-700 flex items-center gap-1.5">
-          <span>{emoji}</span> {label}
+    <div className="bg-white border border-gray-200 rounded-xl px-4 py-3.5">
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-sm font-medium text-gray-700 flex items-center gap-1.5">
+          <span>{emoji}</span> {l}
         </span>
-        <span className={clsx('text-xs font-semibold', severityColor(value))}>
-          {value}/10 · {severityLabel(value)}
+        <span className={clsx('text-xs font-semibold', textColor(value))}>
+          {value}/10 · {label(value)}
         </span>
       </div>
-      <div className="relative">
-        <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-          <div
-            className={clsx('h-full rounded-full transition-all', trackColor(value))}
-            style={{ width: `${value * 10}%` }}
-          />
+      <div className="relative h-5 flex items-center">
+        <div className="absolute inset-x-0 h-1 bg-gray-100 rounded-full overflow-hidden">
+          <div className={clsx('h-full rounded-full transition-all', trackColor(value))} style={{ width: `${value * 10}%` }} />
         </div>
         <input
           type="range"
-          min={0}
-          max={10}
+          min={0} max={10}
           value={value}
-          onChange={(e) => onChange(Number(e.target.value))}
-          className="absolute inset-0 w-full opacity-0 cursor-pointer h-2"
-          style={{ height: '100%' }}
+          onChange={e => onChange(Number(e.target.value))}
+          className="absolute inset-0 w-full opacity-0 cursor-pointer"
         />
       </div>
-      <div className="flex justify-between mt-1">
-        {[0, 2, 4, 6, 8, 10].map((n) => (
+      <div className="flex justify-between mt-2.5">
+        {[0, 5, 10].map(n => (
           <button
             key={n}
             onClick={() => onChange(n)}
-            className={clsx(
-              'w-7 h-7 rounded-full text-xs font-semibold transition-all',
-              value === n
-                ? 'bg-indigo-600 text-white scale-110'
-                : 'bg-white text-gray-400 hover:bg-gray-100',
-            )}
+            className={clsx('text-xs font-medium transition-colors px-1', value === n ? textColor(n) + ' font-bold' : 'text-gray-300 hover:text-gray-500')}
           >
             {n}
           </button>

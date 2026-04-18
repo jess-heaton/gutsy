@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect, useRef, Suspense } from 'react';
+import { useState, useRef, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Search, X, Plus, Check, PenLine, Utensils } from 'lucide-react';
+import { ArrowLeft, Search, X, Check } from 'lucide-react';
 import { MealType, MealEntry, SymptomEntry, BowelEntry, NoteEntry, BristolType, LoggedFood } from '@/lib/types';
 import { addEntry, generateId, getTodayKey, getNowTime } from '@/lib/store';
 import { foods, searchFoods } from '@/data/foods';
@@ -13,106 +13,87 @@ import clsx from 'clsx';
 
 type LogType = 'meal' | 'symptom' | 'bowel' | 'note';
 
-const tabConfig: { type: LogType; emoji: string; label: string; color: string; activeColor: string }[] = [
-  { type: 'meal', emoji: '🍽️', label: 'Meal', color: 'text-amber-600', activeColor: 'bg-amber-500' },
-  { type: 'symptom', emoji: '😣', label: 'Symptom', color: 'text-rose-600', activeColor: 'bg-rose-500' },
-  { type: 'bowel', emoji: '🚽', label: 'Bowel', color: 'text-violet-600', activeColor: 'bg-violet-500' },
-  { type: 'note', emoji: '📝', label: 'Note', color: 'text-sky-600', activeColor: 'bg-sky-500' },
+const TABS: { type: LogType; label: string }[] = [
+  { type: 'meal',    label: 'Meal'    },
+  { type: 'symptom', label: 'Symptom' },
+  { type: 'bowel',   label: 'Bowel'   },
+  { type: 'note',    label: 'Note'    },
 ];
 
-const mealTypes: { type: MealType; emoji: string; label: string }[] = [
-  { type: 'breakfast', emoji: '🌅', label: 'Breakfast' },
-  { type: 'lunch', emoji: '☀️', label: 'Lunch' },
-  { type: 'dinner', emoji: '🌙', label: 'Dinner' },
-  { type: 'snack', emoji: '🍎', label: 'Snack' },
-  { type: 'drink', emoji: '💧', label: 'Drink' },
+const MEAL_TYPES: { type: MealType; label: string }[] = [
+  { type: 'breakfast', label: 'Breakfast' },
+  { type: 'lunch',     label: 'Lunch'     },
+  { type: 'dinner',    label: 'Dinner'    },
+  { type: 'snack',     label: 'Snack'     },
+  { type: 'drink',     label: 'Drink'     },
 ];
 
-function MealLogger({ mealType: initialMealType, onSave }: { mealType: MealType; onSave: () => void }) {
-  const [mealType, setMealType] = useState<MealType>(initialMealType);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedFoods, setSelectedFoods] = useState<LoggedFood[]>([]);
+function MealLogger({ initialMealType, onSave }: { initialMealType: MealType; onSave: () => void }) {
+  const [mealType, setMealType] = useState(initialMealType);
+  const [query, setQuery]       = useState('');
+  const [selected, setSelected] = useState<LoggedFood[]>([]);
   const [freeText, setFreeText] = useState('');
-  const [mode, setMode] = useState<'search' | 'free'>('search');
-  const searchRef = useRef<HTMLInputElement>(null);
+  const [mode, setMode]         = useState<'search' | 'free'>('search');
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  const results = searchQuery.length > 0 ? searchFoods(searchQuery) : foods.slice(0, 20);
-  const isSelected = (id: string) => selectedFoods.some((f) => f.foodId === id);
+  const results  = query ? searchFoods(query) : foods.slice(0, 24);
+  const isActive = (id: string) => selected.some(f => f.foodId === id);
 
   const toggle = (food: (typeof foods)[0]) => {
-    if (isSelected(food.id)) {
-      setSelectedFoods((prev) => prev.filter((f) => f.foodId !== food.id));
-    } else {
-      setSelectedFoods((prev) => [
-        ...prev,
-        {
-          foodId: food.id,
-          foodName: food.name,
-          emoji: food.emoji,
-          fodmapOverall: food.fodmap.overall,
-        },
-      ]);
-    }
+    setSelected(prev =>
+      isActive(food.id)
+        ? prev.filter(f => f.foodId !== food.id)
+        : [...prev, { foodId: food.id, foodName: food.name, emoji: food.emoji, fodmapOverall: food.fodmap.overall }]
+    );
   };
 
   const save = () => {
-    const entry: MealEntry = {
-      id: generateId(),
-      date: getTodayKey(),
-      time: getNowTime(),
-      type: 'meal',
-      mealType,
-      foods: selectedFoods,
+    addEntry({
+      id: generateId(), date: getTodayKey(), time: getNowTime(),
+      type: 'meal', mealType, foods: selected,
       freeText: freeText.trim() || undefined,
-    };
-    addEntry(entry);
+    } as MealEntry);
     onSave();
   };
 
-  const canSave = selectedFoods.length > 0 || freeText.trim().length > 0;
+  const canSave = selected.length > 0 || freeText.trim().length > 0;
 
   return (
-    <div className="space-y-4">
-      {/* Meal type picker */}
+    <div className="space-y-5">
+      {/* Meal type */}
       <div>
-        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Meal type</p>
-        <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
-          {mealTypes.map(({ type, emoji, label }) => (
+        <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Meal type</label>
+        <div className="flex gap-2 flex-wrap">
+          {MEAL_TYPES.map(({ type, label }) => (
             <button
               key={type}
               onClick={() => setMealType(type)}
               className={clsx(
-                'flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all flex-shrink-0',
+                'px-3 py-1.5 rounded-lg text-sm font-medium border transition-all',
                 mealType === type
-                  ? 'bg-indigo-600 text-white shadow-sm'
-                  : 'bg-white text-gray-600 border border-gray-200 hover:border-gray-300',
+                  ? 'bg-brand-700 text-white border-brand-700'
+                  : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300',
               )}
             >
-              {emoji} {label}
+              {label}
             </button>
           ))}
         </div>
       </div>
 
       {/* Mode toggle */}
-      <div className="flex bg-gray-100 rounded-xl p-1 gap-1">
+      <div className="flex bg-gray-100 rounded-xl p-1">
         <button
           onClick={() => setMode('search')}
-          className={clsx(
-            'flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-sm font-semibold transition-all',
-            mode === 'search' ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500',
-          )}
+          className={clsx('flex-1 py-2 rounded-lg text-sm font-medium transition-all', mode === 'search' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700')}
         >
-          <Search className="w-4 h-4" /> Search foods
+          Search foods
         </button>
         <button
           onClick={() => setMode('free')}
-          className={clsx(
-            'flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-sm font-semibold transition-all',
-            mode === 'free' ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500',
-          )}
+          className={clsx('flex-1 py-2 rounded-lg text-sm font-medium transition-all', mode === 'free' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700')}
         >
-          <PenLine className="w-4 h-4" /> Free text
+          Free text
         </button>
       </div>
 
@@ -122,72 +103,56 @@ function MealLogger({ mealType: initialMealType, onSave }: { mealType: MealType;
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
-              ref={searchRef}
+              ref={inputRef}
               type="text"
-              placeholder="Search foods (e.g. banana, rice, chicken)"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-9 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-transparent"
+              placeholder="Search foods…"
+              value={query}
+              onChange={e => setQuery(e.target.value)}
               autoFocus
+              className="w-full pl-9 pr-9 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
             />
-            {searchQuery && (
-              <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
-                <X className="w-4 h-4" />
-              </button>
-            )}
+            {query && <button onClick={() => setQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2"><X className="w-4 h-4 text-gray-400" /></button>}
           </div>
 
-          {/* Selected foods */}
-          {selectedFoods.length > 0 && (
+          {/* Selected chips */}
+          {selected.length > 0 && (
             <div className="flex flex-wrap gap-1.5">
-              {selectedFoods.map((f) => (
+              {selected.map(f => (
                 <button
                   key={f.foodId}
-                  onClick={() => setSelectedFoods((prev) => prev.filter((x) => x.foodId !== f.foodId))}
-                  className="flex items-center gap-1 bg-indigo-100 text-indigo-700 px-2.5 py-1 rounded-full text-xs font-semibold hover:bg-indigo-200 transition-colors"
+                  onClick={() => setSelected(prev => prev.filter(x => x.foodId !== f.foodId))}
+                  className="flex items-center gap-1 bg-brand-100 text-brand-800 px-2.5 py-1 rounded-full text-xs font-medium hover:bg-brand-200 transition-colors"
                 >
-                  {f.emoji} {f.foodName}
-                  <X className="w-3 h-3 ml-0.5" />
+                  {f.foodName} <X className="w-3 h-3" />
                 </button>
               ))}
             </div>
           )}
 
-          {/* Food list */}
-          <div className="space-y-1.5 max-h-72 overflow-y-auto scrollbar-hide">
+          {/* List */}
+          <div className="bg-white border border-gray-200 rounded-xl overflow-hidden max-h-72 overflow-y-auto scrollbar-hide divide-y divide-gray-100">
             {results.length === 0 && (
-              <p className="text-center text-gray-400 text-sm py-6">Nothing found — switch to free text if it's not in the list.</p>
+              <p className="text-center text-gray-400 text-sm py-8">Nothing found — try free text</p>
             )}
-            {results.map((food) => {
-              const selected = isSelected(food.id);
-              return (
-                <button
-                  key={food.id}
-                  onClick={() => toggle(food)}
-                  className={clsx(
-                    'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border transition-all text-left active:scale-98',
-                    selected
-                      ? 'border-indigo-300 bg-indigo-50'
-                      : 'border-gray-100 bg-white hover:border-gray-200',
-                  )}
-                >
-                  <span className="text-xl w-7 text-center flex-shrink-0">{food.emoji || '🍽️'}</span>
-                  <div className="flex-1 min-w-0">
-                    <span className="text-sm font-semibold text-gray-800 block truncate">{food.name}</span>
-                    <span className="text-xs text-gray-400">{food.serving.description}</span>
+            {results.map(food => (
+              <button
+                key={food.id}
+                onClick={() => toggle(food)}
+                className={clsx('w-full flex items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-gray-50', isActive(food.id) && 'bg-brand-50')}
+              >
+                <span className="text-base w-6 text-center flex-shrink-0">{food.emoji ?? '—'}</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900 truncate">{food.name}</p>
+                  <p className="text-xs text-gray-400">{food.serving.description}</p>
+                </div>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <FODMAPBadge level={food.fodmap.overall} size="sm" />
+                  <div className={clsx('w-4 h-4 rounded border-2 flex items-center justify-center transition-all', isActive(food.id) ? 'bg-brand-600 border-brand-600' : 'border-gray-300')}>
+                    {isActive(food.id) && <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />}
                   </div>
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    <FODMAPBadge level={food.fodmap.overall} size="sm" />
-                    <div className={clsx(
-                      'w-5 h-5 rounded-full flex items-center justify-center transition-all flex-shrink-0',
-                      selected ? 'bg-indigo-600' : 'border-2 border-gray-300',
-                    )}>
-                      {selected && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
-                    </div>
-                  </div>
-                </button>
-              );
-            })}
+                </div>
+              </button>
+            ))}
           </div>
         </>
       ) : (
@@ -195,14 +160,12 @@ function MealLogger({ mealType: initialMealType, onSave }: { mealType: MealType;
           <textarea
             placeholder="What did you have? (e.g. scrambled eggs on GF toast, black coffee)"
             value={freeText}
-            onChange={(e) => setFreeText(e.target.value)}
+            onChange={e => setFreeText(e.target.value)}
             rows={5}
-            className="w-full px-3.5 py-3 bg-white border border-gray-200 rounded-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-transparent"
             autoFocus
+            className="w-full px-3.5 py-3 bg-white border border-gray-200 rounded-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-brand-500"
           />
-          <p className="text-xs text-gray-400 mt-1.5">
-            No need to be precise — rough notes are fine.
-          </p>
+          <p className="text-xs text-gray-400 mt-1.5">No need to be precise — rough notes are fine.</p>
         </div>
       )}
 
@@ -210,65 +173,43 @@ function MealLogger({ mealType: initialMealType, onSave }: { mealType: MealType;
         onClick={save}
         disabled={!canSave}
         className={clsx(
-          'w-full py-3.5 rounded-2xl font-bold text-white text-sm transition-all',
-          canSave
-            ? 'bg-indigo-600 hover:bg-indigo-700 active:scale-98 shadow-lg shadow-indigo-200'
-            : 'bg-gray-200 text-gray-400 cursor-not-allowed',
+          'w-full py-3 rounded-xl font-semibold text-sm transition-all',
+          canSave ? 'bg-brand-700 text-white hover:bg-brand-800 active:scale-98' : 'bg-gray-100 text-gray-400 cursor-not-allowed',
         )}
       >
-        {canSave
-          ? `Save ${mealType.charAt(0).toUpperCase() + mealType.slice(1)} (${selectedFoods.length} food${selectedFoods.length !== 1 ? 's' : ''}${freeText.trim() ? ' + notes' : ''})`
-          : 'Add at least one food'}
+        {canSave ? `Save ${mealType}${selected.length > 0 ? ` (${selected.length} food${selected.length !== 1 ? 's' : ''})` : ''}` : 'Add at least one food'}
       </button>
     </div>
   );
 }
 
 function SymptomLogger({ onSave }: { onSave: () => void }) {
-  const [values, setValues] = useState({ bloating: 0, pain: 0, gas: 0, nausea: 0, fatigue: 0, overall: 0 });
+  const [v, setV] = useState({ bloating: 0, pain: 0, gas: 0, nausea: 0, fatigue: 0, overall: 0 });
   const [notes, setNotes] = useState('');
-
-  const set = (key: keyof typeof values) => (v: number) => setValues((prev) => ({ ...prev, [key]: v }));
+  const set = (k: keyof typeof v) => (n: number) => setV(p => ({ ...p, [k]: n }));
 
   const save = () => {
-    const entry: SymptomEntry = {
-      id: generateId(),
-      date: getTodayKey(),
-      time: getNowTime(),
-      type: 'symptom',
-      ...values,
-      notes: notes.trim() || undefined,
-    };
-    addEntry(entry);
+    addEntry({ id: generateId(), date: getTodayKey(), time: getNowTime(), type: 'symptom', ...v, notes: notes.trim() || undefined } as SymptomEntry);
     onSave();
   };
 
-  const hasAny = Object.values(values).some((v) => v > 0);
-
   return (
     <div className="space-y-3">
-      <SymptomSlider label="Overall feeling" emoji="🌡️" value={values.overall} onChange={set('overall')} />
-      <SymptomSlider label="Bloating" emoji="🫃" value={values.bloating} onChange={set('bloating')} />
-      <SymptomSlider label="Abdominal pain" emoji="🤕" value={values.pain} onChange={set('pain')} />
-      <SymptomSlider label="Gas / flatulence" emoji="💨" value={values.gas} onChange={set('gas')} />
-      <SymptomSlider label="Nausea" emoji="🤢" value={values.nausea} onChange={set('nausea')} />
-      <SymptomSlider label="Fatigue" emoji="😴" value={values.fatigue} onChange={set('fatigue')} />
-
-      <div>
-        <textarea
-          placeholder="Any additional notes... (e.g. stress, menstrual cycle, medication)"
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-          rows={3}
-          className="w-full px-3.5 py-3 bg-white border border-gray-200 rounded-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-transparent"
-        />
-      </div>
-
-      <button
-        onClick={save}
-        className="w-full py-3.5 rounded-2xl font-bold text-white text-sm bg-rose-500 hover:bg-rose-600 active:scale-98 transition-all shadow-lg shadow-rose-200"
-      >
-        Save Symptom Log
+      <SymptomSlider label="Overall feeling"   emoji="🌡️" value={v.overall}  onChange={set('overall')}  />
+      <SymptomSlider label="Bloating"          emoji="🫃" value={v.bloating} onChange={set('bloating')} />
+      <SymptomSlider label="Abdominal pain"    emoji="🤕" value={v.pain}     onChange={set('pain')}     />
+      <SymptomSlider label="Gas"               emoji="💨" value={v.gas}      onChange={set('gas')}      />
+      <SymptomSlider label="Nausea"            emoji="🤢" value={v.nausea}   onChange={set('nausea')}   />
+      <SymptomSlider label="Fatigue"           emoji="😴" value={v.fatigue}  onChange={set('fatigue')}  />
+      <textarea
+        placeholder="Any notes? (stress, medication, menstrual cycle…)"
+        value={notes}
+        onChange={e => setNotes(e.target.value)}
+        rows={2}
+        className="w-full px-3.5 py-3 bg-white border border-gray-200 rounded-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-brand-500"
+      />
+      <button onClick={save} className="w-full py-3 bg-rose-600 text-white rounded-xl font-semibold text-sm hover:bg-rose-700 active:scale-98 transition-all">
+        Save symptom log
       </button>
     </div>
   );
@@ -276,69 +217,39 @@ function SymptomLogger({ onSave }: { onSave: () => void }) {
 
 function BowelLogger({ onSave }: { onSave: () => void }) {
   const [bristol, setBristol] = useState<BristolType | undefined>();
-  const [urgency, setUrgency] = useState<'normal' | 'urgent' | 'very-urgent'>('normal');
+  const [urgency, setUrgency] = useState<'normal'|'urgent'|'very-urgent'>('normal');
   const [pain, setPain] = useState(0);
-  const [notes, setNotes] = useState('');
 
   const save = () => {
     if (!bristol) return;
-    const entry: BowelEntry = {
-      id: generateId(),
-      date: getTodayKey(),
-      time: getNowTime(),
-      type: 'bowel',
-      bristolType: bristol,
-      urgency,
-      pain,
-      notes: notes.trim() || undefined,
-    };
-    addEntry(entry);
+    addEntry({ id: generateId(), date: getTodayKey(), time: getNowTime(), type: 'bowel', bristolType: bristol, urgency, pain } as BowelEntry);
     onSave();
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <BristolScale value={bristol} onChange={setBristol} />
-
       <div>
-        <p className="text-sm font-semibold text-gray-700 mb-2">Urgency</p>
+        <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Urgency</label>
         <div className="flex gap-2">
-          {(['normal', 'urgent', 'very-urgent'] as const).map((u) => (
+          {(['normal','urgent','very-urgent'] as const).map(u => (
             <button
               key={u}
               onClick={() => setUrgency(u)}
-              className={clsx(
-                'flex-1 py-2.5 rounded-xl text-xs font-semibold border transition-all',
-                urgency === u ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-600 border-gray-200',
-              )}
+              className={clsx('flex-1 py-2.5 rounded-xl text-xs font-semibold border transition-all', urgency === u ? 'bg-brand-700 text-white border-brand-700' : 'bg-white text-gray-600 border-gray-200')}
             >
-              {u === 'normal' ? '😌 Normal' : u === 'urgent' ? '⚡ Urgent' : '🚨 Very urgent'}
+              {u === 'normal' ? 'Normal' : u === 'urgent' ? 'Urgent' : 'Very urgent'}
             </button>
           ))}
         </div>
       </div>
-
       <SymptomSlider label="Associated pain" emoji="🤕" value={pain} onChange={setPain} />
-
-      <textarea
-        placeholder="Notes (optional)..."
-        value={notes}
-        onChange={(e) => setNotes(e.target.value)}
-        rows={2}
-        className="w-full px-3.5 py-3 bg-white border border-gray-200 rounded-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-transparent"
-      />
-
       <button
         onClick={save}
         disabled={!bristol}
-        className={clsx(
-          'w-full py-3.5 rounded-2xl font-bold text-white text-sm transition-all',
-          bristol
-            ? 'bg-violet-600 hover:bg-violet-700 active:scale-98 shadow-lg shadow-violet-200'
-            : 'bg-gray-200 text-gray-400 cursor-not-allowed',
-        )}
+        className={clsx('w-full py-3 rounded-xl font-semibold text-sm transition-all', bristol ? 'bg-violet-700 text-white hover:bg-violet-800 active:scale-98' : 'bg-gray-100 text-gray-400 cursor-not-allowed')}
       >
-        {bristol ? 'Save Bowel Entry' : 'Select a type above'}
+        {bristol ? 'Save bowel entry' : 'Select a type above'}
       </button>
     </div>
   );
@@ -346,121 +257,98 @@ function BowelLogger({ onSave }: { onSave: () => void }) {
 
 function NoteLogger({ onSave }: { onSave: () => void }) {
   const [text, setText] = useState('');
-
   const save = () => {
-    const entry: NoteEntry = {
-      id: generateId(),
-      date: getTodayKey(),
-      time: getNowTime(),
-      type: 'note',
-      text: text.trim(),
-    };
-    addEntry(entry);
+    addEntry({ id: generateId(), date: getTodayKey(), time: getNowTime(), type: 'note', text: text.trim() } as NoteEntry);
     onSave();
   };
-
   return (
     <div className="space-y-4">
       <textarea
-        placeholder="What do you want to note? (e.g. feeling stressed, trying a new food, missed medication...)"
+        placeholder="Anything worth noting… (new supplement, stressful day, missed medication)"
         value={text}
-        onChange={(e) => setText(e.target.value)}
+        onChange={e => setText(e.target.value)}
         rows={8}
-        className="w-full px-3.5 py-3 bg-white border border-gray-200 rounded-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-transparent"
         autoFocus
+        className="w-full px-3.5 py-3 bg-white border border-gray-200 rounded-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-brand-500"
       />
       <button
         onClick={save}
         disabled={!text.trim()}
-        className={clsx(
-          'w-full py-3.5 rounded-2xl font-bold text-white text-sm transition-all',
-          text.trim()
-            ? 'bg-sky-500 hover:bg-sky-600 active:scale-98 shadow-lg shadow-sky-200'
-            : 'bg-gray-200 text-gray-400 cursor-not-allowed',
-        )}
+        className={clsx('w-full py-3 rounded-xl font-semibold text-sm transition-all', text.trim() ? 'bg-gray-900 text-white hover:bg-gray-800 active:scale-98' : 'bg-gray-100 text-gray-400 cursor-not-allowed')}
       >
-        Save Note
+        Save note
       </button>
     </div>
   );
 }
 
-function LogPageInner() {
+function LogInner() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const typeParam = searchParams.get('type') as LogType | null;
-  const mealParam = searchParams.get('meal') as MealType | null;
+  const params = useSearchParams();
+  const typeParam = params.get('type') as LogType | null;
+  const mealParam = params.get('meal') as MealType | null;
 
-  const [activeType, setActiveType] = useState<LogType>(typeParam || 'meal');
-  const [saved, setSaved] = useState(false);
+  const [tab, setTab]   = useState<LogType>(typeParam || 'meal');
+  const [done, setDone] = useState(false);
 
   const handleSave = () => {
-    setSaved(true);
-    setTimeout(() => {
-      router.push('/');
-      router.refresh();
-    }, 800);
+    setDone(true);
+    setTimeout(() => { router.push('/'); router.refresh(); }, 900);
   };
 
-  if (saved) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4 animate-fade-in">
-        <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center animate-pop">
-          <Check className="w-10 h-10 text-emerald-600" strokeWidth={3} />
-        </div>
-        <p className="text-xl font-bold text-gray-800">Done.</p>
-        <p className="text-sm text-gray-400">Heading back...</p>
+  if (done) return (
+    <div className="flex flex-col items-center justify-center min-h-[50vh] gap-4 animate-fade-in">
+      <div className="w-16 h-16 bg-low/10 rounded-full flex items-center justify-center animate-pop">
+        <Check className="w-8 h-8 text-low" strokeWidth={2.5} />
       </div>
-    );
-  }
+      <p className="text-lg font-bold text-gray-900">Saved</p>
+      <p className="text-sm text-gray-400">Heading back…</p>
+    </div>
+  );
 
   return (
-    <div className="px-4 pt-5 space-y-5">
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3">
         <button
           onClick={() => router.back()}
-          className="w-9 h-9 rounded-full bg-white border border-gray-200 flex items-center justify-center hover:bg-gray-50 active:scale-95 transition-all"
+          className="w-8 h-8 rounded-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors"
         >
           <ArrowLeft className="w-4 h-4 text-gray-600" />
         </button>
-        <h1 className="text-xl font-bold text-gray-900">Add Log Entry</h1>
+        <h1 className="text-xl font-bold text-gray-900">Add entry</h1>
       </div>
 
-      {/* Type tabs */}
-      <div className="flex bg-gray-100 rounded-xl p-1 gap-1">
-        {tabConfig.map(({ type, emoji, label, activeColor }) => (
+      {/* Tabs */}
+      <div className="flex border-b border-gray-200">
+        {TABS.map(({ type, label }) => (
           <button
             key={type}
-            onClick={() => setActiveType(type)}
+            onClick={() => setTab(type)}
             className={clsx(
-              'flex-1 flex flex-col items-center py-2 rounded-lg text-xs font-semibold transition-all gap-0.5',
-              activeType === type ? `${activeColor} text-white shadow-sm` : 'text-gray-500',
+              'px-4 py-2.5 text-sm font-medium border-b-2 transition-all -mb-px',
+              tab === type
+                ? 'text-brand-700 border-brand-700'
+                : 'text-gray-500 border-transparent hover:text-gray-700',
             )}
           >
-            <span>{emoji}</span>
-            <span>{label}</span>
+            {label}
           </button>
         ))}
       </div>
 
-      {/* Content */}
-      {activeType === 'meal' && (
-        <MealLogger mealType={mealParam || 'breakfast'} onSave={handleSave} />
-      )}
-      {activeType === 'symptom' && <SymptomLogger onSave={handleSave} />}
-      {activeType === 'bowel' && <BowelLogger onSave={handleSave} />}
-      {activeType === 'note' && <NoteLogger onSave={handleSave} />}
-
-      <div className="h-4" />
+      {tab === 'meal'    && <MealLogger initialMealType={mealParam ?? 'breakfast'} onSave={handleSave} />}
+      {tab === 'symptom' && <SymptomLogger onSave={handleSave} />}
+      {tab === 'bowel'   && <BowelLogger onSave={handleSave} />}
+      {tab === 'note'    && <NoteLogger onSave={handleSave} />}
     </div>
   );
 }
 
 export default function LogPage() {
   return (
-    <Suspense fallback={<div className="flex items-center justify-center min-h-[60vh]"><div className="w-8 h-8 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin" /></div>}>
-      <LogPageInner />
+    <Suspense fallback={<div className="flex items-center justify-center min-h-[50vh]"><div className="w-6 h-6 border-2 border-brand-200 border-t-brand-600 rounded-full animate-spin" /></div>}>
+      <LogInner />
     </Suspense>
   );
 }

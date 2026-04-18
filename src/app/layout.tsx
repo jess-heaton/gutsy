@@ -1,24 +1,20 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
-import Navigation from '@/components/Navigation';
+import Sidebar from '@/components/Sidebar';
+import BottomNav from '@/components/BottomNav';
 
 export const metadata: Metadata = {
-  title: 'Gutsy — IBS Tracker',
-  description: 'Track your IBS diet, FODMAP intake, symptoms & bowel health',
+  title: { default: 'Gutsy', template: '%s — Gutsy' },
+  description: 'Track your IBS diet, symptoms and FODMAP intake. Based on Monash University research.',
   manifest: '/manifest.json',
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: 'default',
-    title: 'Gutsy',
-  },
+  appleWebApp: { capable: true, statusBarStyle: 'default', title: 'Gutsy' },
 };
 
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
-  userScalable: false,
-  themeColor: '#6366f1',
+  themeColor: '#0c2918',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -28,13 +24,27 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap"
           rel="stylesheet"
         />
       </head>
-      <body className="bg-surface max-w-lg mx-auto relative">
-        <main className="pb-nav min-h-dvh">{children}</main>
-        <Navigation />
+      <body>
+        <div className="flex min-h-dvh">
+          {/* Desktop sidebar */}
+          <Sidebar />
+
+          {/* Main content */}
+          <div className="flex-1 flex flex-col min-w-0 lg:ml-[240px]">
+            <main className="flex-1 pb-nav lg:pb-8">
+              <div className="max-w-content mx-auto px-4 lg:px-8 py-6 lg:py-10">
+                {children}
+              </div>
+            </main>
+          </div>
+        </div>
+
+        {/* Mobile bottom nav */}
+        <BottomNav />
       </body>
     </html>
   );
