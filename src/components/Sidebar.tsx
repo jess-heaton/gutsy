@@ -2,13 +2,18 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, BookOpen, BarChart2, Settings, Plus, BookMarked, ExternalLink } from 'lucide-react';
+import { Home, BookOpen, BarChart2, Settings, Plus, BookMarked, ExternalLink, ScanLine, ChefHat } from 'lucide-react';
 import clsx from 'clsx';
 
 const primary = [
   { href: '/',         icon: Home,       label: 'Today'    },
   { href: '/foods',    icon: BookOpen,   label: 'Foods'    },
   { href: '/insights', icon: BarChart2,  label: 'Insights' },
+];
+
+const tools = [
+  { href: '/menu',    icon: ScanLine,  label: 'Menu scanner' },
+  { href: '/recipe',  icon: ChefHat,   label: 'Recipe fixer' },
 ];
 
 const secondary = [
@@ -65,6 +70,28 @@ export default function Sidebar() {
           <Plus className="w-4 h-4 flex-shrink-0" strokeWidth={2.5} />
           Log entry
         </Link>
+
+        <div className="my-4 border-t border-brand-800" />
+
+        <p className="px-3 text-2xs font-semibold text-brand-600 uppercase tracking-widest mb-1">Tools</p>
+        {tools.map(({ href, icon: Icon, label }) => {
+          const active = isActive(href);
+          return (
+            <Link
+              key={href}
+              href={href}
+              className={clsx(
+                'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all',
+                active
+                  ? 'bg-brand-700 text-white'
+                  : 'text-brand-300 hover:bg-brand-800 hover:text-white',
+              )}
+            >
+              <Icon className="w-4 h-4 flex-shrink-0" strokeWidth={active ? 2.5 : 2} />
+              {label}
+            </Link>
+          );
+        })}
 
         <div className="my-4 border-t border-brand-800" />
 
