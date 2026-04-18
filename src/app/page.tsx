@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { format } from 'date-fns';
-import { Flame, Trash2, ChevronRight } from 'lucide-react';
+import { Flame, Trash2, ChevronRight, ExternalLink } from 'lucide-react';
 import { DayEntry, MealEntry, SymptomEntry, BowelEntry } from '@/lib/types';
 import { getEntriesForDate, deleteEntry, getStreak, getTodayKey } from '@/lib/store';
 import FODMAPBadge from '@/components/FODMAPBadge';
@@ -244,7 +244,16 @@ export default function TodayPage() {
             {greeting.emoji} {greeting.text}
           </h1>
         </div>
-        <StreakBadge streak={streak} />
+        <div className="flex items-center gap-2">
+          <StreakBadge streak={streak} />
+          <button
+            onClick={() => window.open('/popup', 'gutsy-popup', 'width=390,height=540,toolbar=0,menubar=0,location=0,resizable=1')}
+            title="Open quick-log popup"
+            className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
+          >
+            <ExternalLink className="w-3.5 h-3.5 text-gray-500" />
+          </button>
+        </div>
       </div>
 
       {/* Daily summary chips */}

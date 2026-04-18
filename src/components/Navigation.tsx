@@ -2,25 +2,28 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, BookOpen, BarChart2, Settings, PlusCircle } from 'lucide-react';
+import { Home, BookOpen, BarChart2, Settings, PlusCircle, BookMarked } from 'lucide-react';
 import clsx from 'clsx';
 
 const navItems = [
   { href: '/', icon: Home, label: 'Today' },
   { href: '/foods', icon: BookOpen, label: 'Foods' },
   { href: '/log', icon: PlusCircle, label: 'Log', special: true },
+  { href: '/blog', icon: BookMarked, label: 'Read' },
   { href: '/insights', icon: BarChart2, label: 'Insights' },
-  { href: '/settings', icon: Settings, label: 'Settings' },
 ];
 
 export default function Navigation() {
   const pathname = usePathname();
 
+  // Don't render nav inside the popup
+  if (pathname?.startsWith('/popup')) return null;
+
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-t border-gray-100 shadow-nav">
-      <div className="flex items-center justify-around px-2 py-1 max-w-lg mx-auto">
+      <div className="flex items-center justify-around px-1 py-1 max-w-lg mx-auto">
         {navItems.map(({ href, icon: Icon, label, special }) => {
-          const active = pathname === href;
+          const active = pathname === href || (href === '/blog' && pathname?.startsWith('/blog'));
           if (special) {
             return (
               <Link
@@ -41,7 +44,7 @@ export default function Navigation() {
               key={href}
               href={href}
               className={clsx(
-                'flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-all',
+                'flex flex-col items-center gap-0.5 px-2.5 py-1.5 rounded-xl transition-all',
                 active ? 'text-indigo-600' : 'text-gray-400 hover:text-gray-600',
               )}
               aria-label={label}
