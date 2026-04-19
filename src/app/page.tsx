@@ -356,14 +356,19 @@ export default function HomePage() {
           </div>
           <div className="grid md:grid-cols-3 gap-5">
             {[
-              { emoji: '🧪', tag: 'Enzymes', title: 'FODzyme: does the enzyme actually work?', href: '/blog/fodzyme' },
-              { emoji: '🥛', tag: 'Supplements', title: 'Milkaid without the raspberry flavouring', href: '/blog/milkaid' },
-              { emoji: '🌾', tag: 'Science', title: 'Fructan sensitivity vs gluten intolerance', href: '/blog/fructan-vs-gluten' },
-            ].map(({ emoji, tag, title, href }) => (
-              <Link key={href} href={href} className="group bg-white border border-gray-200 rounded-2xl p-6 hover:border-brand-200 hover:shadow-lifted transition-all">
-                <span className="text-2xl mb-4 block">{emoji}</span>
-                <p className="text-xs font-semibold text-brand-600 uppercase tracking-wide mb-2">{tag}</p>
-                <h3 className="text-sm font-bold text-gray-900 leading-snug group-hover:text-brand-700 transition-colors">{title}</h3>
+              { image: 'https://images.unsplash.com/photo-1615486511484-92e172cc4fe0?auto=format&fit=crop&w=1000&q=80', alt: 'Fresh garlic and onions', tag: 'Supplements', title: 'FODzyme: can you actually eat garlic and onion again?', href: '/blog/fodzyme' },
+              { image: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=1000&q=80', alt: 'A glass of milk', tag: 'Supplements', title: 'The Milkaid thing nobody tells you', href: '/blog/milkaid' },
+              { image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=1000&q=80', alt: 'Fresh sourdough bread', tag: 'Science', title: 'It was probably the fructans, not the gluten', href: '/blog/fructan-vs-gluten' },
+            ].map(({ image, alt, tag, title, href }) => (
+              <Link key={href} href={href} className="group bg-white border border-gray-200 rounded-2xl overflow-hidden hover:border-brand-200 hover:shadow-lifted transition-all">
+                <div className="aspect-[4/3] relative overflow-hidden bg-gradient-to-br from-brand-900 to-brand-700">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={image} alt={alt} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                </div>
+                <div className="p-6">
+                  <p className="text-xs font-semibold text-brand-600 uppercase tracking-wide mb-2">{tag}</p>
+                  <h3 className="text-sm font-bold text-gray-900 leading-snug group-hover:text-brand-700 transition-colors">{title}</h3>
+                </div>
               </Link>
             ))}
           </div>

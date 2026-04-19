@@ -1,4 +1,5 @@
 import type { MetadataRoute } from 'next';
+import { articles } from '@/data/articles';
 
 const SITE = 'https://gutsy.freedible.co.uk';
 
@@ -14,23 +15,20 @@ const STATIC_PATHS = [
   { path: '/privacy',    priority: 0.3, changeFrequency: 'yearly' as const },
 ];
 
-/* Add blog posts manually for now; if a CMS shows up later replace with a fetch. */
-const BLOG_SLUGS = ['fodzyme', 'milkaid', 'fructan-vs-gluten'];
-
 export default function sitemap(): MetadataRoute.Sitemap {
-  const lastModified = new Date();
+  const now = new Date();
   return [
     ...STATIC_PATHS.map(({ path, priority, changeFrequency }) => ({
       url: `${SITE}${path}`,
-      lastModified,
+      lastModified: now,
       changeFrequency,
       priority,
     })),
-    ...BLOG_SLUGS.map(slug => ({
-      url: `${SITE}/blog/${slug}`,
-      lastModified,
-      changeFrequency: 'yearly' as const,
-      priority: 0.6,
+    ...articles.map(a => ({
+      url: `${SITE}/blog/${a.slug}`,
+      lastModified: new Date(a.updatedDate ?? a.date),
+      changeFrequency: 'monthly' as const,
+      priority: 0.7,
     })),
   ];
 }
