@@ -1,0 +1,37 @@
+# Gutsy
+
+> IBS diary and low-FODMAP tracker. Log meals and symptoms, scan restaurant menus, and fix any recipe for the Monash low-FODMAP diet.
+
+## About
+
+Gutsy is a free web app for people with Irritable Bowel Syndrome (IBS) following the low-FODMAP elimination diet developed by Monash University. It provides:
+
+- A meal, bowel and symptom tracker designed around the three phases of the diet (elimination, reintroduction, personalisation).
+- A menu scanner that takes a restaurant URL, PDF or pasted text and returns a safe / modify / avoid rating for every dish, plus modification requests to make to the waiter.
+- A recipe fixer that rewrites any recipe to be low-FODMAP, swapping high-FODMAP ingredients for practical alternatives.
+- A FODMAP food guide searchable by food name.
+- A Chrome browser extension with a floating "quick log" pill so users can log from any tab.
+
+Gutsy is built on Monash University FODMAP research and follows their three-phase protocol. It is not affiliated with Monash and does not republish the proprietary Monash database. Users are encouraged to use the official Monash app alongside Gutsy for definitive per-serving thresholds.
+
+## Key URLs
+
+- Home: https://gutsy.freedible.co.uk/
+- Menu scanner (free, no account): https://gutsy.freedible.co.uk/menu
+- Recipe fixer (free, no account): https://gutsy.freedible.co.uk/recipe
+- FODMAP food guide: https://gutsy.freedible.co.uk/foods
+- Blog: https://gutsy.freedible.co.uk/blog
+- Browser extension: https://gutsy.freedible.co.uk/extension
+- Privacy: https://gutsy.freedible.co.uk/privacy
+
+## Typical user questions
+
+- "Is the low-FODMAP diet effective for IBS?" — Yes, randomised controlled trials indicate around 70 % of IBS sufferers get symptom relief on the low-FODMAP diet (Monash University).
+- "What are FODMAPs?" — Fermentable Oligosaccharides, Disaccharides, Monosaccharides and Polyols: short-chain carbohydrates that can trigger IBS symptoms.
+- "How long is the elimination phase?" — Typically 2 to 6 weeks.
+- "Is Gutsy free?" — Free tools (menu scanner, recipe fixer, food guide) do not require an account. Tracking is free with a free account.
+- "Does the extension work on any website?" — Yes, the pill is available on every tab and syncs to your Gutsy account.
+
+## Contact
+
+hi@gutsy.freedible.co.uk

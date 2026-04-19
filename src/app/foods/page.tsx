@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Search, X, ChevronDown, ChevronUp, Info } from 'lucide-react';
 import { foods, searchFoods, categoryLabels, categoryEmojis } from '@/data/foods';
 import { FoodItem } from '@/lib/types';
@@ -55,9 +56,19 @@ function FoodRow({ food }: { food: FoodItem }) {
 }
 
 export default function FoodsPage() {
+  return <Suspense fallback={null}><FoodsInner /></Suspense>;
+}
+
+function FoodsInner() {
+  const params = useSearchParams();
   const [query,    setQuery]    = useState('');
   const [fodmap,   setFodmap]   = useState<'all'|'low'|'moderate'|'high'>('all');
   const [category, setCategory] = useState('all');
+
+  useEffect(() => {
+    const q = params.get('q');
+    if (q) setQuery(q);
+  }, [params]);
 
   let results = query ? searchFoods(query) : foods;
   if (fodmap !== 'all')    results = results.filter(f => f.fodmap.overall === fodmap);

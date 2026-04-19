@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Link2, Upload, ClipboardList, X, AlertCircle, CheckCircle, AlertTriangle, Ban } from 'lucide-react';
 import clsx from 'clsx';
 
@@ -68,9 +69,22 @@ function MenuCard({ item }: { item: MenuItem }) {
 }
 
 export default function MenuPage() {
+  return <Suspense fallback={null}><MenuInner /></Suspense>;
+}
+
+function MenuInner() {
+  const params = useSearchParams();
   const [mode, setMode]         = useState<InputMode>('url');
   const [url, setUrl]           = useState('');
   const [text, setText]         = useState('');
+
+  // Prefill from ?q= (intent routing from the homepage hero).
+  useEffect(() => {
+    const q = params.get('q');
+    if (!q) return;
+    if (/^https?:\/\//i.test(q)) { setMode('url'); setUrl(q); }
+    else { setMode('text'); setText(q); }
+  }, [params]);
   const [pdfName, setPdfName]   = useState('');
   const [pdfB64, setPdfB64]     = useState('');
   const [loading, setLoading]   = useState(false);

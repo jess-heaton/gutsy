@@ -5,8 +5,37 @@ import BottomNav from '@/components/BottomNav';
 import QuickLogWidget from '@/components/QuickLogWidget';
 
 export const metadata: Metadata = {
-  title: { default: 'Gutsy', template: '%s — Gutsy' },
-  description: 'Track your IBS diet, symptoms and FODMAP intake. Based on Monash University research.',
+  metadataBase: new URL('https://gutsy.freedible.co.uk'),
+  title: {
+    default: 'Gutsy — IBS diary and low-FODMAP tracker',
+    template: '%s — Gutsy',
+  },
+  description:
+    'Free IBS tracker built around the Monash low-FODMAP diet. Log meals and symptoms, scan restaurant menus, and fix any recipe to make it low-FODMAP.',
+  keywords: [
+    'IBS tracker', 'low FODMAP app', 'low FODMAP diet', 'FODMAP tracker',
+    'IBS diary', 'Monash FODMAP', 'IBS food diary', 'FODMAP menu scanner',
+    'low FODMAP recipes', 'FODMAP elimination diet',
+  ],
+  alternates: { canonical: '/' },
+  openGraph: {
+    type: 'website',
+    siteName: 'Gutsy',
+    title: 'Gutsy — IBS diary and low-FODMAP tracker',
+    description:
+      'Free IBS tracker built around the Monash low-FODMAP diet. Log meals and symptoms, scan restaurant menus, and fix any recipe.',
+    url: '/',
+    locale: 'en_GB',
+    images: [{ url: '/og.png', width: 1200, height: 630, alt: 'Gutsy — IBS diary' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Gutsy — IBS diary and low-FODMAP tracker',
+    description:
+      'Free IBS tracker built around the Monash low-FODMAP diet. Menu scanner, recipe fixer, and daily diary.',
+    images: ['/og.png'],
+  },
+  robots: { index: true, follow: true, googleBot: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1 } },
   manifest: '/manifest.json',
   appleWebApp: { capable: true, statusBarStyle: 'default', title: 'Gutsy' },
 };

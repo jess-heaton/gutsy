@@ -1,6 +1,32 @@
 import Link from 'next/link';
 import { ArrowRight, ScanLine, ChefHat, Activity, BarChart2, BookOpen, CheckCircle } from 'lucide-react';
 import clsx from 'clsx';
+import HeroPrompt from '@/components/HeroPrompt';
+
+const SITE_URL = 'https://gutsy.freedible.co.uk';
+
+const FAQS = [
+  {
+    q: 'What is the low-FODMAP diet?',
+    a: 'A three-phase elimination diet developed by Monash University for irritable bowel syndrome (IBS). Phase 1 removes high-FODMAP foods for 2–6 weeks. Phase 2 reintroduces each FODMAP group one at a time to identify triggers. Phase 3 is a personalised long-term diet that only restricts the FODMAPs you actually react to.',
+  },
+  {
+    q: 'Is Gutsy free?',
+    a: 'The menu scanner, recipe fixer and food guide are free to use without an account. Tracking your meals and symptoms is also free — you just need to create a free account so your data syncs across devices.',
+  },
+  {
+    q: 'Do you use real Monash FODMAP data?',
+    a: 'Gutsy is built around Monash University FODMAP research and follows their three-phase protocol. It is not affiliated with Monash and does not republish their proprietary app database. For definitive per-serving thresholds we recommend using the official Monash app alongside Gutsy.',
+  },
+  {
+    q: 'How does the menu scanner work?',
+    a: 'Paste a restaurant URL, upload their menu PDF or paste the text. Each dish is evaluated against FODMAP principles and returned with a safe / modify / avoid rating plus a specific request to make to the waiter.',
+  },
+  {
+    q: 'Can Gutsy replace my dietitian?',
+    a: 'No. Gutsy helps you track, log and stay consistent between appointments, but the low-FODMAP diet is intended to be done under the guidance of a qualified dietitian, especially the reintroduction phase.',
+  },
+];
 
 function HeroBg() {
   return (
@@ -87,72 +113,15 @@ export default function HomePage() {
       {/* ── Hero ── */}
       <section className="relative bg-brand-950 overflow-hidden min-h-[88vh] flex items-center">
         <HeroBg />
-        <div className="relative z-10 max-w-6xl mx-auto px-6 py-28 w-full">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <div>
-              <h1 className="text-5xl lg:text-[3.75rem] font-bold text-white leading-[1.08] tracking-tight mb-6">
-                Know exactly<br />
-                <span className="text-brand-400">what you can eat.</span>
-              </h1>
-              <p className="text-lg text-brand-200 leading-relaxed mb-10 max-w-md">
-                Track your meals and symptoms, scan restaurant menus, and fix recipes — all built around the Monash University low FODMAP diet.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-3">
-                <Link
-                  href="/dashboard"
-                  className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-white text-brand-900 font-semibold rounded-xl hover:bg-brand-50 transition-colors text-sm"
-                >
-                  Start tracking
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-                <Link
-                  href="/menu"
-                  className="inline-flex items-center justify-center gap-2 px-6 py-3.5 border border-brand-700 text-brand-200 font-semibold rounded-xl hover:bg-brand-900 hover:border-brand-600 hover:text-white transition-colors text-sm"
-                >
-                  <ScanLine className="w-4 h-4" />
-                  Scan a menu
-                </Link>
-              </div>
-            </div>
-
-            {/* App mockup */}
-            <div className="hidden lg:flex justify-end">
-              <div className="bg-gray-900 rounded-[2.5rem] p-3 shadow-2xl w-[260px]">
-                <div className="bg-white rounded-[2rem] overflow-hidden">
-                  <div className="bg-brand-900 px-4 pt-4 pb-5">
-                    <p className="text-xs text-brand-500 font-medium mb-1">Saturday, 19 Apr</p>
-                    <p className="text-white font-bold text-base mb-4">Good morning</p>
-                    <div className="grid grid-cols-2 gap-2">
-                      <div className="bg-brand-800 rounded-xl px-3 py-2">
-                        <p className="text-xs text-brand-400">Meals</p>
-                        <p className="text-white font-bold text-lg">3</p>
-                      </div>
-                      <div className="bg-brand-800 rounded-xl px-3 py-2">
-                        <p className="text-xs text-brand-400">High FODMAP</p>
-                        <p className="text-emerald-400 font-bold text-lg">0</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="p-3 space-y-2 bg-gray-50">
-                    {[
-                      { emoji: '🌅', label: 'Breakfast', detail: 'Oats, banana', badge: 'Safe', cls: 'bg-emerald-100 text-emerald-700' },
-                      { emoji: '☀️', label: 'Lunch', detail: 'Salmon, rice', badge: 'Safe', cls: 'bg-emerald-100 text-emerald-700' },
-                      { emoji: '😣', label: 'Symptoms', detail: 'Bloating 2/10', badge: 'Mild', cls: 'bg-amber-100 text-amber-700' },
-                    ].map(({ emoji, label, detail, badge, cls }) => (
-                      <div key={label} className="flex items-center gap-2 bg-white rounded-xl p-2.5">
-                        <div className="w-8 h-8 bg-gray-50 rounded-lg flex items-center justify-center text-sm flex-shrink-0">{emoji}</div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs font-semibold text-gray-800">{label}</p>
-                          <p className="text-xs text-gray-400 truncate">{detail}</p>
-                        </div>
-                        <span className={clsx('text-2xs font-semibold px-1.5 py-0.5 rounded-full flex-shrink-0', cls)}>{badge}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+        <div className="relative z-10 max-w-4xl mx-auto px-6 py-24 w-full flex flex-col items-center text-center">
+          <h1 className="text-5xl lg:text-[4rem] font-bold text-white leading-[1.05] tracking-tight mb-5">
+            Know exactly<br />
+            <span className="text-brand-400">what you can eat.</span>
+          </h1>
+          <p className="text-lg text-brand-200 leading-relaxed mb-10 max-w-xl">
+            The IBS diary built around the Monash low-FODMAP diet. Track meals, scan menus, fix any recipe — just say what you need.
+          </p>
+          <HeroPrompt />
         </div>
       </section>
 
@@ -309,6 +278,69 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* ── FAQ ── */}
+      <section className="py-24 bg-white border-t border-gray-100">
+        <div className="max-w-3xl mx-auto px-6">
+          <div className="mb-12">
+            <p className="text-xs font-semibold text-brand-600 uppercase tracking-widest mb-3">FAQ</p>
+            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Common questions</h2>
+          </div>
+          <div className="divide-y divide-gray-100">
+            {FAQS.map(({ q, a }) => (
+              <details key={q} className="group py-6">
+                <summary className="flex items-center justify-between cursor-pointer list-none">
+                  <span className="text-base font-semibold text-gray-900 pr-8">{q}</span>
+                  <span className="text-brand-600 text-xl group-open:rotate-45 transition-transform leading-none">+</span>
+                </summary>
+                <p className="mt-3 text-sm text-gray-600 leading-relaxed">{a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Structured data for SEO + GEO ── */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify([
+            {
+              '@context': 'https://schema.org',
+              '@type': 'WebApplication',
+              name: 'Gutsy',
+              url: SITE_URL,
+              description: 'IBS diary and low-FODMAP tracker. Log meals and symptoms, scan restaurant menus, and fix recipes for the Monash low-FODMAP diet.',
+              applicationCategory: 'HealthApplication',
+              operatingSystem: 'Web, Chrome',
+              offers: { '@type': 'Offer', price: '0', priceCurrency: 'GBP' },
+              featureList: [
+                'Low-FODMAP meal and symptom tracker',
+                'Restaurant menu scanner',
+                'Recipe FODMAP fixer',
+                'FODMAP food guide',
+                'Browser extension for quick logging',
+              ],
+            },
+            {
+              '@context': 'https://schema.org',
+              '@type': 'Organization',
+              name: 'Gutsy',
+              url: SITE_URL,
+              logo: `${SITE_URL}/icon-128.png`,
+            },
+            {
+              '@context': 'https://schema.org',
+              '@type': 'FAQPage',
+              mainEntity: FAQS.map(({ q, a }) => ({
+                '@type': 'Question',
+                name: q,
+                acceptedAnswer: { '@type': 'Answer', text: a },
+              })),
+            },
+          ]),
+        }}
+      />
 
       {/* ── Blog ── */}
       <section className="py-24 bg-gray-50">
