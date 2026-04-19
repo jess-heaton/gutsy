@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Gutsy</title>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { width: 260px; font: 400 13px Inter, system-ui, sans-serif; color: #111; background: #fff; padding: 16px; }
+    .logo { font: 400 28px Pacifico, cursive; color: #047857; text-align: center; margin-bottom: 4px; line-height: 1; }
+    .sub  { text-align: center; color: #6b7280; font-size: 12px; margin-bottom: 14px; }
+    .status { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; padding: 10px 12px; font-size: 12px; margin-bottom: 10px; }
+    .status b { display: block; color: #047857; font-weight: 600; margin-bottom: 2px; }
+    .status.out b { color: #b45309; }
+    .btn { display: block; text-align: center; width: 100%; padding: 9px; border-radius: 10px; background: #047857; color: #fff; text-decoration: none; font-weight: 600; font-size: 12px; border: none; cursor: pointer; }
+    .btn:hover { background: #059669; }
+    .btn.ghost { background: #fff; color: #374151; border: 1px solid #e5e7eb; margin-top: 6px; }
+    .pending { font-size: 11px; color: #6b7280; text-align: center; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <div class="logo">gutsy</div>
+  <div class="sub">Quick log from any tab</div>
+  <div id="status" class="status">Checking…</div>
+  <a id="open" class="btn" href="https://gutsy.freedible.co.uk" target="_blank" rel="noopener">Open Gutsy</a>
+  <div id="pending" class="pending"></div>
+  <script src="popup.js"></script>
+</body>
+</html>
