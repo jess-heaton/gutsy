@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "Gutsy — Quick Log",
+  "version": "1.0.0",
+  "description": "Log meals, symptoms and bowel movements from any tab. Data syncs to the Gutsy app.",
+  "permissions": ["storage"],
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ]
+}
