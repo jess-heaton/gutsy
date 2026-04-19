@@ -2,41 +2,61 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowRight, ScanLine, ChefHat, Refrigerator, PlayCircle, Pen } from 'lucide-react';
+import clsx from 'clsx';
+import {
+  ArrowRight, ScanLine, ChefHat, Refrigerator, PlayCircle, Pen, Sparkles, Loader2,
+} from 'lucide-react';
 
-/* Cycling example prompts. Each maps to a route via routeFor(). */
 const EXAMPLES = [
   "I'm starting the elimination diet",
-  'Scan this menu',
-  'Make this recipe low-FODMAP',
+  'Scan the Nando\'s menu for me',
+  'Make carbonara low-FODMAP',
   'I have chicken, rice and spinach in my fridge',
-  'Add celery and peanut butter to today',
+  'Log celery with peanut butter',
   'Is sourdough OK for IBS?',
+  'What can I eat at an Italian restaurant?',
+  'Swap high-FODMAP ingredients in banana bread',
 ];
 
 const QUICK_ACTIONS = [
   { icon: PlayCircle,   label: 'Start tracking', href: '/signup' },
   { icon: ScanLine,     label: 'Scan a menu',    href: '/menu' },
   { icon: ChefHat,      label: 'Fix a recipe',   href: '/recipe' },
-  { icon: Refrigerator, label: 'What can I cook?', href: '/recipe?mode=fridge' },
+  { icon: Refrigerator, label: 'Fridge → recipe', href: '/recipe?mode=fridge' },
   { icon: Pen,          label: 'Quick log',      href: '/dashboard?quicklog=1' },
 ];
 
-function routeFor(text: string): string {
+type Intent = {
+  route: string;
+  label: string;
+  icon: React.ElementType;
+};
+
+function matchIntent(text: string): Intent {
   const t = text.trim();
   const q = encodeURIComponent(t);
   const l = t.toLowerCase();
-
   const has = (...words: string[]) => words.some(w => l.includes(w));
 
-  if (has('menu', 'restaurant', 'cafe', 'takeaway', 'eating out')) return `/menu?q=${q}`;
-  if (has('fridge', 'have ', 'leftover', 'in my kitchen', 'what can i cook', 'what can i make')) return `/recipe?mode=fridge&q=${q}`;
-  if (has('recipe', 'bake', 'cook', 'make this', 'fix this', 'swap')) return `/recipe?q=${q}`;
-  if (has('log', 'add ', 'ate ', 'had ', 'track this', 'track my')) return `/dashboard?quicklog=${q}`;
-  if (has('elimination', 'reintroduction', 'start', 'begin', 'just got diagnosed', 'diagnosed', 'phase')) return `/signup?intent=${q}`;
-  if (has('safe', 'is ', 'can i eat', 'high fodmap', 'low fodmap', 'fodmap')) return `/foods?q=${q}`;
-  // Default: take them to the tracker with the text prefilled as a quick log.
-  return `/dashboard?quicklog=${q}`;
+  if (has('menu', 'restaurant', 'cafe', 'takeaway', 'eating out', 'nando', 'pizza express'))
+    return { route: `/menu?q=${q}`, label: 'Scanning menu', icon: ScanLine };
+
+  if (has('fridge', 'have ', 'got ', 'leftover', 'in my kitchen', 'what can i cook', 'what can i make'))
+    return { route: `/recipe?mode=fridge&q=${q}`, label: 'Finding a recipe', icon: Refrigerator };
+
+  if (has('recipe', 'bake', 'cook', 'make this', 'fix this', 'swap', 'carbonara', 'bread', 'pasta', 'curry'))
+    return { route: `/recipe?q=${q}`, label: 'Fixing recipe', icon: ChefHat };
+
+  if (has('log', 'add ', 'ate ', 'had ', 'track this', 'track my'))
+    return { route: `/dashboard?quicklog=${q}`, label: 'Logging it', icon: Pen };
+
+  if (has('elimination', 'reintroduction', 'just got diagnosed', 'diagnosed', 'phase', 'starting'))
+    return { route: `/signup?intent=${q}`, label: 'Starting you off', icon: PlayCircle };
+
+  if (has('safe', 'can i eat', 'is ', 'high fodmap', 'low fodmap', 'fodmap'))
+    return { route: `/foods?q=${q}`, label: 'Checking the food guide', icon: Sparkles };
+
+  return { route: `/dashboard?quicklog=${q}`, label: 'Taking you to Gutsy', icon: Sparkles };
 }
 
 export default function HeroPrompt() {
@@ -44,106 +64,124 @@ export default function HeroPrompt() {
   const [value, setValue] = useState('');
   const [placeholder, setPlaceholder] = useState('');
   const [focused, setFocused] = useState(false);
+  const [submitting, setSubmitting] = useState<Intent | null>(null);
+
   const idxRef = useRef(0);
   const charRef = useRef(0);
   const dirRef = useRef<'type' | 'pause' | 'delete'>('type');
-  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  // Typewriter cycling through EXAMPLES. Pauses when input is focused or has content.
+  const showFake = !value && !focused && !submitting;
+
+  // Typewriter. Only runs while idle (no value, not focused, not submitting).
   useEffect(() => {
-    if (focused || value) return;
+    if (!showFake) return;
     let cancelled = false;
 
     const tick = () => {
       if (cancelled) return;
       const full = EXAMPLES[idxRef.current];
-      let delay = 55;
+      let delay = 32;
 
       if (dirRef.current === 'type') {
-        charRef.current += 1;
+        charRef.current = Math.min(charRef.current + 1, full.length);
         setPlaceholder(full.slice(0, charRef.current));
-        if (charRef.current === full.length) { dirRef.current = 'pause'; delay = 1800; }
+        if (charRef.current === full.length) { dirRef.current = 'pause'; delay = 1100; }
       } else if (dirRef.current === 'pause') {
         dirRef.current = 'delete';
-        delay = 60;
+        delay = 30;
       } else {
-        charRef.current -= 1;
+        charRef.current = Math.max(charRef.current - 1, 0);
         setPlaceholder(full.slice(0, charRef.current));
         if (charRef.current === 0) {
           dirRef.current = 'type';
           idxRef.current = (idxRef.current + 1) % EXAMPLES.length;
-          delay = 350;
+          delay = 220;
         }
       }
       setTimeout(tick, delay);
     };
-    tick();
-    return () => { cancelled = true; };
-  }, [focused, value]);
+    const t = setTimeout(tick, 200);
+    return () => { cancelled = true; clearTimeout(t); };
+  }, [showFake]);
 
   function submit() {
+    if (submitting) return;
     const text = value.trim() || EXAMPLES[idxRef.current];
-    router.push(routeFor(text));
-  }
-
-  function onKey(e: React.KeyboardEvent<HTMLTextAreaElement>) {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      submit();
-    }
+    const intent = matchIntent(text);
+    setSubmitting(intent);
+    // Brief confirm animation → route. Feels intentional, not jarring.
+    setTimeout(() => router.push(intent.route), 550);
   }
 
   return (
     <div className="w-full max-w-xl">
       <div
-        className="relative rounded-2xl bg-white/95 backdrop-blur-xl shadow-2xl border border-white/40 p-1.5 ring-1 ring-black/5"
+        className={clsx(
+          'relative rounded-2xl bg-white/95 backdrop-blur-xl shadow-2xl ring-1 ring-black/5 border transition-colors',
+          focused ? 'border-brand-400' : 'border-white/40',
+        )}
         onClick={() => inputRef.current?.focus()}
       >
-        <div className="flex items-start gap-2 px-4 py-3">
-          <div className="flex-1 min-h-[52px] relative">
-            <textarea
+        <div className="flex items-center gap-2 px-5 py-3.5">
+          <div className="flex-1 relative min-w-0">
+            <input
               ref={inputRef}
-              rows={1}
+              type="text"
               value={value}
               onChange={(e) => setValue(e.target.value)}
-              onKeyDown={onKey}
+              onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); submit(); } }}
               onFocus={() => setFocused(true)}
               onBlur={() => setFocused(false)}
-              className="w-full resize-none bg-transparent outline-none text-[17px] text-gray-900 placeholder-transparent leading-relaxed pt-1"
+              disabled={!!submitting}
               aria-label="Ask Gutsy anything about your diet"
+              className={clsx(
+                'w-full bg-transparent outline-none text-[17px] leading-[1.4] text-gray-900 py-1.5',
+                showFake && 'caret-transparent',
+              )}
             />
-            {!value && (
-              <div className="absolute inset-0 pt-1 pointer-events-none text-[17px] leading-relaxed text-gray-500">
-                <span>{placeholder}</span>
-                <span className="inline-block w-[2px] h-[1.15em] bg-brand-600 align-middle ml-0.5 animate-[blink_1s_steps(2)_infinite]" />
+            {showFake && (
+              <div className="absolute inset-0 flex items-center pointer-events-none text-[17px] leading-[1.4] text-gray-500 py-1.5 truncate">
+                <span className="whitespace-pre">{placeholder}</span>
+                <span className="inline-block w-[2px] h-[1.1em] bg-brand-600 ml-0.5 animate-blink" />
+              </div>
+            )}
+            {submitting && (
+              <div className="absolute inset-0 flex items-center pointer-events-none text-[17px] leading-[1.4] text-gray-700 py-1.5 truncate">
+                <submitting.icon className="w-4 h-4 text-brand-600 mr-2 flex-shrink-0" />
+                <span>{submitting.label}…</span>
               </div>
             )}
           </div>
           <button
             onClick={submit}
+            disabled={!!submitting}
             aria-label="Go"
-            className="flex-shrink-0 w-10 h-10 rounded-xl bg-brand-700 hover:bg-brand-800 text-white flex items-center justify-center transition-colors shadow-sm"
+            className="flex-shrink-0 w-10 h-10 rounded-xl bg-brand-700 hover:bg-brand-800 disabled:opacity-70 text-white flex items-center justify-center transition-colors shadow-sm"
           >
-            <ArrowRight className="w-4 h-4" />
+            {submitting
+              ? <Loader2 className="w-4 h-4 animate-spin" />
+              : <ArrowRight className="w-4 h-4" />}
           </button>
         </div>
       </div>
 
       {/* Quick-action chips */}
-      <div className="flex flex-wrap gap-2 mt-4">
+      <div className="flex flex-wrap justify-center gap-2 mt-4">
         {QUICK_ACTIONS.map(({ icon: Icon, label, href }) => (
           <button
             key={label}
             onClick={() => router.push(href)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/20 bg-white/10 text-white text-xs font-medium hover:bg-white/20 transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/15 bg-white/5 text-white/90 text-xs font-medium hover:bg-white/15 hover:border-white/25 transition-colors"
           >
             <Icon className="w-3.5 h-3.5 text-brand-300" /> {label}
           </button>
         ))}
       </div>
 
-      <style jsx>{`
-        @keyframes blink { 50% { opacity: 0; } }
+      <style jsx global>{`
+        @keyframes gutsy-blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+        .animate-blink { animation: gutsy-blink 0.9s steps(2, end) infinite; }
       `}</style>
     </div>
   );
