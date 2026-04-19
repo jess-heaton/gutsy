@@ -90,10 +90,10 @@ export default function HomePage() {
         <div className="relative z-10 max-w-6xl mx-auto px-6 py-28 w-full">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
-              {/* Wordmark */}
-              <div className="font-display text-7xl lg:text-8xl text-white mb-6 leading-none">
-                gutsy
-              </div>
+              <h1 className="text-5xl lg:text-[3.75rem] font-bold text-white leading-[1.08] tracking-tight mb-6">
+                Know exactly<br />
+                <span className="text-brand-400">what you can eat.</span>
+              </h1>
               <p className="text-lg text-brand-200 leading-relaxed mb-10 max-w-md">
                 Track your meals and symptoms, scan restaurant menus, and fix recipes — all built around the Monash University low FODMAP diet.
               </p>
@@ -113,7 +113,6 @@ export default function HomePage() {
                   Scan a menu
                 </Link>
               </div>
-              <p className="text-xs text-brand-700 mt-4">Menu scanning and recipe fixer are free — no account needed.</p>
             </div>
 
             {/* App mockup */}

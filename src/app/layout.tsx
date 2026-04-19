@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import TopNav from '@/components/TopNav';
 import BottomNav from '@/components/BottomNav';
+import QuickLogWidget from '@/components/QuickLogWidget';
 
 export const metadata: Metadata = {
   title: { default: 'Gutsy', template: '%s — Gutsy' },
@@ -32,6 +33,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <TopNav />
         <main>{children}</main>
         <BottomNav />
+        <QuickLogWidget />
       </body>
     </html>
   );
