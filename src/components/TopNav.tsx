@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
 import clsx from 'clsx';
+import AuthStatus from './AuthStatus';
 
 const NAV = [
   { href: '/dashboard', label: 'My tracker' },
@@ -48,12 +49,7 @@ export default function TopNav() {
         </nav>
 
         <div className="hidden md:flex items-center gap-2 flex-shrink-0">
-          <Link
-            href="/settings"
-            className="px-3 py-2 text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors"
-          >
-            Settings
-          </Link>
+          <AuthStatus />
           <Link
             href="/dashboard"
             className="px-4 py-2 bg-brand-700 text-white text-sm font-semibold rounded-lg hover:bg-brand-800 transition-colors"
@@ -87,13 +83,7 @@ export default function TopNav() {
             </Link>
           ))}
           <div className="pt-3 border-t border-gray-100 mt-2 flex gap-2">
-            <Link
-              href="/settings"
-              onClick={() => setOpen(false)}
-              className="flex-1 py-2.5 text-center border border-gray-200 text-gray-700 text-sm font-semibold rounded-lg"
-            >
-              Settings
-            </Link>
+            <AuthStatus variant="mobile" />
             <Link
               href="/dashboard"
               onClick={() => setOpen(false)}
