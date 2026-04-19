@@ -1,279 +1,329 @@
-'use client';
-
-import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
-import { format } from 'date-fns';
-import { Flame, Trash2, ChevronRight, Plus, ExternalLink } from 'lucide-react';
-import { DayEntry, MealEntry, SymptomEntry, BowelEntry } from '@/lib/types';
-import { getEntriesForDate, deleteEntry, getStreak, getTodayKey, getSettings } from '@/lib/store';
-import FODMAPBadge from '@/components/FODMAPBadge';
+import { ArrowRight, ScanLine, ChefHat, Activity, BarChart2, BookOpen, CheckCircle } from 'lucide-react';
 import clsx from 'clsx';
 
-const MEAL_LABEL: Record<string, string> = {
-  breakfast: 'Breakfast', lunch: 'Lunch', dinner: 'Dinner', snack: 'Snack', drink: 'Drink',
-};
-
-const BRISTOL: Record<number, { label: string; sentiment: 'good' | 'warn' | 'bad' }> = {
-  1: { label: 'Hard pellets', sentiment: 'bad' },
-  2: { label: 'Lumpy', sentiment: 'bad' },
-  3: { label: 'Cracked', sentiment: 'warn' },
-  4: { label: 'Well-formed', sentiment: 'good' },
-  5: { label: 'Soft blobs', sentiment: 'warn' },
-  6: { label: 'Mushy', sentiment: 'bad' },
-  7: { label: 'Watery', sentiment: 'bad' },
-};
-
-function Stat({ label, value, sub, variant = 'neutral' }: {
-  label: string; value: string | number; sub?: string; variant?: 'neutral' | 'good' | 'warn' | 'bad';
-}) {
-  const valueColor = {
-    neutral: 'text-gray-900',
-    good:    'text-low',
-    warn:    'text-moderate',
-    bad:     'text-high',
-  }[variant];
-
+export default function HomePage() {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4">
-      <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">{label}</p>
-      <p className={clsx('text-2xl font-bold tabular-nums', valueColor)}>{value}</p>
-      {sub && <p className="text-xs text-gray-400 mt-0.5">{sub}</p>}
-    </div>
-  );
-}
+    <div className="bg-white">
 
-function EntryRow({ entry, onDelete }: { entry: DayEntry; onDelete: () => void }) {
-  if (entry.type === 'meal') {
-    const m = entry as MealEntry;
-    const hasHigh = m.foods.some(f => f.fodmapOverall === 'high');
-    const hasMod  = m.foods.some(f => f.fodmapOverall === 'moderate');
-    const overall = hasHigh ? 'high' : hasMod ? 'moderate' : 'low';
-    const foodList = m.foods.map(f => f.foodName).join(', ') || m.freeText || '—';
-
-    return (
-      <div className="flex items-start gap-3 py-3 border-b border-gray-100 last:border-0 group">
-        <div className="w-10 h-10 rounded-lg bg-amber-50 border border-amber-100 flex items-center justify-center text-sm flex-shrink-0 mt-0.5">
-          {m.mealType === 'breakfast' ? '🌅' : m.mealType === 'lunch' ? '☀️' : m.mealType === 'dinner' ? '🌙' : m.mealType === 'drink' ? '💧' : '🍎'}
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-0.5">
-            <span className="text-sm font-semibold text-gray-800">{MEAL_LABEL[m.mealType]}</span>
-            {m.foods.length > 0 && <FODMAPBadge level={overall} size="sm" />}
-          </div>
-          <p className="text-xs text-gray-500 truncate">{foodList}</p>
-        </div>
-        <div className="flex items-center gap-2 flex-shrink-0">
-          <span className="text-xs text-gray-400 tabular-nums">{entry.time}</span>
-          <button
-            onClick={onDelete}
-            className="opacity-0 group-hover:opacity-100 p-1 rounded text-gray-300 hover:text-red-400 transition-all"
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (entry.type === 'symptom') {
-    const s = entry as SymptomEntry;
-    const worst = Math.max(s.bloating, s.pain, s.gas, s.nausea, s.fatigue, s.overall);
-    const color = worst <= 3 ? 'text-low' : worst <= 6 ? 'text-moderate' : 'text-high';
-    return (
-      <div className="flex items-center gap-3 py-3 border-b border-gray-100 last:border-0 group">
-        <div className="w-10 h-10 rounded-lg bg-rose-50 border border-rose-100 flex items-center justify-center text-sm flex-shrink-0">😣</div>
-        <div className="flex-1">
-          <p className="text-sm font-semibold text-gray-800">Symptoms</p>
-          <p className="text-xs text-gray-500">
-            Worst: <span className={clsx('font-semibold', color)}>{worst}/10</span>
-            {s.bloating > 0 && ` · Bloating ${s.bloating}`}
-            {s.pain > 0 && ` · Pain ${s.pain}`}
-          </p>
-        </div>
-        <div className="flex items-center gap-2 flex-shrink-0">
-          <span className="text-xs text-gray-400 tabular-nums">{entry.time}</span>
-          <button onClick={onDelete} className="opacity-0 group-hover:opacity-100 p-1 rounded text-gray-300 hover:text-red-400 transition-all">
-            <Trash2 className="w-3.5 h-3.5" />
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (entry.type === 'bowel') {
-    const b = entry as BowelEntry;
-    const info = BRISTOL[b.bristolType];
-    const dotColor = info.sentiment === 'good' ? 'bg-low' : info.sentiment === 'warn' ? 'bg-moderate' : 'bg-high';
-    return (
-      <div className="flex items-center gap-3 py-3 border-b border-gray-100 last:border-0 group">
-        <div className="w-10 h-10 rounded-lg bg-violet-50 border border-violet-100 flex items-center justify-center text-sm flex-shrink-0">🚽</div>
-        <div className="flex-1">
-          <p className="text-sm font-semibold text-gray-800">Bowel movement</p>
-          <div className="flex items-center gap-1.5 mt-0.5">
-            <span className={clsx('w-2 h-2 rounded-full flex-shrink-0', dotColor)} />
-            <p className="text-xs text-gray-500">Type {b.bristolType} — {info.label}{b.urgency !== 'normal' ? ` · ${b.urgency === 'urgent' ? 'Urgent' : 'Very urgent'}` : ''}</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2 flex-shrink-0">
-          <span className="text-xs text-gray-400 tabular-nums">{entry.time}</span>
-          <button onClick={onDelete} className="opacity-0 group-hover:opacity-100 p-1 rounded text-gray-300 hover:text-red-400 transition-all">
-            <Trash2 className="w-3.5 h-3.5" />
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  const n = entry as { type: 'note'; text: string; time: string; id: string; date: string };
-  return (
-    <div className="flex items-start gap-3 py-3 border-b border-gray-100 last:border-0 group">
-      <div className="w-10 h-10 rounded-lg bg-gray-50 border border-gray-200 flex items-center justify-center text-sm flex-shrink-0 mt-0.5">📝</div>
-      <p className="flex-1 text-sm text-gray-600 leading-relaxed">{n.text}</p>
-      <div className="flex items-center gap-2 flex-shrink-0">
-        <span className="text-xs text-gray-400 tabular-nums">{entry.time}</span>
-        <button onClick={onDelete} className="opacity-0 group-hover:opacity-100 p-1 rounded text-gray-300 hover:text-red-400 transition-all">
-          <Trash2 className="w-3.5 h-3.5" />
-        </button>
-      </div>
-    </div>
-  );
-}
-
-export default function TodayPage() {
-  const [entries, setEntries] = useState<DayEntry[]>([]);
-  const [streak, setStreak] = useState(0);
-  const today = getTodayKey();
-  const settings = typeof window !== 'undefined' ? getSettings() : null;
-
-  const load = useCallback(() => {
-    setEntries(getEntriesForDate(today));
-    setStreak(getStreak());
-  }, [today]);
-
-  useEffect(() => {
-    load();
-    window.addEventListener('focus', load);
-    window.addEventListener('storage', load);
-    return () => { window.removeEventListener('focus', load); window.removeEventListener('storage', load); };
-  }, [load]);
-
-  const handleDelete = (id: string) => { deleteEntry(today, id); load(); };
-
-  const meals   = entries.filter(e => e.type === 'meal') as MealEntry[];
-  const bowels  = entries.filter(e => e.type === 'bowel') as BowelEntry[];
-  const symptoms = entries.filter(e => e.type === 'symptom') as SymptomEntry[];
-  const allFoods = meals.flatMap(m => m.foods);
-  const highCount = allFoods.filter(f => f.fodmapOverall === 'high').length;
-  const worstSym = symptoms.length
-    ? Math.max(...symptoms.flatMap(s => [s.bloating, s.pain, s.gas, s.nausea, s.fatigue, s.overall]))
-    : null;
-
-  const dateStr = format(new Date(), 'EEEE, d MMMM yyyy');
-  const hour = new Date().getHours();
-  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
-
-  return (
-    <div className="space-y-7">
-      {/* Page header */}
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="text-sm text-gray-400 font-medium">{dateStr}</p>
-          <h1 className="text-2xl font-bold text-gray-900 mt-0.5">{greeting}{settings?.name ? `, ${settings.name}` : ''}</h1>
-        </div>
-        <div className="flex items-center gap-2">
-          {streak > 0 && (
-            <div className="flex items-center gap-1.5 bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-full">
-              <Flame className="w-3.5 h-3.5 text-amber-500" />
-              <span className="text-sm font-bold text-amber-700 tabular-nums">{streak}</span>
-              <span className="text-xs text-amber-600">{streak === 1 ? 'day' : 'days'}</span>
-            </div>
-          )}
-          <button
-            onClick={() => window.open('/popup', 'gutsy-popup', 'width=390,height=540,toolbar=0,menubar=0,location=0,resizable=1')}
-            title="Open quick-log popup"
-            className="w-8 h-8 rounded-lg border border-gray-200 bg-white flex items-center justify-center hover:bg-gray-50 transition-colors"
-          >
-            <ExternalLink className="w-3.5 h-3.5 text-gray-400" />
-          </button>
-        </div>
-      </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <Stat label="Meals logged"   value={meals.length}  sub="today" />
-        <Stat label="High FODMAP"    value={highCount}     sub="items" variant={highCount > 0 ? 'bad' : 'good'} />
-        <Stat label="Bowel movements" value={bowels.length} sub="today" />
-        <Stat
-          label="Symptom score"
-          value={worstSym !== null ? `${worstSym}/10` : '—'}
-          sub="worst today"
-          variant={worstSym === null ? 'neutral' : worstSym <= 3 ? 'good' : worstSym <= 6 ? 'warn' : 'bad'}
+      {/* ── Hero ── */}
+      <section className="relative bg-brand-950 overflow-hidden">
+        <div
+          className="absolute inset-0 opacity-[0.04]"
+          style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '28px 28px' }}
         />
-      </div>
+        <div className="relative max-w-6xl mx-auto px-6 py-24 lg:py-32">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div>
+              <div className="inline-flex items-center gap-2 bg-brand-900 border border-brand-800 rounded-full px-3.5 py-1.5 mb-8">
+                <span className="w-1.5 h-1.5 rounded-full bg-brand-400 animate-pulse flex-shrink-0" />
+                <span className="text-xs font-medium text-brand-300">Based on Monash University FODMAP research</span>
+              </div>
+              <h1 className="text-5xl lg:text-[3.75rem] font-bold text-white leading-[1.08] tracking-tight mb-6">
+                Know exactly<br />
+                <span className="text-brand-400">what you can eat.</span>
+              </h1>
+              <p className="text-lg text-brand-200 leading-relaxed mb-10 max-w-md">
+                Track meals and symptoms, scan restaurant menus, and fix any recipe for FODMAP safety — all in one place.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Link
+                  href="/dashboard"
+                  className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-white text-brand-900 font-semibold rounded-xl hover:bg-brand-50 transition-colors text-sm"
+                >
+                  Start tracking — it&apos;s free
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+                <Link
+                  href="/menu"
+                  className="inline-flex items-center justify-center gap-2 px-6 py-3.5 border border-brand-700 text-brand-200 font-semibold rounded-xl hover:bg-brand-900 hover:text-white transition-colors text-sm"
+                >
+                  <ScanLine className="w-4 h-4" />
+                  Scan a menu free
+                </Link>
+              </div>
+              <p className="text-xs text-brand-700 mt-4">Menu scanning and recipe fixing require no account.</p>
+            </div>
 
-      {/* Quick log */}
-      <div>
-        <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">Quick log</h2>
-        <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
-          {[
-            { href: '/log?type=meal&meal=breakfast', label: 'Breakfast', bg: 'bg-amber-50 hover:bg-amber-100 border-amber-200 text-amber-800' },
-            { href: '/log?type=meal&meal=lunch',     label: 'Lunch',     bg: 'bg-sky-50 hover:bg-sky-100 border-sky-200 text-sky-800' },
-            { href: '/log?type=meal&meal=dinner',    label: 'Dinner',    bg: 'bg-indigo-50 hover:bg-indigo-100 border-indigo-200 text-indigo-800' },
-            { href: '/log?type=meal&meal=snack',     label: 'Snack',     bg: 'bg-brand-50 hover:bg-brand-100 border-brand-200 text-brand-800' },
-            { href: '/log?type=symptom',             label: 'Symptom',   bg: 'bg-rose-50 hover:bg-rose-100 border-rose-200 text-rose-800' },
-            { href: '/log?type=bowel',               label: 'Bowel',     bg: 'bg-violet-50 hover:bg-violet-100 border-violet-200 text-violet-800' },
-          ].map(({ href, label, bg }) => (
+            {/* App preview mockup */}
+            <div className="hidden lg:flex justify-end">
+              <div className="bg-gray-900 rounded-[2.5rem] p-3 shadow-2xl w-[260px]">
+                <div className="bg-white rounded-[2rem] overflow-hidden">
+                  <div className="bg-brand-900 px-4 pt-4 pb-5">
+                    <p className="text-xs text-brand-500 font-medium mb-1">Saturday, 19 Apr</p>
+                    <p className="text-white font-bold text-base mb-4">Good morning</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {[
+                        { label: 'Meals', value: '3', color: 'text-white' },
+                        { label: 'High FODMAP', value: '0', color: 'text-emerald-400' },
+                      ].map(({ label, value, color }) => (
+                        <div key={label} className="bg-brand-800 rounded-xl px-3 py-2">
+                          <p className="text-xs text-brand-400">{label}</p>
+                          <p className={clsx('font-bold text-lg', color)}>{value}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="p-3 space-y-2 bg-gray-50">
+                    {[
+                      { emoji: '🌅', label: 'Breakfast', detail: 'Oats, banana', badge: 'Safe', badgeClass: 'bg-emerald-100 text-emerald-700' },
+                      { emoji: '☀️', label: 'Lunch', detail: 'Salmon, rice', badge: 'Safe', badgeClass: 'bg-emerald-100 text-emerald-700' },
+                      { emoji: '😣', label: 'Symptoms', detail: 'Bloating 2/10', badge: 'Mild', badgeClass: 'bg-amber-100 text-amber-700' },
+                    ].map(({ emoji, label, detail, badge, badgeClass }) => (
+                      <div key={label} className="flex items-center gap-2 bg-white rounded-xl p-2.5">
+                        <div className="w-8 h-8 bg-gray-50 rounded-lg flex items-center justify-center text-sm flex-shrink-0">{emoji}</div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-semibold text-gray-800">{label}</p>
+                          <p className="text-xs text-gray-400 truncate">{detail}</p>
+                        </div>
+                        <span className={clsx('text-2xs font-semibold px-1.5 py-0.5 rounded-full flex-shrink-0', badgeClass)}>{badge}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Trust strip ── */}
+      <section className="border-b border-gray-100 py-4 bg-white">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-2.5">
+            {[
+              'Based on Monash University research',
+              'No account needed for free tools',
+              'All data stays on your device',
+              'Free to use',
+            ].map(item => (
+              <div key={item} className="flex items-center gap-2">
+                <CheckCircle className="w-3.5 h-3.5 text-brand-500 flex-shrink-0" />
+                <span className="text-sm text-gray-600 font-medium">{item}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── What Gutsy does ── */}
+      <section className="py-24 bg-white">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="mb-14">
+            <p className="text-xs font-semibold text-brand-600 uppercase tracking-widest mb-3">What Gutsy does</p>
+            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 leading-tight max-w-xl">
+              Everything you need to manage IBS with confidence
+            </h2>
+          </div>
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              {
+                icon: Activity,
+                title: 'Track meals and symptoms',
+                desc: 'Log what you eat, how you feel, and bowel movements. See patterns emerge with FODMAP charts and symptom graphs.',
+                note: 'Free tracker',
+                free: true,
+                href: '/dashboard',
+              },
+              {
+                icon: ScanLine,
+                title: 'Scan any restaurant menu',
+                desc: 'Paste a URL, upload a PDF, or paste the menu text. Get a dish-by-dish breakdown — safe, modify, or avoid.',
+                note: 'Free · no account',
+                free: true,
+                href: '/menu',
+              },
+              {
+                icon: ChefHat,
+                title: 'Fix any recipe',
+                desc: 'Drop in a recipe. Get every high-FODMAP ingredient swapped out and the full method rewritten for FODMAP safety.',
+                note: 'Free · no account',
+                free: true,
+                href: '/recipe',
+              },
+            ].map(({ icon: Icon, title, desc, note, href }) => (
+              <Link key={title} href={href} className="group block">
+                <div className="border border-gray-100 rounded-2xl p-6 hover:border-brand-200 hover:shadow-lifted transition-all h-full bg-gray-50 hover:bg-white">
+                  <div className="w-10 h-10 bg-brand-700 rounded-xl flex items-center justify-center mb-5">
+                    <Icon className="w-5 h-5 text-white" />
+                  </div>
+                  <h3 className="text-base font-bold text-gray-900 mb-2">{title}</h3>
+                  <p className="text-sm text-gray-600 leading-relaxed mb-5">{desc}</p>
+                  <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700">
+                    {note}
+                  </span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Free tools CTA ── */}
+      <section className="py-24 bg-brand-950">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="mb-12">
+            <p className="text-xs font-semibold text-brand-400 uppercase tracking-widest mb-3">Try it now, free</p>
+            <h2 className="text-3xl lg:text-4xl font-bold text-white leading-tight max-w-xl">
+              No account. No credit card. Just answers.
+            </h2>
+          </div>
+          <div className="grid md:grid-cols-2 gap-5">
+            <Link href="/menu" className="group bg-brand-900 border border-brand-800 rounded-2xl p-8 hover:border-brand-600 transition-all">
+              <ScanLine className="w-7 h-7 text-brand-400 mb-5" />
+              <h3 className="text-xl font-bold text-white mb-2">Menu scanner</h3>
+              <p className="text-brand-300 text-sm leading-relaxed mb-6">
+                Paste a restaurant URL or upload their PDF. We&apos;ll tell you exactly what to order, what to modify, and what to avoid.
+              </p>
+              <span className="inline-flex items-center gap-1.5 text-brand-400 text-sm font-semibold group-hover:text-white transition-colors">
+                Scan a menu <ArrowRight className="w-4 h-4" />
+              </span>
+            </Link>
+            <Link href="/recipe" className="group bg-brand-900 border border-brand-800 rounded-2xl p-8 hover:border-brand-600 transition-all">
+              <ChefHat className="w-7 h-7 text-brand-400 mb-5" />
+              <h3 className="text-xl font-bold text-white mb-2">Recipe fixer</h3>
+              <p className="text-brand-300 text-sm leading-relaxed mb-6">
+                Paste any recipe — we&apos;ll identify every high-FODMAP ingredient and rewrite the whole thing with practical safe swaps.
+              </p>
+              <span className="inline-flex items-center gap-1.5 text-brand-400 text-sm font-semibold group-hover:text-white transition-colors">
+                Fix a recipe <ArrowRight className="w-4 h-4" />
+              </span>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ── How tracking works ── */}
+      <section className="py-24 bg-white">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="mb-16">
+            <p className="text-xs font-semibold text-brand-600 uppercase tracking-widest mb-3">The tracker</p>
+            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 leading-tight max-w-xl">
+              See what your gut is actually telling you
+            </h2>
+          </div>
+          <div className="grid md:grid-cols-3 gap-10">
+            {[
+              {
+                num: '01',
+                icon: Activity,
+                title: 'Log meals and symptoms',
+                desc: 'Quick one-tap logging for meals, symptoms, and bowel movements. Free-text or pick from the FODMAP food guide.',
+              },
+              {
+                num: '02',
+                icon: BarChart2,
+                title: 'Spot the patterns',
+                desc: 'Symptom charts, FODMAP intake graphs, and bowel tracking — built around the elimination and reintroduction phases.',
+              },
+              {
+                num: '03',
+                icon: BookOpen,
+                title: 'Learn as you go',
+                desc: 'Evidence-based articles on enzymes, supplements, and the science behind the FODMAP diet. No fluff.',
+              },
+            ].map(({ num, icon: Icon, title, desc }) => (
+              <div key={title} className="flex gap-5">
+                <span className="text-4xl font-bold text-gray-100 leading-none flex-shrink-0 font-mono">{num}</span>
+                <div>
+                  <Icon className="w-5 h-5 text-brand-600 mb-3" />
+                  <h3 className="text-base font-bold text-gray-900 mb-2">{title}</h3>
+                  <p className="text-sm text-gray-600 leading-relaxed">{desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-14">
             <Link
-              key={href}
-              href={href}
-              className={clsx('flex items-center justify-center py-2.5 rounded-lg border text-xs font-semibold text-center transition-colors active:scale-98', bg)}
+              href="/dashboard"
+              className="inline-flex items-center gap-2 px-6 py-3.5 bg-brand-700 text-white font-semibold rounded-xl hover:bg-brand-800 transition-colors text-sm"
             >
-              {label}
-            </Link>
-          ))}
-        </div>
-      </div>
-
-      {/* Today's entries */}
-      <div>
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-widest">Today's log</h2>
-          {entries.length > 0 && (
-            <span className="text-xs text-gray-400">{entries.length} {entries.length === 1 ? 'entry' : 'entries'}</span>
-          )}
-        </div>
-
-        {entries.length === 0 ? (
-          <div className="bg-white border border-gray-200 rounded-xl p-6 text-center">
-            <p className="text-sm text-gray-500">Nothing logged yet today.</p>
-            <Link href="/log" className="inline-flex items-center gap-1.5 mt-3 text-sm font-medium text-brand-700 hover:text-brand-900">
-              <Plus className="w-4 h-4" /> Add your first entry
+              Start tracking — it&apos;s free <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
-        ) : (
-          <div className="bg-white border border-gray-200 rounded-xl divide-y divide-gray-100 px-4">
-            {entries.map(e => <EntryRow key={e.id} entry={e} onDelete={() => handleDelete(e.id)} />)}
-          </div>
-        )}
-      </div>
-
-      {/* Phase card */}
-      <Link href="/settings" className="block bg-brand-900 rounded-xl p-5 hover:bg-brand-800 transition-colors active:scale-98">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs font-semibold text-brand-400 uppercase tracking-widest">Current phase</p>
-            <p className="text-base font-bold text-white mt-1 capitalize">{settings?.phase ?? 'Elimination'}</p>
-            <p className="text-sm text-brand-300 mt-0.5">
-              {settings?.phase === 'elimination'
-                ? 'Avoid all high-FODMAP foods'
-                : settings?.phase === 'reintroduction'
-                ? `Testing: ${settings.reintroductionCategory ?? 'select a category'}`
-                : 'Personalised maintenance diet'}
-            </p>
-          </div>
-          <ChevronRight className="w-5 h-5 text-brand-500 flex-shrink-0" />
         </div>
-      </Link>
+      </section>
+
+      {/* ── Blog preview ── */}
+      <section className="py-24 bg-gray-50">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="flex items-end justify-between mb-12">
+            <div>
+              <p className="text-xs font-semibold text-brand-600 uppercase tracking-widest mb-3">From the reading list</p>
+              <h2 className="text-3xl font-bold text-gray-900">Research you can actually use</h2>
+            </div>
+            <Link href="/blog" className="hidden md:flex items-center gap-1.5 text-sm font-semibold text-brand-700 hover:text-brand-900">
+              All articles <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+          <div className="grid md:grid-cols-3 gap-5">
+            {[
+              { emoji: '🧪', tag: 'Enzymes', title: 'FODzyme: does the enzyme actually work?', href: '/blog/fodzyme' },
+              { emoji: '🥛', tag: 'Supplements', title: 'Milkaid without the raspberry flavouring', href: '/blog/milkaid' },
+              { emoji: '🌾', tag: 'Science', title: 'Fructan sensitivity vs gluten intolerance', href: '/blog/fructan-vs-gluten' },
+            ].map(({ emoji, tag, title, href }) => (
+              <Link key={href} href={href} className="group bg-white border border-gray-200 rounded-2xl p-6 hover:border-brand-200 hover:shadow-lifted transition-all">
+                <span className="text-2xl mb-4 block">{emoji}</span>
+                <p className="text-xs font-semibold text-brand-600 uppercase tracking-wide mb-2">{tag}</p>
+                <h3 className="text-sm font-bold text-gray-900 leading-snug group-hover:text-brand-700 transition-colors">{title}</h3>
+              </Link>
+            ))}
+          </div>
+          <div className="mt-6 md:hidden">
+            <Link href="/blog" className="flex items-center gap-1.5 text-sm font-semibold text-brand-700">
+              All articles <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Footer ── */}
+      <footer className="bg-brand-950 py-14">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="flex flex-col md:flex-row items-start justify-between gap-10">
+            <div>
+              <div className="flex items-center gap-2.5 mb-3">
+                <div className="w-7 h-7 rounded-lg bg-brand-700 flex items-center justify-center">
+                  <span className="text-white font-black text-xs">G</span>
+                </div>
+                <span className="font-bold text-white text-base">Gutsy</span>
+              </div>
+              <p className="text-sm text-brand-500 max-w-xs leading-relaxed">
+                IBS management tools built on Monash University low FODMAP research. Not medical advice.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-x-14 gap-y-8">
+              <div>
+                <p className="text-xs font-semibold text-brand-600 uppercase tracking-widest mb-4">Free tools</p>
+                <div className="space-y-2.5">
+                  <Link href="/menu"   className="block text-sm text-brand-400 hover:text-white transition-colors">Menu scanner</Link>
+                  <Link href="/recipe" className="block text-sm text-brand-400 hover:text-white transition-colors">Recipe fixer</Link>
+                  <Link href="/foods"  className="block text-sm text-brand-400 hover:text-white transition-colors">Food guide</Link>
+                </div>
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-brand-600 uppercase tracking-widest mb-4">Tracker</p>
+                <div className="space-y-2.5">
+                  <Link href="/dashboard" className="block text-sm text-brand-400 hover:text-white transition-colors">Today</Link>
+                  <Link href="/log"       className="block text-sm text-brand-400 hover:text-white transition-colors">Log entry</Link>
+                  <Link href="/insights"  className="block text-sm text-brand-400 hover:text-white transition-colors">Insights</Link>
+                  <Link href="/settings"  className="block text-sm text-brand-400 hover:text-white transition-colors">Settings</Link>
+                </div>
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-brand-600 uppercase tracking-widest mb-4">Reading</p>
+                <div className="space-y-2.5">
+                  <Link href="/blog" className="block text-sm text-brand-400 hover:text-white transition-colors">All articles</Link>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="border-t border-brand-900 mt-12 pt-6">
+            <p className="text-xs text-brand-800">© 2025 Gutsy. FODMAP data based on Monash University research. Not a substitute for medical advice.</p>
+          </div>
+        </div>
+      </footer>
+
     </div>
   );
 }

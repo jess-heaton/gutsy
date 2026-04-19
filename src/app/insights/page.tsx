@@ -121,7 +121,7 @@ export default function InsightsPage() {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-content mx-auto px-4 sm:px-6 py-8 lg:py-12 pb-20 lg:pb-12 space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Insights</h1>
         <p className="text-sm text-gray-400 mt-1">Last 14 days</p>

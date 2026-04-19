@@ -6,22 +6,24 @@ import { Home, BookOpen, Plus, BarChart2, BookMarked } from 'lucide-react';
 import clsx from 'clsx';
 
 const items = [
-  { href: '/',         icon: Home,       label: 'Today'    },
-  { href: '/foods',    icon: BookOpen,   label: 'Foods'    },
-  { href: '/log',      icon: Plus,       label: 'Log',     special: true },
-  { href: '/blog',     icon: BookMarked, label: 'Read'     },
-  { href: '/insights', icon: BarChart2,  label: 'Insights' },
+  { href: '/dashboard', icon: Home,       label: 'Today'    },
+  { href: '/foods',     icon: BookOpen,   label: 'Foods'    },
+  { href: '/log',       icon: Plus,       label: 'Log',     special: true },
+  { href: '/blog',      icon: BookMarked, label: 'Read'     },
+  { href: '/insights',  icon: BarChart2,  label: 'Insights' },
 ];
+
+const HIDDEN_ON = ['/', '/popup'];
 
 export default function BottomNav() {
   const pathname = usePathname();
-  if (pathname?.startsWith('/popup')) return null;
+  if (HIDDEN_ON.some(p => pathname === p) || pathname?.startsWith('/popup')) return null;
 
   return (
     <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200">
       <div className="flex items-center justify-around px-2 py-1">
         {items.map(({ href, icon: Icon, label, special }) => {
-          const active = href === '/' ? pathname === '/' : pathname?.startsWith(href);
+          const active = href === '/dashboard' ? pathname === '/dashboard' : pathname?.startsWith(href);
           if (special) {
             return (
               <Link key={href} href={href} className="flex flex-col items-center -mt-4" aria-label={label}>

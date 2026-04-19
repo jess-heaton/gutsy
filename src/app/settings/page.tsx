@@ -63,7 +63,7 @@ export default function SettingsPage() {
   const daysSince = Math.floor((Date.now() - new Date(s.startDate).getTime()) / 86400000);
 
   return (
-    <div className="space-y-10">
+    <div className="max-w-content mx-auto px-4 sm:px-6 py-8 lg:py-12 pb-20 lg:pb-12 space-y-10">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
         {flash && (

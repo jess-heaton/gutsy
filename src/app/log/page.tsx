@@ -293,7 +293,7 @@ function LogInner() {
 
   const handleSave = () => {
     setDone(true);
-    setTimeout(() => { router.push('/'); router.refresh(); }, 900);
+    setTimeout(() => { router.push('/dashboard'); router.refresh(); }, 900);
   };
 
   if (done) return (
@@ -307,7 +307,7 @@ function LogInner() {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-content mx-auto px-4 sm:px-6 py-8 lg:py-12 pb-20 lg:pb-12 space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3">
         <button

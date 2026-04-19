@@ -62,7 +62,7 @@ export default function RecipePage() {
   const cfg = result ? CONFIDENCE_CONFIG[result.lowFodmapConfidence] ?? CONFIDENCE_CONFIG.medium : null;
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-content mx-auto px-4 sm:px-6 py-8 lg:py-12 pb-20 lg:pb-12 space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Recipe analyser</h1>
         <p className="text-sm text-gray-500 mt-1">

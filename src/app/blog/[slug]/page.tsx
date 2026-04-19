@@ -35,7 +35,7 @@ export default function ArticlePage() {
   const related = articles.filter(a => a.slug !== article.slug && a.tags.some(t => article.tags.includes(t))).slice(0, 2);
 
   return (
-    <div>
+    <div className="max-w-content mx-auto px-4 sm:px-6 py-8 lg:py-12 pb-20 lg:pb-12">
       {/* Back */}
       <Link href="/blog" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 mb-8 group">
         <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />

@@ -67,7 +67,7 @@ export default function FoodsPage() {
   const highCount = foods.filter(f => f.fodmap.overall === 'high').length;
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-content mx-auto px-4 sm:px-6 py-8 lg:py-12 pb-20 lg:pb-12 space-y-6">
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900">FODMAP food guide</h1>

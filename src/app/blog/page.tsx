@@ -18,7 +18,7 @@ const TAG_COLORS: Record<string, string> = {
 
 export default function BlogPage() {
   return (
-    <div className="space-y-8">
+    <div className="max-w-content mx-auto px-4 sm:px-6 py-8 lg:py-12 pb-20 lg:pb-12 space-y-8">
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Reading</h1>

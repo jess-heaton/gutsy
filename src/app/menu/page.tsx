@@ -117,7 +117,7 @@ export default function MenuPage() {
   const avoid  = result?.items.filter(i => i.status === 'avoid')  ?? [];
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-content mx-auto px-4 sm:px-6 py-8 lg:py-12 pb-20 lg:pb-12 space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Menu scanner</h1>
         <p className="text-sm text-gray-500 mt-1">

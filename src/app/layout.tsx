@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
-import Sidebar from '@/components/Sidebar';
+import TopNav from '@/components/TopNav';
 import BottomNav from '@/components/BottomNav';
 
 export const metadata: Metadata = {
@@ -14,7 +14,7 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
-  themeColor: '#0c2918',
+  themeColor: '#ffffff',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -28,22 +28,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
         />
       </head>
-      <body>
-        <div className="flex min-h-dvh">
-          {/* Desktop sidebar */}
-          <Sidebar />
-
-          {/* Main content */}
-          <div className="flex-1 flex flex-col min-w-0 lg:ml-[240px]">
-            <main className="flex-1 pb-nav lg:pb-8">
-              <div className="max-w-content mx-auto px-4 lg:px-8 py-6 lg:py-10">
-                {children}
-              </div>
-            </main>
-          </div>
-        </div>
-
-        {/* Mobile bottom nav */}
+      <body className="bg-white antialiased">
+        <TopNav />
+        <main>{children}</main>
         <BottomNav />
       </body>
     </html>
