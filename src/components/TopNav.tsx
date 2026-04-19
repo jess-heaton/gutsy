@@ -11,7 +11,7 @@ const NAV = [
   { href: '/menu',      label: 'Menu scanner' },
   { href: '/recipe',    label: 'Recipe fixer' },
   { href: '/foods',     label: 'Food guide' },
-  { href: '/blog',      label: 'Reading' },
+  { href: '/blog',      label: 'Blog' },
 ];
 
 export default function TopNav() {
@@ -26,11 +26,8 @@ export default function TopNav() {
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-6">
 
-        <Link href="/" className="flex items-center gap-2.5 flex-shrink-0">
-          <div className="w-7 h-7 rounded-lg bg-brand-700 flex items-center justify-center">
-            <span className="text-white font-black text-xs leading-none">G</span>
-          </div>
-          <span className="font-bold text-gray-900 text-base tracking-tight">Gutsy</span>
+        <Link href="/" className="flex items-center flex-shrink-0">
+          <span className="font-display text-2xl text-brand-700 leading-none">gutsy</span>
         </Link>
 
         <nav className="hidden md:flex items-center gap-0.5 flex-1">

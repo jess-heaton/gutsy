@@ -9,7 +9,7 @@ const items = [
   { href: '/dashboard', icon: Home,       label: 'Today'    },
   { href: '/foods',     icon: BookOpen,   label: 'Foods'    },
   { href: '/log',       icon: Plus,       label: 'Log',     special: true },
-  { href: '/blog',      icon: BookMarked, label: 'Read'     },
+  { href: '/blog',      icon: BookMarked, label: 'Blog'     },
   { href: '/insights',  icon: BarChart2,  label: 'Insights' },
 ];
 

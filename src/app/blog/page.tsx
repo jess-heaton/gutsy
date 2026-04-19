@@ -21,9 +21,9 @@ export default function BlogPage() {
     <div className="max-w-content mx-auto px-4 sm:px-6 py-8 lg:py-12 pb-20 lg:pb-12 space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Reading</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Blog</h1>
         <p className="text-sm text-gray-500 mt-1 max-w-md">
-          Research-backed articles on managing IBS, understanding FODMAPs, and making informed choices about supplements and diet.
+          Articles on the science of IBS, the FODMAP diet, and supplements — based on published research, not guesswork.
         </p>
       </div>
 

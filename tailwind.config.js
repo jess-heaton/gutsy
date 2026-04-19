@@ -24,9 +24,10 @@ module.exports = {
         high:     '#dc2626',
       },
       fontFamily: {
-        sans:   ['Inter', 'system-ui', 'sans-serif'],
-        serif:  ['Lora', 'Georgia', 'serif'],
-        mono:   ['JetBrains Mono', 'monospace'],
+        sans:    ['Inter', 'system-ui', 'sans-serif'],
+        serif:   ['Lora', 'Georgia', 'serif'],
+        mono:    ['JetBrains Mono', 'monospace'],
+        display: ['Pacifico', 'cursive'],
       },
       fontSize: {
         '2xs': ['0.65rem', { lineHeight: '1rem' }],
