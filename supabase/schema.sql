@@ -36,9 +36,25 @@ create table if not exists public.recipes (
   fodmap_summary jsonb,
   ingredients jsonb,
   swaps jsonb,
+  notes jsonb,
+  tags jsonb,
+  emoji text,
+  accent text,
+  total_time text,
+  servings text,
+  confidence text,
   created_at timestamptz default now()
 );
 create index if not exists recipes_user_idx on public.recipes(user_id, created_at desc);
+
+-- Backfill new columns on existing installs
+alter table public.recipes add column if not exists notes jsonb;
+alter table public.recipes add column if not exists tags jsonb;
+alter table public.recipes add column if not exists emoji text;
+alter table public.recipes add column if not exists accent text;
+alter table public.recipes add column if not exists total_time text;
+alter table public.recipes add column if not exists servings text;
+alter table public.recipes add column if not exists confidence text;
 
 -- ── menu scans (shareable) ──────────────────────────────────────────────────
 create table if not exists public.menu_scans (
