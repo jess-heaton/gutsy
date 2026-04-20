@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Link2, Upload, ClipboardList, X, AlertCircle, CheckCircle, AlertTriangle, Ban } from 'lucide-react';
+import { Link2, Upload, ClipboardList, X, AlertCircle, CheckCircle, AlertTriangle, Ban, ExternalLink } from 'lucide-react';
 import clsx from 'clsx';
 
 type InputMode = 'url' | 'pdf' | 'text';
@@ -15,10 +15,14 @@ interface MenuItem {
   modifications: string | null;
 }
 
+interface Source { url: string; title?: string }
+
 interface ScanResult {
   restaurant: string | null;
   summary: string;
   items: MenuItem[];
+  menu_source_url?: string | null;
+  sources?: Source[];
 }
 
 const STATUS_CONFIG = {
@@ -172,7 +176,7 @@ function MenuInner() {
               onChange={e => setUrl(e.target.value)}
               className="w-full px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
             />
-            <p className="text-xs text-gray-400 mt-1.5">Works best with restaurant websites that have text menus. PDF menus on their site may need to be downloaded and uploaded directly.</p>
+            <p className="text-xs text-gray-400 mt-1.5">You can paste the homepage or a specific menu page — Gutsy will find the menu on the site, or search the web if needed. For PDF-only menus, download and upload under the PDF tab.</p>
           </div>
         )}
 
@@ -246,6 +250,28 @@ function MenuInner() {
               {result.restaurant ?? 'Menu'} — overall assessment
             </p>
             <p className="text-sm text-brand-100 leading-relaxed">{result.summary}</p>
+
+            {result.sources && result.sources.length > 0 && (
+              <div className="mt-3 pt-3 border-t border-white/10">
+                <p className="text-2xs font-semibold text-brand-400 uppercase tracking-widest mb-1.5">Sources</p>
+                <ul className="space-y-1">
+                  {result.sources.slice(0, 5).map((s, i) => (
+                    <li key={i}>
+                      <a
+                        href={s.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-xs text-brand-200 hover:text-white underline-offset-2 hover:underline break-all"
+                      >
+                        <ExternalLink className="w-3 h-3 flex-shrink-0" />
+                        {s.title ? `${s.title} — ` : ''}{new URL(s.url).host}{new URL(s.url).pathname}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
             <div className="flex gap-4 mt-4">
               {[
                 { label: 'Safe',   count: safe.length,   color: 'text-emerald-400' },
