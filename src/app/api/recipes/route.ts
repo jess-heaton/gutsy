@@ -8,7 +8,7 @@ export async function GET() {
 
   const { data, error } = await supa
     .from('recipes')
-    .select('id,title,emoji,accent,tags,total_time,servings,confidence,source_url,created_at')
+    .select('id,title,emoji,accent,tags,total_time,servings,confidence,source_url,image_url,created_at')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
     .limit(60);

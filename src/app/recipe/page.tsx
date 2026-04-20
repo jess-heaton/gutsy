@@ -32,6 +32,7 @@ interface SavedCard {
   total_time: string | null;
   servings: string | null;
   confidence: string | null;
+  image_url: string | null;
   created_at: string;
 }
 
@@ -116,7 +117,7 @@ function RecipeCard({ r, onOpen, onDelete }: { r: SavedCard; onOpen: () => void;
       <div className="h-36 relative overflow-hidden">
         {!imgFailed ? (
           <img
-            src={foodImageUrl(r.title, r.tags)}
+            src={r.image_url ?? foodImageUrl(r.title, r.tags)}
             alt={r.title}
             className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             onError={() => setImgFailed(true)}
@@ -176,7 +177,7 @@ function RecipeDetail({ id, onClose, onDeleted }: { id: string; onClose: () => v
         <div className="h-48 relative overflow-hidden">
           {r && !imgFailed ? (
             <img
-              src={foodImageUrl(r.title, r.tags)}
+              src={r.image_url ?? foodImageUrl(r.title, r.tags)}
               alt={r.title}
               className="absolute inset-0 w-full h-full object-cover"
               onError={() => setImgFailed(true)}
@@ -277,6 +278,7 @@ export default function RecipePage() {
   const [error, setError] = useState('');
   const [result, setResult] = useState<RecipeResult | null>(null);
   const [saving, setSaving] = useState(false);
+  const [saveStep, setSaveStep] = useState<'saving' | 'imaging' | 'done' | null>(null);
   const [saved, setSaved] = useState(false);
 
   const [cards, setCards] = useState<SavedCard[]>([]);
@@ -321,6 +323,7 @@ export default function RecipePage() {
   const save = async () => {
     if (!result) return;
     setSaving(true);
+    setSaveStep('saving');
     try {
       const res = await fetch('/api/recipes', {
         method: 'POST',
@@ -342,10 +345,21 @@ export default function RecipePage() {
       });
       const data = await res.json();
       if (!res.ok || data.error) throw new Error(data.error ?? 'Save failed');
+
+      // Generate AI image (non-blocking on failure)
+      setSaveStep('imaging');
+      await fetch('/api/recipe-image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ recipeId: data.id, title: result.title, tags: result.tags }),
+      }).catch(() => {}); // silently ignore if image gen fails
+
       setSaved(true);
+      setSaveStep('done');
       loadCards();
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Save failed');
+      setSaveStep(null);
     } finally {
       setSaving(false);
     }
@@ -507,7 +521,14 @@ export default function RecipePage() {
                     saved ? 'bg-emerald-50 text-emerald-700' : 'bg-brand-700 text-white hover:bg-brand-800',
                   )}
                 >
-                  {saved ? <><BookmarkCheck className="w-3.5 h-3.5" />Saved</> : <><Bookmark className="w-3.5 h-3.5" />{saving ? 'Saving…' : 'Save'}</>}
+                  {saved
+                    ? <><BookmarkCheck className="w-3.5 h-3.5" />Saved</>
+                    : saveStep === 'imaging'
+                      ? <><Sparkles className="w-3.5 h-3.5 animate-pulse" />Generating image…</>
+                      : saving
+                        ? <><Bookmark className="w-3.5 h-3.5" />Saving…</>
+                        : <><Bookmark className="w-3.5 h-3.5" />Save</>
+                  }
                 </button>
               </div>
               {result.tags && result.tags.length > 0 && (
