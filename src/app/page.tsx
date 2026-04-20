@@ -1,30 +1,48 @@
 import Link from 'next/link';
-import { ArrowRight, ScanLine, ChefHat, Activity, BarChart2, BookOpen, CheckCircle } from 'lucide-react';
-import clsx from 'clsx';
+import { ArrowRight, ScanLine, ChefHat, Activity, BarChart2, BookOpen, CheckCircle, Utensils } from 'lucide-react';
 import HeroPrompt from '@/components/HeroPrompt';
+import RestaurantCarousel from '@/components/RestaurantCarousel';
 
 const SITE_URL = 'https://gutsy.freedible.co.uk';
 
 const FAQS = [
   {
     q: 'What is the low-FODMAP diet?',
-    a: 'A three-phase elimination diet developed by Monash University for irritable bowel syndrome (IBS). Phase 1 removes high-FODMAP foods for 2–6 weeks. Phase 2 reintroduces each FODMAP group one at a time to identify triggers. Phase 3 is a personalised long-term diet that only restricts the FODMAPs you actually react to.',
+    a: 'A three-phase elimination diet developed by Monash University for IBS. Phase 1 removes high-FODMAP foods for 2–6 weeks. Phase 2 reintroduces each FODMAP group one at a time to find your triggers. Phase 3 is a personalised long-term diet that only restricts the FODMAPs you actually react to.',
   },
   {
     q: 'Is Gutsy free?',
-    a: 'The menu scanner, recipe fixer and food guide are free to use without an account. Tracking your meals and symptoms is also free — you just need to create a free account so your data syncs across devices.',
+    a: 'The menu scanner, recipe fixer and food guide are completely free — no account needed. The meal and symptom tracker is also free; you just need a free account so your data syncs across devices.',
   },
   {
     q: 'Do you use real Monash FODMAP data?',
-    a: 'Gutsy is built around Monash University FODMAP research and follows their three-phase protocol. It is not affiliated with Monash and does not republish their proprietary app database. For definitive per-serving thresholds we recommend using the official Monash app alongside Gutsy.',
+    a: 'Yes. Gutsy is built around Monash University FODMAP research and follows their three-phase protocol. We\'re not affiliated with Monash and don\'t republish their proprietary database. For definitive per-serving thresholds, use the official Monash app alongside Gutsy.',
   },
   {
     q: 'How does the menu scanner work?',
-    a: 'Paste a restaurant URL, upload their menu PDF or paste the text. Each dish is evaluated against FODMAP principles and returned with a safe / modify / avoid rating plus a specific request to make to the waiter.',
+    a: 'Paste a restaurant URL, upload their PDF, or paste the menu text. Gutsy fetches the actual menu from the restaurant\'s site, then rates every dish safe, modify, or avoid — with the exact words to use when ordering.',
   },
   {
     q: 'Can Gutsy replace my dietitian?',
-    a: 'No. Gutsy helps you track, log and stay consistent between appointments, but the low-FODMAP diet is intended to be done under the guidance of a qualified dietitian, especially the reintroduction phase.',
+    a: 'No. Gutsy helps you track, log and stay consistent between appointments — but the low-FODMAP diet should be done under a qualified dietitian\'s guidance, especially during reintroduction.',
+  },
+];
+
+const RECIPE_EXAMPLES = [
+  {
+    name: 'Spaghetti Bolognese',
+    swaps: ['Garlic → garlic-infused oil', 'Onion → green tops of spring onion', 'Regular pasta → gluten-free pasta'],
+    tag: 'Italian',
+  },
+  {
+    name: 'Thai Green Curry',
+    swaps: ['Shallots → chives', 'Garlic → garlic-infused oil', 'Regular milk → coconut cream (½ tin max)'],
+    tag: 'Asian',
+  },
+  {
+    name: 'Caesar Salad',
+    swaps: ['Regular croutons → GF bread croutons', 'Garlic dressing → garlic-infused oil base', 'Parmesan → fine (low-lactose in small amounts)'],
+    tag: 'Salad',
   },
 ];
 
@@ -51,56 +69,31 @@ function HeroBg() {
           <stop offset="100%" stopColor="#071a0f" stopOpacity="0" />
         </radialGradient>
       </defs>
-
-      {/* Gradient depth layers */}
       <rect width="1440" height="900" fill="url(#rg1)" />
       <rect width="1440" height="900" fill="url(#rg2)" />
       <rect width="1440" height="900" fill="url(#rg3)" />
-
-      {/* Large organic form — right edge */}
       <path
         d="M1440,0 C1360,0 1180,60 1120,210 C1060,360 1150,490 1130,640 C1110,790 1040,900 1440,900 Z"
-        fill="#0c2918"
-        opacity="0.95"
+        fill="#0c2918" opacity="0.95"
       />
-
-      {/* Concentric quarter-circles from top-right corner */}
       <circle cx="1440" cy="0" r="260" fill="none" stroke="#1a5c36" strokeWidth="1" opacity="0.55" />
       <circle cx="1440" cy="0" r="400" fill="none" stroke="#113d24" strokeWidth="1" opacity="0.4" />
       <circle cx="1440" cy="0" r="560" fill="none" stroke="#0c2918" strokeWidth="1.5" opacity="0.45" />
       <circle cx="1440" cy="0" r="720" fill="none" stroke="#0c2918" strokeWidth="1" opacity="0.3" />
-
-      {/* Flowing accent line — left of centre */}
-      <path
-        d="M580,0 C630,120 680,260 660,420 C640,580 560,660 580,840"
-        fill="none" stroke="#113d24" strokeWidth="1" opacity="0.35"
-      />
-      <path
-        d="M680,0 C740,140 790,290 770,460 C750,630 660,710 680,900"
-        fill="none" stroke="#0c2918" strokeWidth="1" opacity="0.4"
-      />
-
-      {/* Bottom-left accent block */}
-      <path
-        d="M0,900 C0,720 70,650 50,500 C30,350 -30,280 0,150 L0,900 Z"
-        fill="#0c2918"
-        opacity="0.65"
-      />
-
-      {/* Subtle dot cluster — left mid-section */}
+      <path d="M580,0 C630,120 680,260 660,420 C640,580 560,660 580,840" fill="none" stroke="#113d24" strokeWidth="1" opacity="0.35" />
+      <path d="M680,0 C740,140 790,290 770,460 C750,630 660,710 680,900" fill="none" stroke="#0c2918" strokeWidth="1" opacity="0.4" />
+      <path d="M0,900 C0,720 70,650 50,500 C30,350 -30,280 0,150 L0,900 Z" fill="#0c2918" opacity="0.65" />
       <g fill="#2d9960">
-        <circle cx="170" cy="210" r="2"   opacity="0.35" />
+        <circle cx="170" cy="210" r="2" opacity="0.35" />
         <circle cx="230" cy="310" r="1.5" opacity="0.28" />
-        <circle cx="150" cy="420" r="2"   opacity="0.3"  />
+        <circle cx="150" cy="420" r="2" opacity="0.3" />
         <circle cx="290" cy="260" r="1.5" opacity="0.22" />
-        <circle cx="320" cy="390" r="1"   opacity="0.2"  />
+        <circle cx="320" cy="390" r="1" opacity="0.2" />
         <circle cx="250" cy="510" r="1.5" opacity="0.25" />
-        <circle cx="360" cy="190" r="1"   opacity="0.18" />
-        <circle cx="140" cy="570" r="2"   opacity="0.2"  />
+        <circle cx="360" cy="190" r="1" opacity="0.18" />
+        <circle cx="140" cy="570" r="2" opacity="0.2" />
         <circle cx="310" cy="620" r="1.5" opacity="0.15" />
-        <circle cx="200" cy="670" r="1"   opacity="0.18" />
-        <circle cx="420" cy="480" r="1"   opacity="0.15" />
-        <circle cx="380" cy="580" r="1.5" opacity="0.12" />
+        <circle cx="200" cy="670" r="1" opacity="0.18" />
       </g>
     </svg>
   );
@@ -114,12 +107,16 @@ export default function HomePage() {
       <section className="relative bg-brand-950 overflow-hidden min-h-[88vh] flex items-center">
         <HeroBg />
         <div className="relative z-10 max-w-4xl mx-auto px-6 py-24 w-full flex flex-col items-center text-center">
+          <div className="inline-flex items-center gap-2 bg-brand-900/80 border border-brand-700 rounded-full px-4 py-1.5 mb-8">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-xs font-semibold text-brand-300 tracking-wide">Free · no account needed for most tools</span>
+          </div>
           <h1 className="text-5xl lg:text-[4rem] font-bold text-white leading-[1.05] tracking-tight mb-5">
-            Know exactly<br />
-            <span className="text-brand-400">what you can eat.</span>
+            Eating out with IBS<br />
+            <span className="text-brand-400">doesn't have to be stressful.</span>
           </h1>
           <p className="text-lg text-brand-200 leading-relaxed mb-10 max-w-xl">
-            The IBS diary built around the Monash low-FODMAP diet. Track meals, scan menus, fix any recipe — just say what you need.
+            Gutsy scans restaurant menus dish by dish, fixes your favourite recipes, and tracks your gut — all built around the Monash low-FODMAP diet.
           </p>
           <HeroPrompt />
         </div>
@@ -130,10 +127,10 @@ export default function HomePage() {
         <div className="max-w-6xl mx-auto px-6">
           <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-2.5">
             {[
-              'Based on Monash University FODMAP research',
-              'No account needed for free tools',
-              'All data stays on your device',
-              'Free to use',
+              'Built on Monash University FODMAP research',
+              'Menu scanner finds the right menu automatically',
+              'Free to use · no account needed',
+              'Works with any restaurant URL, PDF, or text',
             ].map(item => (
               <div key={item} className="flex items-center gap-2">
                 <CheckCircle className="w-3.5 h-3.5 text-brand-500 flex-shrink-0" />
@@ -144,37 +141,90 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ── Restaurant carousel ── */}
+      <section className="py-20 bg-white">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="flex items-end justify-between mb-8">
+            <div>
+              <p className="text-xs font-semibold text-brand-600 uppercase tracking-widest mb-2">Real scans</p>
+              <h2 className="text-2xl font-bold text-gray-900">Restaurants people have scanned</h2>
+              <p className="text-sm text-gray-500 mt-1">Click any to see the full dish-by-dish breakdown.</p>
+            </div>
+            <Link href="/menu" className="hidden md:flex items-center gap-1.5 text-sm font-semibold text-brand-700 hover:text-brand-900 flex-shrink-0">
+              Scan a restaurant <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+          <RestaurantCarousel />
+          <div className="mt-14 text-center">
+            <Link
+              href="/menu"
+              className="inline-flex items-center gap-2 bg-brand-700 hover:bg-brand-800 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors"
+            >
+              <ScanLine className="w-4 h-4" />
+              Scan your restaurant
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Hope section ── */}
+      <section className="py-20 bg-brand-950">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <p className="text-xs font-semibold text-brand-400 uppercase tracking-widest mb-4">You're not alone</p>
+          <h2 className="text-3xl lg:text-4xl font-bold text-white leading-tight mb-6">
+            IBS affects 1 in 7 people.<br />
+            <span className="text-brand-400">Most of them just stop going out.</span>
+          </h2>
+          <p className="text-brand-200 text-lg leading-relaxed max-w-2xl mx-auto mb-10">
+            Gutsy exists because navigating menus with IBS is exhausting — mentally scanning every ingredient, asking awkward questions, hoping nothing goes wrong. The low-FODMAP diet works, but applying it in the real world is hard. We built the tools to make it easy.
+          </p>
+          <div className="grid sm:grid-cols-3 gap-6 text-left">
+            {[
+              { stat: '75%', label: 'of IBS sufferers see improvement on low-FODMAP', sub: 'Monash University research' },
+              { stat: '15–25', label: 'dishes rated per menu scan', sub: 'safe, modify, or avoid' },
+              { stat: 'Free', label: 'menu scanner, recipe fixer & food guide', sub: 'no account needed' },
+            ].map(({ stat, label, sub }) => (
+              <div key={stat} className="bg-brand-900/50 border border-brand-800 rounded-2xl p-6">
+                <p className="text-3xl font-bold text-brand-400 mb-1">{stat}</p>
+                <p className="text-sm font-semibold text-white leading-snug mb-1">{label}</p>
+                <p className="text-xs text-brand-500">{sub}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── What it does ── */}
       <section className="py-24 bg-white">
         <div className="max-w-6xl mx-auto px-6">
           <div className="mb-14">
-            <p className="text-xs font-semibold text-brand-600 uppercase tracking-widest mb-3">What it does</p>
+            <p className="text-xs font-semibold text-brand-600 uppercase tracking-widest mb-3">What Gutsy does</p>
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 leading-tight max-w-xl">
-              Three tools for eating with IBS
+              Three tools. One goal: actually enjoying food.
             </h2>
           </div>
           <div className="grid md:grid-cols-3 gap-6">
             {[
               {
-                icon: Activity,
-                title: 'Track meals and symptoms',
-                desc: 'Log what you eat, how you feel, and bowel movements. Charts show your FODMAP intake and symptom patterns over time.',
-                note: 'Free tracker',
-                href: '/dashboard',
-              },
-              {
                 icon: ScanLine,
-                title: 'Scan a restaurant menu',
-                desc: 'Paste a URL, upload a PDF, or copy the menu text. Each dish is assessed as safe, modify, or avoid — with what to ask the waiter.',
+                title: 'Scan any restaurant menu',
+                desc: 'Paste a URL and Gutsy finds the real menu automatically — even if you give it the homepage. Every dish comes back safe, modify, or avoid with specific words to use when ordering.',
                 note: 'Free · no account',
                 href: '/menu',
               },
               {
                 icon: ChefHat,
-                title: 'Fix a recipe',
-                desc: 'Paste any recipe and get a FODMAP-safe rewrite. Every high-FODMAP ingredient is replaced with a practical alternative.',
+                title: 'Fix any recipe',
+                desc: 'Paste a recipe and get a rewritten version with every high-FODMAP ingredient swapped for something practical. The method is rewritten around the swaps, not just flagged.',
                 note: 'Free · no account',
                 href: '/recipe',
+              },
+              {
+                icon: Activity,
+                title: 'Track meals and symptoms',
+                desc: 'Log what you eat, how you feel, and bowel movements. Charts reveal your FODMAP intake and symptom patterns so you know your actual triggers — not just the common ones.',
+                note: 'Free tracker',
+                href: '/dashboard',
               },
             ].map(({ icon: Icon, title, desc, note, href }) => (
               <Link key={title} href={href} className="group block">
@@ -184,9 +234,7 @@ export default function HomePage() {
                   </div>
                   <h3 className="text-base font-bold text-gray-900 mb-2">{title}</h3>
                   <p className="text-sm text-gray-600 leading-relaxed mb-5">{desc}</p>
-                  <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700">
-                    {note}
-                  </span>
+                  <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700">{note}</span>
                 </div>
               </Link>
             ))}
@@ -194,35 +242,45 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Free tools ── */}
-      <section className="py-24 bg-brand-950">
+      {/* ── Recipe fixer showcase ── */}
+      <section className="py-24 bg-gray-50 border-t border-gray-100">
         <div className="max-w-6xl mx-auto px-6">
-          <div className="mb-12">
-            <p className="text-xs font-semibold text-brand-400 uppercase tracking-widest mb-3">Try without an account</p>
-            <h2 className="text-3xl lg:text-4xl font-bold text-white leading-tight max-w-xl">
-              The free tools
-            </h2>
-          </div>
-          <div className="grid md:grid-cols-2 gap-5">
-            <Link href="/menu" className="group bg-brand-900 border border-brand-800 rounded-2xl p-8 hover:border-brand-600 transition-all">
-              <ScanLine className="w-7 h-7 text-brand-400 mb-5" />
-              <h3 className="text-xl font-bold text-white mb-2">Menu scanner</h3>
-              <p className="text-brand-300 text-sm leading-relaxed mb-6">
-                Paste a restaurant URL or upload their PDF. Each dish is rated safe, modify, or avoid — with specific modification requests.
-              </p>
-              <span className="inline-flex items-center gap-1.5 text-brand-400 text-sm font-semibold group-hover:text-white transition-colors">
-                Scan a menu <ArrowRight className="w-4 h-4" />
-              </span>
+          <div className="flex items-end justify-between mb-12">
+            <div>
+              <p className="text-xs font-semibold text-brand-600 uppercase tracking-widest mb-3">Recipe fixer</p>
+              <h2 className="text-3xl font-bold text-gray-900">Your favourite dishes, FODMAP-safe</h2>
+              <p className="text-sm text-gray-500 mt-2 max-w-md">Paste any recipe — Gutsy rewrites it with practical swaps, not just a list of things to avoid.</p>
+            </div>
+            <Link href="/recipe" className="hidden md:flex items-center gap-1.5 text-sm font-semibold text-brand-700 hover:text-brand-900 flex-shrink-0">
+              Fix a recipe <ArrowRight className="w-4 h-4" />
             </Link>
-            <Link href="/recipe" className="group bg-brand-900 border border-brand-800 rounded-2xl p-8 hover:border-brand-600 transition-all">
-              <ChefHat className="w-7 h-7 text-brand-400 mb-5" />
-              <h3 className="text-xl font-bold text-white mb-2">Recipe fixer</h3>
-              <p className="text-brand-300 text-sm leading-relaxed mb-6">
-                Paste any recipe. Every high-FODMAP ingredient gets a swap with a brief explanation, and the full method is rewritten.
-              </p>
-              <span className="inline-flex items-center gap-1.5 text-brand-400 text-sm font-semibold group-hover:text-white transition-colors">
-                Fix a recipe <ArrowRight className="w-4 h-4" />
-              </span>
+          </div>
+          <div className="grid md:grid-cols-3 gap-5">
+            {RECIPE_EXAMPLES.map(({ name, swaps, tag }) => (
+              <div key={name} className="bg-white border border-gray-100 rounded-2xl p-6 hover:border-brand-200 hover:shadow-lifted transition-all">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-brand-100 text-brand-700">{tag}</span>
+                  <Utensils className="w-4 h-4 text-gray-300" />
+                </div>
+                <h3 className="text-base font-bold text-gray-900 mb-4">{name}</h3>
+                <div className="space-y-2">
+                  {swaps.map(swap => {
+                    const [before, after] = swap.split(' → ');
+                    return (
+                      <div key={swap} className="flex items-start gap-2 text-xs">
+                        <span className="text-red-500 line-through text-gray-400 flex-shrink-0 pt-px">{before}</span>
+                        <ArrowRight className="w-3 h-3 text-gray-300 flex-shrink-0 mt-px" />
+                        <span className="text-emerald-700 font-medium">{after}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-10 text-center md:hidden">
+            <Link href="/recipe" className="inline-flex items-center gap-1.5 text-sm font-semibold text-brand-700">
+              Fix a recipe <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
         </div>
@@ -234,8 +292,9 @@ export default function HomePage() {
           <div className="mb-16">
             <p className="text-xs font-semibold text-brand-600 uppercase tracking-widest mb-3">The tracker</p>
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 leading-tight max-w-xl">
-              Built for the elimination and reintroduction phases
+              Know your triggers, not just the common ones
             </h2>
+            <p className="text-gray-500 text-sm mt-3 max-w-lg">Everyone's gut is different. The tracker helps you find your personal FODMAP threshold — so you're not avoiding things you don't need to.</p>
           </div>
           <div className="grid md:grid-cols-3 gap-10">
             {[
@@ -243,19 +302,19 @@ export default function HomePage() {
                 num: '01',
                 icon: Activity,
                 title: 'Log meals and symptoms',
-                desc: 'One-tap logging for meals, symptoms, and bowel movements. Search from the FODMAP database or free-type.',
+                desc: 'One-tap logging for meals, symptoms, and bowel movements. Search from the FODMAP database or free-type anything.',
               },
               {
                 num: '02',
                 icon: BarChart2,
                 title: 'Spot the patterns',
-                desc: 'Symptom charts and FODMAP intake graphs across your elimination and reintroduction phases.',
+                desc: 'Symptom charts and FODMAP intake graphs across your elimination and reintroduction phases — all in one place.',
               },
               {
                 num: '03',
                 icon: BookOpen,
                 title: 'Read the research',
-                desc: 'Articles on enzymes, supplements, and the FODMAP science — written plainly without the hype.',
+                desc: 'Plain-English articles on enzymes, supplements, and the FODMAP science — written without the noise.',
               },
             ].map(({ num, icon: Icon, title, desc }) => (
               <div key={title} className="flex gap-5">
@@ -300,7 +359,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Structured data for SEO + GEO ── */}
+      {/* ── Structured data for SEO ── */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -387,7 +446,7 @@ export default function HomePage() {
             <div>
               <div className="font-display text-3xl text-white mb-3">gutsy</div>
               <p className="text-sm text-brand-500 max-w-xs leading-relaxed">
-                Built on Monash University low FODMAP research. Not a substitute for medical advice.
+                Built on Monash University low-FODMAP research. Not a substitute for medical advice.
               </p>
             </div>
             <div className="flex flex-wrap gap-x-14 gap-y-8">
