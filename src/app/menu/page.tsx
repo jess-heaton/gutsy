@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Link2, Upload, ClipboardList, X, AlertCircle, CheckCircle, AlertTriangle, Ban, ExternalLink } from 'lucide-react';
+import { Link2, Upload, ClipboardList, X, AlertCircle, CheckCircle, AlertTriangle, Ban, ExternalLink, Share2, Copy, Check } from 'lucide-react';
 import clsx from 'clsx';
 
 type InputMode = 'url' | 'pdf' | 'text';
@@ -23,6 +23,7 @@ interface ScanResult {
   items: MenuItem[];
   menu_source_url?: string | null;
   sources?: Source[];
+  image_url?: string | null;
 }
 
 const STATUS_CONFIG = {
@@ -94,6 +95,9 @@ function MenuInner() {
   const [loading, setLoading]   = useState(false);
   const [error, setError]       = useState('');
   const [result, setResult]     = useState<ScanResult | null>(null);
+  const [shareSlug, setShareSlug] = useState<string | null>(null);
+  const [sharing, setSharing]   = useState(false);
+  const [copied, setCopied]     = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -109,8 +113,33 @@ function MenuInner() {
     reader.readAsDataURL(file);
   };
 
+  async function share() {
+    if (!result || sharing) return;
+    setSharing(true);
+    try {
+      const res = await fetch('/api/save-menu-scan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(result),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? 'Failed to save');
+      setShareSlug(data.slug);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not save scan');
+    } finally {
+      setSharing(false);
+    }
+  }
+
+  async function copyLink(slug: string) {
+    await navigator.clipboard.writeText(`${window.location.origin}/s/${slug}`);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
   const scan = async () => {
-    setError(''); setResult(null); setLoading(true);
+    setError(''); setResult(null); setLoading(true); setShareSlug(null);
     try {
       const body: Record<string, string> = {};
       if (mode === 'url')  body.url     = url;
@@ -246,9 +275,20 @@ function MenuInner() {
         <div className="space-y-6 animate-slide-up">
           {/* Summary */}
           <div className="bg-brand-900 rounded-xl p-5">
-            <p className="text-xs font-semibold text-brand-400 uppercase tracking-widest mb-1">
-              {result.restaurant ?? 'Menu'} — overall assessment
-            </p>
+            <div className="flex items-center gap-3 mb-3">
+              {result.menu_source_url && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={`https://logo.clearbit.com/${new URL(result.menu_source_url).host}`}
+                  alt=""
+                  className="w-10 h-10 rounded-lg object-contain bg-white p-1 flex-shrink-0"
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                />
+              )}
+              <p className="text-xs font-semibold text-brand-400 uppercase tracking-widest">
+                {result.restaurant ?? 'Menu'} — overall assessment
+              </p>
+            </div>
             <p className="text-sm text-brand-100 leading-relaxed">{result.summary}</p>
 
             {result.sources && result.sources.length > 0 && (
@@ -283,6 +323,35 @@ function MenuInner() {
                   <p className="text-xs text-brand-400">{label}</p>
                 </div>
               ))}
+            </div>
+
+            {/* Share */}
+            <div className="mt-4 pt-3 border-t border-white/10">
+              {shareSlug ? (
+                <div className="flex items-center gap-2">
+                  <input
+                    readOnly
+                    value={`${typeof window !== 'undefined' ? window.location.origin : ''}/s/${shareSlug}`}
+                    className="flex-1 text-xs bg-white/10 text-brand-100 rounded-lg px-3 py-1.5 outline-none truncate"
+                  />
+                  <button
+                    onClick={() => copyLink(shareSlug)}
+                    className="flex-shrink-0 flex items-center gap-1 text-xs font-semibold text-white bg-white/15 hover:bg-white/25 px-3 py-1.5 rounded-lg transition-colors"
+                  >
+                    {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                    {copied ? 'Copied!' : 'Copy link'}
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={share}
+                  disabled={sharing}
+                  className="flex items-center gap-1.5 text-xs font-semibold text-brand-200 hover:text-white transition-colors disabled:opacity-50"
+                >
+                  <Share2 className="w-3.5 h-3.5" />
+                  {sharing ? 'Saving…' : 'Save & share this scan'}
+                </button>
+              )}
             </div>
           </div>
 

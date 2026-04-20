@@ -13,6 +13,7 @@ const STATIC_PATHS = [
   { path: '/login',      priority: 0.4, changeFrequency: 'yearly' as const },
   { path: '/signup',     priority: 0.5, changeFrequency: 'yearly' as const },
   { path: '/privacy',    priority: 0.3, changeFrequency: 'yearly' as const },
+  { path: '/s',          priority: 0.5, changeFrequency: 'daily' as const  },
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {
