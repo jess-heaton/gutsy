@@ -7,49 +7,59 @@ import { addEntry, generateId, getTodayKey, getNowTime } from '@/lib/store';
 import { BristolType } from '@/lib/types';
 import clsx from 'clsx';
 
-type Mode = 'meal' | 'bowel' | 'symptom';
-
 const BRISTOL_LABELS: Record<number, string> = {
-  1: 'Hard',
-  2: 'Lumpy',
-  3: 'Cracked',
-  4: 'Normal',
-  5: 'Soft',
-  6: 'Mushy',
-  7: 'Watery',
+  1: 'Hard', 2: 'Lumpy', 3: 'Cracked', 4: 'Normal', 5: 'Soft', 6: 'Mushy', 7: 'Watery',
 };
+
+type MedKey = 'paracetamol' | 'psyllium' | 'lactase' | 'fodzyme';
+const MEDS: { key: MedKey; label: string; emoji: string }[] = [
+  { key: 'paracetamol', label: 'Paracetamol', emoji: '💊' },
+  { key: 'psyllium', label: 'Psyllium', emoji: '🌾' },
+  { key: 'lactase', label: 'Lactase', emoji: '🥛' },
+  { key: 'fodzyme', label: 'Fodzyme', emoji: '🧪' },
+];
 
 export default function QuickLogWidget() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const [mode, setMode] = useState<Mode>('meal');
   const [text, setText] = useState('');
-  const [bristol, setBristol] = useState<number | null>(null);
-  const [symptomScore, setSymptomScore] = useState<number | null>(null);
-  const [saved, setSaved] = useState(false);
+  const [flashMsg, setFlashMsg] = useState<string | null>(null);
 
   if (pathname?.startsWith('/popup')) return null;
 
-  const flash = () => {
-    setSaved(true);
-    setTimeout(() => { setSaved(false); setText(''); setBristol(null); setSymptomScore(null); }, 1400);
+  const flash = (msg: string) => {
+    setFlashMsg(msg);
+    setText('');
+    setTimeout(() => setFlashMsg(null), 1200);
   };
 
-  const save = () => {
-    const base = { id: generateId(), date: getTodayKey(), time: getNowTime() };
-    if (mode === 'meal' && text.trim()) {
-      addEntry({ ...base, type: 'meal', mealType: 'snack', foods: [], freeText: text.trim() });
-      flash();
-    } else if (mode === 'bowel' && bristol !== null) {
-      addEntry({ ...base, type: 'bowel', bristolType: bristol as BristolType, urgency: 'normal', pain: 0 });
-      flash();
-    } else if (mode === 'symptom' && symptomScore !== null) {
-      addEntry({ ...base, type: 'symptom', overall: symptomScore, bloating: 0, pain: 0, gas: 0, nausea: 0, fatigue: 0, notes: '' });
-      flash();
+  const base = () => ({ id: generateId(), date: getTodayKey(), time: getNowTime() });
+
+  const logMeal = () => {
+    const t = text.trim();
+    if (!t) return;
+    addEntry({ ...base(), type: 'meal', mealType: 'snack', foods: [], freeText: t });
+    flash('✓ Meal logged');
+  };
+
+  const logBristol = (n: number) => {
+    addEntry({ ...base(), type: 'bowel', bristolType: n as BristolType, urgency: 'normal', pain: 0 });
+    flash(`✓ Bristol ${n} — ${BRISTOL_LABELS[n]}`);
+  };
+
+  const logMed = (med: { key: MedKey; label: string }) => {
+    const t = text.trim();
+    if (med.key === 'lactase' || med.key === 'fodzyme') {
+      if (t) {
+        addEntry({ ...base(), type: 'meal', mealType: 'snack', foods: [], freeText: `${t} (with ${med.label.toLowerCase()})` });
+        flash(`✓ Logged with ${med.label}`);
+        return;
+      }
     }
+    const noteText = t ? `${med.label} — ${t}` : `Took ${med.label}`;
+    addEntry({ ...base(), type: 'note', text: noteText });
+    flash(`✓ ${med.label} logged`);
   };
-
-  const canSave = (mode === 'meal' && text.trim()) || (mode === 'bowel' && bristol !== null) || (mode === 'symptom' && symptomScore !== null);
 
   /* ── Collapsed pill ── */
   if (!open) {
@@ -66,10 +76,9 @@ export default function QuickLogWidget() {
 
   /* ── Expanded widget ── */
   return (
-    <div className="hidden lg:block fixed bottom-5 left-5 z-[9999] w-[280px] rounded-2xl overflow-hidden shadow-2xl border border-white/5"
+    <div className="hidden lg:block fixed bottom-5 left-5 z-[9999] w-[300px] rounded-2xl overflow-hidden shadow-2xl border border-white/5"
       style={{ background: 'rgba(10,10,10,0.96)', backdropFilter: 'blur(20px)' }}
     >
-      {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
         <span className="font-display text-base text-white leading-none">gutsy</span>
         <button
@@ -80,100 +89,59 @@ export default function QuickLogWidget() {
         </button>
       </div>
 
-      {/* Mode tabs */}
-      <div className="flex gap-1 px-3 pt-3">
-        {(['meal', 'bowel', 'symptom'] as Mode[]).map(m => (
-          <button
-            key={m}
-            onClick={() => setMode(m)}
-            className={clsx(
-              'flex-1 py-1.5 rounded-lg text-xs font-medium transition-colors capitalize',
-              mode === m ? 'bg-brand-800 text-brand-300' : 'text-gray-600 hover:text-gray-300',
-            )}
-          >
-            {m === 'meal' ? '🍎' : m === 'bowel' ? '🚽' : '😣'} {m}
-          </button>
-        ))}
-      </div>
+      <div className="px-3 py-3 space-y-3">
+        <textarea
+          placeholder="What did you eat or feel? Enter to log…"
+          value={text}
+          onChange={e => setText(e.target.value)}
+          rows={2}
+          onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); logMeal(); } }}
+          className="w-full rounded-xl px-3 py-2.5 text-sm text-white placeholder:text-gray-600 resize-none focus:outline-none border border-white/5 focus:border-brand-800"
+          style={{ background: 'rgba(255,255,255,0.04)' }}
+        />
 
-      {/* Content */}
-      <div className="px-3 py-3 space-y-2">
-        {mode === 'meal' && (
-          <textarea
-            placeholder="What did you eat?"
-            value={text}
-            onChange={e => setText(e.target.value)}
-            rows={2}
-            onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); save(); } }}
-            className="w-full rounded-xl px-3 py-2.5 text-sm text-white placeholder:text-gray-600 resize-none focus:outline-none border border-white/5 focus:border-brand-800"
-            style={{ background: 'rgba(255,255,255,0.04)' }}
-          />
-        )}
+        <div>
+          <p className="text-2xs uppercase tracking-wider text-gray-600 px-0.5 mb-1.5">Stool type</p>
+          <div className="grid grid-cols-7 gap-1">
+            {[1, 2, 3, 4, 5, 6, 7].map(n => (
+              <button
+                key={n}
+                onClick={() => logBristol(n)}
+                title={BRISTOL_LABELS[n]}
+                className="py-2 rounded-lg text-xs font-bold text-gray-400 hover:text-white hover:bg-brand-700 transition-colors"
+                style={{ background: 'rgba(255,255,255,0.04)' }}
+              >
+                {n}
+              </button>
+            ))}
+          </div>
+        </div>
 
-        {mode === 'bowel' && (
-          <div className="space-y-2">
-            <p className="text-xs text-gray-600 px-0.5">Bristol stool type</p>
-            <div className="grid grid-cols-7 gap-1">
-              {[1, 2, 3, 4, 5, 6, 7].map(n => (
-                <button
-                  key={n}
-                  onClick={() => setBristol(n)}
-                  className={clsx(
-                    'py-2 rounded-lg text-xs font-bold transition-colors',
-                    bristol === n ? 'bg-brand-700 text-white' : 'text-gray-500 hover:text-gray-200',
-                  )}
-                  style={{ background: bristol === n ? undefined : 'rgba(255,255,255,0.04)' }}
-                >
-                  {n}
-                </button>
-              ))}
-            </div>
-            {bristol !== null && (
-              <p className="text-xs text-gray-500 text-center">{BRISTOL_LABELS[bristol]}</p>
-            )}
+        <div>
+          <p className="text-2xs uppercase tracking-wider text-gray-600 px-0.5 mb-1.5">Meds & enzymes</p>
+          <div className="grid grid-cols-2 gap-1">
+            {MEDS.map(m => (
+              <button
+                key={m.key}
+                onClick={() => logMed(m)}
+                className="py-2 px-2 rounded-lg text-xs font-medium text-gray-300 hover:text-white hover:bg-brand-700 transition-colors flex items-center gap-1.5"
+                style={{ background: 'rgba(255,255,255,0.04)' }}
+              >
+                <span>{m.emoji}</span>
+                <span>{m.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {flashMsg && (
+          <div className={clsx(
+            'text-center text-xs font-semibold py-2 rounded-xl',
+            'bg-emerald-900/50 text-emerald-300',
+          )}>
+            {flashMsg}
           </div>
         )}
-
-        {mode === 'symptom' && (
-          <div className="space-y-2">
-            <p className="text-xs text-gray-600 px-0.5">Overall symptom score</p>
-            <div className="grid grid-cols-5 gap-1">
-              {[2, 4, 6, 8, 10].map(n => (
-                <button
-                  key={n}
-                  onClick={() => setSymptomScore(n)}
-                  className={clsx(
-                    'py-2 rounded-lg text-xs font-bold transition-colors',
-                    symptomScore === n ? 'bg-brand-700 text-white' : 'text-gray-500 hover:text-gray-200',
-                  )}
-                  style={{ background: symptomScore === n ? undefined : 'rgba(255,255,255,0.04)' }}
-                >
-                  {n}
-                </button>
-              ))}
-            </div>
-            <div className="flex justify-between px-0.5">
-              <span className="text-2xs text-gray-700">mild</span>
-              <span className="text-2xs text-gray-700">severe</span>
-            </div>
-          </div>
-        )}
-
-        <button
-          onClick={save}
-          disabled={!canSave || saved}
-          className={clsx(
-            'w-full py-2 rounded-xl text-xs font-semibold transition-all',
-            saved
-              ? 'bg-emerald-800 text-emerald-300'
-              : canSave
-              ? 'bg-brand-700 text-white hover:bg-brand-600'
-              : 'text-gray-700 cursor-not-allowed',
-          )}
-          style={{ background: !canSave && !saved ? 'rgba(255,255,255,0.04)' : undefined }}
-        >
-          {saved ? '✓ Saved' : 'Log it'}
-        </button>
       </div>
     </div>
   );
