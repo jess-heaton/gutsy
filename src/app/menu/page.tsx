@@ -23,14 +23,28 @@ interface ScanResult {
   items: MenuItem[];
   menu_source_url?: string | null;
   sources?: Source[];
-  image_url?: string | null;
+}
+
+interface PublicScan {
+  slug: string;
+  restaurant: string | null;
+  image_url: string | null;
+  analysis: { summary: string; items: MenuItem[] };
+  created_at: string;
 }
 
 const STATUS_CONFIG = {
-  safe:   { label: 'Safe',     icon: CheckCircle,    bg: 'bg-emerald-50', border: 'border-emerald-200', text: 'text-emerald-700', badge: 'bg-emerald-100 text-emerald-700' },
-  modify: { label: 'Modify',   icon: AlertTriangle,  bg: 'bg-amber-50',   border: 'border-amber-200',   text: 'text-amber-700',   badge: 'bg-amber-100 text-amber-700'   },
-  avoid:  { label: 'Avoid',    icon: Ban,            bg: 'bg-red-50',     border: 'border-red-200',     text: 'text-red-700',     badge: 'bg-red-100 text-red-700'       },
+  safe:   { label: 'Safe',   icon: CheckCircle,   bg: 'bg-emerald-50', border: 'border-emerald-200', text: 'text-emerald-700', badge: 'bg-emerald-100 text-emerald-700' },
+  modify: { label: 'Modify', icon: AlertTriangle,  bg: 'bg-amber-50',   border: 'border-amber-200',   text: 'text-amber-700',   badge: 'bg-amber-100 text-amber-700'   },
+  avoid:  { label: 'Avoid',  icon: Ban,            bg: 'bg-red-50',     border: 'border-red-200',     text: 'text-red-700',     badge: 'bg-red-100 text-red-700'       },
 };
+
+function safeHost(url: string): string {
+  try { return new URL(url).host; } catch { return ''; }
+}
+function safePath(url: string): string {
+  try { const u = new URL(url); return `${u.host}${u.pathname}`; } catch { return url; }
+}
 
 function Spinner() {
   return (
@@ -41,7 +55,7 @@ function Spinner() {
       </div>
       <div className="text-center">
         <p className="text-sm font-semibold text-gray-700">Scanning menu…</p>
-        <p className="text-xs text-gray-400 mt-1">Checking each dish against the FODMAP database</p>
+        <p className="text-xs text-gray-400 mt-1">This can take 20–40 s while Gutsy searches for the menu</p>
       </div>
     </div>
   );
@@ -73,32 +87,75 @@ function MenuCard({ item }: { item: MenuItem }) {
   );
 }
 
+function ScanCard({ scan }: { scan: PublicScan }) {
+  const safe   = scan.analysis.items.filter(i => i.status === 'safe').length;
+  const modify = scan.analysis.items.filter(i => i.status === 'modify').length;
+  const avoid  = scan.analysis.items.filter(i => i.status === 'avoid').length;
+  return (
+    <a
+      href={`/s/${scan.slug}`}
+      className="block bg-white border border-gray-100 rounded-xl p-4 hover:shadow-md hover:border-brand-200 transition-all group"
+    >
+      <div className="flex items-center gap-3 mb-2">
+        {scan.image_url ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={scan.image_url}
+            alt=""
+            className="w-9 h-9 rounded-lg object-contain bg-gray-50 border border-gray-100 p-0.5 flex-shrink-0"
+            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+          />
+        ) : (
+          <div className="w-9 h-9 rounded-lg bg-brand-50 flex items-center justify-center flex-shrink-0 text-base">🍽️</div>
+        )}
+        <p className="text-sm font-semibold text-gray-900 truncate group-hover:text-brand-700 transition-colors">
+          {scan.restaurant ?? 'Unnamed restaurant'}
+        </p>
+      </div>
+      <p className="text-xs text-gray-500 leading-relaxed line-clamp-2 mb-2">{scan.analysis.summary}</p>
+      <div className="flex gap-3 text-2xs font-semibold">
+        <span className="text-emerald-600">{safe} safe</span>
+        <span className="text-amber-600">{modify} modify</span>
+        <span className="text-red-500">{avoid} avoid</span>
+      </div>
+    </a>
+  );
+}
+
 export default function MenuPage() {
   return <Suspense fallback={null}><MenuInner /></Suspense>;
 }
 
 function MenuInner() {
   const params = useSearchParams();
-  const [mode, setMode]         = useState<InputMode>('url');
-  const [url, setUrl]           = useState('');
-  const [text, setText]         = useState('');
+  const [mode, setMode]     = useState<InputMode>('url');
+  const [url, setUrl]       = useState('');
+  const [text, setText]     = useState('');
+  const [pdfName, setPdfName] = useState('');
+  const [pdfB64, setPdfB64]   = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError]     = useState('');
+  const [result, setResult]   = useState<ScanResult | null>(null);
+  const [shareSlug, setShareSlug] = useState<string | null>(null);
+  const [sharing, setSharing]     = useState(false);
+  const [copied, setCopied]       = useState(false);
+  const [publicScans, setPublicScans] = useState<PublicScan[]>([]);
+  const [search, setSearch]           = useState('');
+  const fileRef = useRef<HTMLInputElement>(null);
 
-  // Prefill from ?q= (intent routing from the homepage hero).
   useEffect(() => {
     const q = params.get('q');
     if (!q) return;
     if (/^https?:\/\//i.test(q)) { setMode('url'); setUrl(q); }
     else { setMode('text'); setText(q); }
   }, [params]);
-  const [pdfName, setPdfName]   = useState('');
-  const [pdfB64, setPdfB64]     = useState('');
-  const [loading, setLoading]   = useState(false);
-  const [error, setError]       = useState('');
-  const [result, setResult]     = useState<ScanResult | null>(null);
-  const [shareSlug, setShareSlug] = useState<string | null>(null);
-  const [sharing, setSharing]   = useState(false);
-  const [copied, setCopied]     = useState(false);
-  const fileRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    fetch('/api/public-scans')
+      .then(r => r.json())
+      .then(d => { if (Array.isArray(d)) setPublicScans(d); })
+      .catch(() => {});
+  }, [shareSlug]); // refetch when user saves a new scan
 
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -106,10 +163,7 @@ function MenuInner() {
     if (file.size > 5 * 1024 * 1024) { setError('PDF must be under 5 MB'); return; }
     setPdfName(file.name);
     const reader = new FileReader();
-    reader.onload = ev => {
-      const b64 = (ev.target?.result as string).split(',')[1];
-      setPdfB64(b64);
-    };
+    reader.onload = ev => setPdfB64((ev.target?.result as string).split(',')[1]);
     reader.readAsDataURL(file);
   };
 
@@ -138,14 +192,13 @@ function MenuInner() {
     setTimeout(() => setCopied(false), 2000);
   }
 
-  const scan = async () => {
+  async function scan() {
     setError(''); setResult(null); setLoading(true); setShareSlug(null);
     try {
       const body: Record<string, string> = {};
-      if (mode === 'url')  body.url     = url;
-      if (mode === 'text') body.text    = text;
+      if (mode === 'url')  body.url       = url;
+      if (mode === 'text') body.text      = text;
       if (mode === 'pdf')  body.pdfBase64 = pdfB64;
-
       const res  = await fetch('/api/scan-menu', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
       const data = await res.json();
       if (!res.ok || data.error) throw new Error(data.error ?? 'Scan failed');
@@ -155,29 +208,32 @@ function MenuInner() {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   const canScan = (mode === 'url' && url.trim()) || (mode === 'text' && text.trim()) || (mode === 'pdf' && pdfB64);
-
   const safe   = result?.items.filter(i => i.status === 'safe')   ?? [];
   const modify = result?.items.filter(i => i.status === 'modify') ?? [];
   const avoid  = result?.items.filter(i => i.status === 'avoid')  ?? [];
+
+  const filteredScans = publicScans.filter(s =>
+    !search.trim() || (s.restaurant ?? '').toLowerCase().includes(search.trim().toLowerCase()),
+  );
 
   return (
     <div className="max-w-content mx-auto px-4 sm:px-6 py-8 lg:py-12 pb-20 lg:pb-12 space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Menu scanner</h1>
         <p className="text-sm text-gray-500 mt-1">
-          Paste a restaurant URL, upload a PDF menu, or paste the menu text — and get a dish-by-dish breakdown of what's safe.
+          Paste a restaurant URL, upload a PDF menu, or paste the menu text — and get a dish-by-dish FODMAP breakdown.
         </p>
       </div>
 
       {/* Input mode tabs */}
       <div className="flex border-b border-gray-200">
         {([
-          { id: 'url',  icon: Link2,         label: 'URL'       },
-          { id: 'pdf',  icon: Upload,         label: 'PDF'       },
-          { id: 'text', icon: ClipboardList,  label: 'Paste text' },
+          { id: 'url',  icon: Link2,        label: 'URL'        },
+          { id: 'pdf',  icon: Upload,        label: 'PDF'        },
+          { id: 'text', icon: ClipboardList, label: 'Paste text' },
         ] as { id: InputMode; icon: React.ElementType; label: string }[]).map(({ id, icon: Icon, label }) => (
           <button
             key={id}
@@ -187,8 +243,7 @@ function MenuInner() {
               mode === id ? 'text-brand-700 border-brand-700' : 'text-gray-500 border-transparent hover:text-gray-700',
             )}
           >
-            <Icon className="w-4 h-4" />
-            {label}
+            <Icon className="w-4 h-4" /> {label}
           </button>
         ))}
       </div>
@@ -200,15 +255,15 @@ function MenuInner() {
             <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Restaurant or menu URL</label>
             <input
               type="url"
-              placeholder="https://restaurantname.com/menu"
+              placeholder="https://restaurantname.com  or  https://restaurantname.com/menu"
               value={url}
               onChange={e => setUrl(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') scan(); }}
               className="w-full px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
             />
-            <p className="text-xs text-gray-400 mt-1.5">You can paste the homepage or a specific menu page — Gutsy will find the menu on the site, or search the web if needed. For PDF-only menus, download and upload under the PDF tab.</p>
+            <p className="text-xs text-gray-400 mt-1.5">Paste the homepage or menu page — Gutsy crawls common menu paths and web-searches if needed. For PDF-only menus use the PDF tab.</p>
           </div>
         )}
-
         {mode === 'pdf' && (
           <div>
             <input ref={fileRef} type="file" accept="application/pdf" onChange={handleFile} className="hidden" />
@@ -220,9 +275,7 @@ function MenuInner() {
               {pdfName ? (
                 <div className="flex items-center justify-center gap-2">
                   <span className="text-sm font-medium text-gray-700">{pdfName}</span>
-                  <button onClick={e => { e.stopPropagation(); setPdfName(''); setPdfB64(''); }} className="text-gray-400 hover:text-red-400">
-                    <X className="w-4 h-4" />
-                  </button>
+                  <button onClick={e => { e.stopPropagation(); setPdfName(''); setPdfB64(''); }} className="text-gray-400 hover:text-red-400"><X className="w-4 h-4" /></button>
                 </div>
               ) : (
                 <>
@@ -233,7 +286,6 @@ function MenuInner() {
             </button>
           </div>
         )}
-
         {mode === 'text' && (
           <div>
             <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Paste the menu</label>
@@ -259,27 +311,24 @@ function MenuInner() {
           disabled={!canScan || loading}
           className={clsx(
             'w-full py-3 rounded-xl font-semibold text-sm transition-all',
-            canScan && !loading
-              ? 'bg-brand-700 text-white hover:bg-brand-800 active:scale-98'
-              : 'bg-gray-100 text-gray-400 cursor-not-allowed',
+            canScan && !loading ? 'bg-brand-700 text-white hover:bg-brand-800' : 'bg-gray-100 text-gray-400 cursor-not-allowed',
           )}
         >
           {loading ? 'Scanning…' : 'Scan menu'}
         </button>
       </div>
 
-      {/* Results */}
       {loading && <Spinner />}
 
+      {/* ── Scan result ── */}
       {result && (
         <div className="space-y-6 animate-slide-up">
-          {/* Summary */}
           <div className="bg-brand-900 rounded-xl p-5">
             <div className="flex items-center gap-3 mb-3">
-              {result.menu_source_url && (
+              {result.menu_source_url && safeHost(result.menu_source_url) && (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
-                  src={`https://logo.clearbit.com/${new URL(result.menu_source_url).host}`}
+                  src={`https://logo.clearbit.com/${safeHost(result.menu_source_url)}`}
                   alt=""
                   className="w-10 h-10 rounded-lg object-contain bg-white p-1 flex-shrink-0"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
@@ -289,6 +338,7 @@ function MenuInner() {
                 {result.restaurant ?? 'Menu'} — overall assessment
               </p>
             </div>
+
             <p className="text-sm text-brand-100 leading-relaxed">{result.summary}</p>
 
             {result.sources && result.sources.length > 0 && (
@@ -297,14 +347,10 @@ function MenuInner() {
                 <ul className="space-y-1">
                   {result.sources.slice(0, 5).map((s, i) => (
                     <li key={i}>
-                      <a
-                        href={s.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-xs text-brand-200 hover:text-white underline-offset-2 hover:underline break-all"
-                      >
+                      <a href={s.url} target="_blank" rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-xs text-brand-200 hover:text-white underline-offset-2 hover:underline break-all">
                         <ExternalLink className="w-3 h-3 flex-shrink-0" />
-                        {s.title ? `${s.title} — ` : ''}{new URL(s.url).host}{new URL(s.url).pathname}
+                        {s.title ? `${s.title} — ` : ''}{safePath(s.url)}
                       </a>
                     </li>
                   ))}
@@ -325,7 +371,6 @@ function MenuInner() {
               ))}
             </div>
 
-            {/* Share */}
             <div className="mt-4 pt-3 border-t border-white/10">
               {shareSlug ? (
                 <div className="flex items-center gap-2">
@@ -355,12 +400,11 @@ function MenuInner() {
             </div>
           </div>
 
-          {/* Items by group */}
           {[
-            { items: safe,   title: 'Safe to order',        cfg: STATUS_CONFIG.safe   },
-            { items: modify, title: 'Order with changes',   cfg: STATUS_CONFIG.modify },
-            { items: avoid,  title: 'Avoid',                cfg: STATUS_CONFIG.avoid  },
-          ].map(({ items, title, cfg }) => items.length > 0 && (
+            { items: safe,   title: 'Safe to order'      },
+            { items: modify, title: 'Order with changes' },
+            { items: avoid,  title: 'Avoid'              },
+          ].map(({ items, title }) => items.length > 0 && (
             <div key={title}>
               <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">{title}</h2>
               <div className="space-y-2">
@@ -368,6 +412,30 @@ function MenuInner() {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* ── Public scan portfolio ── */}
+      {!loading && !result && publicScans.length > 0 && (
+        <div className="pt-4">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-widest">Previously scanned restaurants</h2>
+            {publicScans.length > 6 && (
+              <input
+                type="text"
+                placeholder="Search…"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                className="text-xs border border-gray-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-brand-500 w-36"
+              />
+            )}
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {filteredScans.map(scan => <ScanCard key={scan.slug} scan={scan} />)}
+          </div>
+          {filteredScans.length === 0 && search && (
+            <p className="text-sm text-gray-400 text-center py-6">No results for "{search}"</p>
+          )}
         </div>
       )}
     </div>
