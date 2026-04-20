@@ -35,6 +35,38 @@ interface SavedCard {
   created_at: string;
 }
 
+const FOOD_PHOTO_MAP: { keys: string[]; id: string }[] = [
+  { keys: ['pasta','spaghetti','noodle','linguine','penne','fettuccine','tagliatelle','orzo','rigatoni'], id: '1621996346565-e3dbc646d9a9' },
+  { keys: ['salad','greens','lettuce','coleslaw','slaw','cobb'], id: '1512621776951-a57141f2eefd' },
+  { keys: ['soup','stew','broth','chowder','bisque','minestrone','ramen'], id: '1547592166-23ac45744acd' },
+  { keys: ['chicken','turkey','poultry'], id: '1598103442097-8b74394b95c1' },
+  { keys: ['salmon','fish','tuna','cod','seafood','prawn','shrimp','mackerel','halibut','trout'], id: '1580476262798-bddd9f4b7369' },
+  { keys: ['curry','masala','tikka','dal','dhal','indian','thai','korma'], id: '1565557623262-b51c2513a641' },
+  { keys: ['oat','porridge','granola','muesli'], id: '1517686469429-8bdb88b9f907' },
+  { keys: ['bread','toast','sandwich','sourdough','wrap'], id: '1509440159596-0249088772ff' },
+  { keys: ['rice','risotto','pilaf','paella','congee','biryani'], id: '1536304929831-ee1ca9d44906' },
+  { keys: ['egg','omelette','frittata','scrambled','shakshuka','quiche'], id: '1525351484163-7529414344d8' },
+  { keys: ['steak','beef','meat','pork','lamb','venison','mince','meatball'], id: '1544025162-d76694265947' },
+  { keys: ['smoothie','juice','shake','blend'], id: '1505252585461-04db1eb84625' },
+  { keys: ['bowl','buddha','grain bowl','power bowl'], id: '1546069901-ba9599a7e63c' },
+  { keys: ['pizza'], id: '1565299624946-b28f40a0ae38' },
+  { keys: ['burger','patty'], id: '1568901346375-23c9450c58cd' },
+  { keys: ['taco','burrito','mexican','quesadilla','enchilada'], id: '1565299585323-38d6b0865b47' },
+  { keys: ['cake','dessert','sweet','muffin','cookie','biscuit','brownie','chocolate','pudding'], id: '1578985545062-69928b1d9587' },
+  { keys: ['stir','wok','asian','chinese','japanese','korean'], id: '1563379926898-05f4575a45d8' },
+  { keys: ['vegetable','veg','roast','aubergine','courgette','carrot','plant'], id: '1540420773420-3366772f4999' },
+];
+
+function foodImageUrl(title: string, tags: string[] | null): string {
+  const hay = [title, ...(tags ?? [])].join(' ').toLowerCase();
+  for (const { keys, id } of FOOD_PHOTO_MAP) {
+    if (keys.some(k => hay.includes(k))) {
+      return `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=800&q=80`;
+    }
+  }
+  return `https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80`;
+}
+
 const ACCENTS: Record<string, { from: string; to: string; ring: string; chip: string }> = {
   amber:   { from: 'from-amber-200',   to: 'to-orange-300',  ring: 'ring-amber-300',   chip: 'bg-amber-100 text-amber-800' },
   rose:    { from: 'from-rose-200',    to: 'to-pink-300',    ring: 'ring-rose-300',    chip: 'bg-rose-100 text-rose-800' },
@@ -75,13 +107,26 @@ function Spinner({ label }: { label: string }) {
 
 function RecipeCard({ r, onOpen, onDelete }: { r: SavedCard; onOpen: () => void; onDelete: () => void }) {
   const a = accent(r.accent);
+  const [imgFailed, setImgFailed] = useState(false);
   return (
     <button
       onClick={onOpen}
       className="group relative text-left rounded-2xl overflow-hidden bg-white shadow-card hover:shadow-lifted transition-all hover:-translate-y-0.5"
     >
-      <div className={clsx('h-28 bg-gradient-to-br flex items-center justify-center relative', a.from, a.to)}>
-        <span className="text-5xl drop-shadow-sm" aria-hidden>{r.emoji ?? '🍽️'}</span>
+      <div className="h-36 relative overflow-hidden">
+        {!imgFailed ? (
+          <img
+            src={foodImageUrl(r.title, r.tags)}
+            alt={r.title}
+            className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            onError={() => setImgFailed(true)}
+          />
+        ) : (
+          <div className={clsx('absolute inset-0 bg-gradient-to-br flex items-center justify-center', a.from, a.to)}>
+            <span className="text-5xl drop-shadow-sm" aria-hidden>{r.emoji ?? '🍽️'}</span>
+          </div>
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
         <button
           onClick={e => { e.stopPropagation(); onDelete(); }}
           className="absolute top-2 right-2 w-7 h-7 rounded-full bg-white/80 backdrop-blur flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white text-gray-600 hover:text-red-600"
@@ -111,6 +156,7 @@ function RecipeCard({ r, onOpen, onDelete }: { r: SavedCard; onOpen: () => void;
 function RecipeDetail({ id, onClose, onDeleted }: { id: string; onClose: () => void; onDeleted: () => void }) {
   const [r, setR] = useState<(SavedCard & { fixed_text: string; swaps: Swap[]; notes: string[]; source_url: string | null }) | null>(null);
   const [loading, setLoading] = useState(true);
+  const [imgFailed, setImgFailed] = useState(false);
 
   useEffect(() => {
     fetch(`/api/recipes/${id}`).then(r => r.json()).then(d => { setR(d.recipe); setLoading(false); });
@@ -127,8 +173,25 @@ function RecipeDetail({ id, onClose, onDeleted }: { id: string; onClose: () => v
   return (
     <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-start sm:items-center justify-center p-0 sm:p-4 overflow-y-auto" onClick={onClose}>
       <div className="bg-white w-full sm:max-w-2xl rounded-none sm:rounded-2xl my-0 sm:my-8 overflow-hidden shadow-lifted animate-slide-up" onClick={e => e.stopPropagation()}>
-        <div className={clsx('h-36 bg-gradient-to-br flex items-center justify-center relative', a.from, a.to)}>
-          <span className="text-6xl drop-shadow" aria-hidden>{r?.emoji ?? '🍽️'}</span>
+        <div className="h-48 relative overflow-hidden">
+          {r && !imgFailed ? (
+            <img
+              src={foodImageUrl(r.title, r.tags)}
+              alt={r.title}
+              className="absolute inset-0 w-full h-full object-cover"
+              onError={() => setImgFailed(true)}
+            />
+          ) : (
+            <div className={clsx('absolute inset-0 bg-gradient-to-br flex items-center justify-center', a.from, a.to)}>
+              <span className="text-6xl drop-shadow" aria-hidden>{r?.emoji ?? '🍽️'}</span>
+            </div>
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
+          {r && (
+            <p className="absolute bottom-4 left-5 text-white font-bold text-lg drop-shadow-sm leading-tight max-w-[80%]">
+              {r.title}
+            </p>
+          )}
           <button onClick={onClose} className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/80 backdrop-blur flex items-center justify-center hover:bg-white">
             <X className="w-4 h-4" />
           </button>
@@ -137,8 +200,7 @@ function RecipeDetail({ id, onClose, onDeleted }: { id: string; onClose: () => v
           {loading || !r ? <Spinner label="Loading…" /> : (
             <>
               <div>
-                <h2 className="text-xl font-bold text-gray-900">{r.title}</h2>
-                <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
+                <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
                   {r.total_time && <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" />{r.total_time}</span>}
                   {r.servings && <span className="flex items-center gap-1"><Users className="w-3.5 h-3.5" />{r.servings}</span>}
                 </div>
