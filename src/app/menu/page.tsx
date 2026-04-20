@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Link2, Upload, ClipboardList, X, AlertCircle, CheckCircle, AlertTriangle, Ban, ExternalLink, Share2, Copy, Check } from 'lucide-react';
 import clsx from 'clsx';
+import RestaurantLogo from '@/components/RestaurantLogo';
 
 type InputMode = 'url' | 'pdf' | 'text';
 type Status    = 'safe' | 'modify' | 'avoid';
@@ -22,13 +23,14 @@ interface ScanResult {
   summary: string;
   items: MenuItem[];
   menu_source_url?: string | null;
+  hero_image_url?: string | null;
   sources?: Source[];
 }
 
 interface PublicScan {
   slug: string;
   restaurant: string | null;
-  image_url: string | null;
+  image_url: string | null;   // hero photo (og:image) or Clearbit logo
   analysis: { summary: string; items: MenuItem[] };
   created_at: string;
 }
@@ -91,32 +93,40 @@ function ScanCard({ scan }: { scan: PublicScan }) {
   const safe   = scan.analysis.items.filter(i => i.status === 'safe').length;
   const modify = scan.analysis.items.filter(i => i.status === 'modify').length;
   const avoid  = scan.analysis.items.filter(i => i.status === 'avoid').length;
+  const name   = scan.restaurant ?? 'Restaurant';
   return (
     <a
       href={`/s/${scan.slug}`}
-      className="block bg-white border border-gray-100 rounded-xl p-4 hover:shadow-md hover:border-brand-200 transition-all group"
+      className="block rounded-2xl overflow-hidden bg-white border border-gray-100 hover:shadow-lg transition-all group"
     >
-      <div className="flex items-center gap-3 mb-2">
+      {/* Hero photo */}
+      <div className="relative h-36 bg-gray-100 overflow-hidden">
         {scan.image_url ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={scan.image_url}
-            alt=""
-            className="w-9 h-9 rounded-lg object-contain bg-gray-50 border border-gray-100 p-0.5 flex-shrink-0"
-            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+            alt={name}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            onError={(e) => {
+              const el = e.target as HTMLImageElement;
+              el.style.display = 'none';
+              (el.parentElement as HTMLElement).style.background = '#f0fdf4';
+            }}
           />
         ) : (
-          <div className="w-9 h-9 rounded-lg bg-brand-50 flex items-center justify-center flex-shrink-0 text-base">🍽️</div>
+          <div className="w-full h-full flex items-center justify-center bg-brand-50 text-4xl">🍽️</div>
         )}
-        <p className="text-sm font-semibold text-gray-900 truncate group-hover:text-brand-700 transition-colors">
-          {scan.restaurant ?? 'Unnamed restaurant'}
-        </p>
+        {/* Status pill overlay */}
+        <div className="absolute bottom-2 left-2 flex gap-1">
+          <span className="text-2xs font-bold px-1.5 py-0.5 rounded-full bg-emerald-500 text-white">{safe} safe</span>
+          {modify > 0 && <span className="text-2xs font-bold px-1.5 py-0.5 rounded-full bg-amber-400 text-white">{modify} modify</span>}
+          {avoid > 0  && <span className="text-2xs font-bold px-1.5 py-0.5 rounded-full bg-red-500 text-white">{avoid} avoid</span>}
+        </div>
       </div>
-      <p className="text-xs text-gray-500 leading-relaxed line-clamp-2 mb-2">{scan.analysis.summary}</p>
-      <div className="flex gap-3 text-2xs font-semibold">
-        <span className="text-emerald-600">{safe} safe</span>
-        <span className="text-amber-600">{modify} modify</span>
-        <span className="text-red-500">{avoid} avoid</span>
+      {/* Info */}
+      <div className="px-3 py-2.5">
+        <p className="text-sm font-semibold text-gray-900 truncate group-hover:text-brand-700 transition-colors">{name}</p>
+        <p className="text-xs text-gray-400 mt-0.5 line-clamp-1">{scan.analysis.summary}</p>
       </div>
     </a>
   );
@@ -324,16 +334,21 @@ function MenuInner() {
       {result && (
         <div className="space-y-6 animate-slide-up">
           <div className="bg-brand-900 rounded-xl p-5">
+            {result.hero_image_url && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={result.hero_image_url}
+                alt=""
+                className="w-full h-32 object-cover rounded-lg mb-3 opacity-80"
+                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+              />
+            )}
             <div className="flex items-center gap-3 mb-3">
-              {result.menu_source_url && safeHost(result.menu_source_url) && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={`https://logo.clearbit.com/${safeHost(result.menu_source_url)}`}
-                  alt=""
-                  className="w-10 h-10 rounded-lg object-contain bg-white p-1 flex-shrink-0"
-                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                />
-              )}
+              <RestaurantLogo
+                domain={safeHost(result.menu_source_url ?? '')}
+                name={result.restaurant}
+                className="w-9 h-9 flex-shrink-0"
+              />
               <p className="text-xs font-semibold text-brand-400 uppercase tracking-widest">
                 {result.restaurant ?? 'Menu'} — overall assessment
               </p>

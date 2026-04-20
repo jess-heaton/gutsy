@@ -24,13 +24,14 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { restaurant, summary, items, sources, menu_source_url } = body;
+    const { restaurant, summary, items, sources, menu_source_url, hero_image_url } = body;
     if (!items || !summary) {
       return Response.json({ error: 'Invalid scan data.' }, { status: 400 });
     }
 
     const slug = generateSlug();
-    const image_url = logoUrl(menu_source_url ?? sources?.[0]?.url ?? null);
+    // Prefer the restaurant's own og:image hero photo; fall back to Clearbit logo
+    const image_url = hero_image_url ?? logoUrl(menu_source_url ?? sources?.[0]?.url ?? null);
 
     const { error: insertError } = await supabase.from('menu_scans').insert({
       user_id: user.id,

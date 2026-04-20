@@ -43,7 +43,7 @@ const MENU_PATHS = [
   '/the-menu', '/sample-menu', '/a-la-carte',
 ];
 
-async function fetchText(url: string): Promise<string> {
+async function fetchRaw(url: string): Promise<string> {
   try {
     const res = await fetch(url, {
       headers: { 'User-Agent': 'Mozilla/5.0 (compatible; Gutsy/1.0)' },
@@ -51,17 +51,33 @@ async function fetchText(url: string): Promise<string> {
       redirect: 'follow',
     });
     if (!res.ok) return '';
-    const html = await res.text();
-    return html
-      .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
-      .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
-      .replace(/<[^>]+>/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim()
-      .slice(0, 15000);
+    return await res.text();
   } catch {
     return '';
   }
+}
+
+function extractOgImage(html: string, baseUrl: string): string | null {
+  const m = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i)
+    ?? html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i);
+  if (!m) return null;
+  try {
+    return new URL(m[1], baseUrl).href;
+  } catch {
+    return null;
+  }
+}
+
+async function fetchText(url: string): Promise<string> {
+  const html = await fetchRaw(url);
+  if (!html) return '';
+  return html
+    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+    .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 15000);
 }
 
 /* Higher score = more likely to actually be a menu page. */
@@ -78,14 +94,21 @@ function menuScore(t: string): number {
   return prices * 2 + wordHits;
 }
 
-async function crawlForMenu(inputUrl: string): Promise<{ url: string; text: string; score: number } | null> {
-  const urls = new Set<string>([inputUrl]);
+async function crawlForMenu(inputUrl: string): Promise<{ url: string; text: string; score: number; heroImage: string | null } | null> {
+  let origin = '';
   try {
-    const u = new URL(inputUrl);
-    for (const p of MENU_PATHS) urls.add(`${u.origin}${p}`);
+    origin = new URL(inputUrl).origin;
   } catch {
     return null;
   }
+
+  const urls = new Set<string>([inputUrl]);
+  for (const p of MENU_PATHS) urls.add(`${origin}${p}`);
+
+  // Fetch homepage HTML separately to grab og:image
+  const homepageHtml = await fetchRaw(origin);
+  const heroImage = homepageHtml ? extractOgImage(homepageHtml, origin) : null;
+
   const results = await Promise.all(
     [...urls].map(async u => ({ url: u, text: await fetchText(u) })),
   );
@@ -93,7 +116,7 @@ async function crawlForMenu(inputUrl: string): Promise<{ url: string; text: stri
     .map(r => ({ ...r, score: menuScore(r.text) }))
     .sort((a, b) => b.score - a.score);
   const best = scored[0];
-  return best && best.score >= 6 ? best : null;
+  return best && best.score >= 6 ? { ...best, heroImage } : null;
 }
 
 type Source = { url: string; title?: string };
@@ -127,6 +150,7 @@ export async function POST(req: NextRequest) {
 
     let userContent: Anthropic.MessageParam['content'];
     const fetchedSources: Source[] = [];
+    let heroImage: string | null = null;
 
     if (pdfBase64) {
       userContent = [
@@ -137,6 +161,7 @@ export async function POST(req: NextRequest) {
       const targetUrl = (url || text!.match(/https?:\/\/\S+/)![0]).trim();
       const found = await crawlForMenu(targetUrl);
       if (found) {
+        heroImage = found.heroImage;
         fetchedSources.push({ url: found.url, title: 'Fetched from restaurant website' });
         userContent =
           `The user gave this URL: ${targetUrl}\n` +
@@ -186,7 +211,7 @@ export async function POST(req: NextRequest) {
     fetchedSources.forEach(pushUnique);
     webSources.forEach(pushUnique);
 
-    return Response.json({ ...parsed, sources: combined });
+    return Response.json({ ...parsed, sources: combined, hero_image_url: heroImage });
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : 'Something went wrong';
     return Response.json({ error: msg }, { status: 500 });

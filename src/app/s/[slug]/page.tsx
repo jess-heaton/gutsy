@@ -41,24 +41,24 @@ export default async function SharePage({ params }: { params: { slug: string } }
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-2xl mx-auto px-4 py-10 space-y-6">
 
+        {/* Hero image */}
+        {data.image_url && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={data.image_url}
+            alt={data.restaurant ?? ''}
+            className="w-full h-48 object-cover rounded-2xl shadow-sm"
+            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+          />
+        )}
+
         {/* Header */}
-        <div className="flex items-center gap-4">
-          {data.image_url && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={data.image_url}
-              alt=""
-              className="w-14 h-14 rounded-xl object-contain bg-white border border-gray-100 p-1 shadow-sm"
-              onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-            />
-          )}
-          <div>
-            <h1 className="text-xl font-bold text-gray-900">{data.restaurant ?? 'Menu scan'}</h1>
-            <p className="text-xs text-gray-400 mt-0.5">
-              Low-FODMAP analysis by{' '}
-              <a href="https://gutsy.freedible.co.uk" className="text-brand-600 hover:underline">Gutsy</a>
-            </p>
-          </div>
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">{data.restaurant ?? 'Menu scan'}</h1>
+          <p className="text-xs text-gray-400 mt-1">
+            Low-FODMAP analysis by{' '}
+            <a href="https://gutsy.freedible.co.uk" className="text-brand-600 hover:underline">Gutsy</a>
+          </p>
         </div>
 
         {/* Summary banner */}
