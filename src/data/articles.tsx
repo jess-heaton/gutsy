@@ -506,7 +506,6 @@ export const articles: Article[] = [
       </>
     ),
   },
-];
 
   {
     slug: 'ttg-iga-celiac-testing',
