@@ -1,41 +1,61 @@
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '@supabase/supabase-js';
 import { notFound } from 'next/navigation';
 import { CheckCircle, AlertTriangle, Ban, ExternalLink } from 'lucide-react';
 import type { Metadata } from 'next';
 import clsx from 'clsx';
 
-interface MenuItem { name: string; status: 'safe' | 'modify' | 'avoid'; reason: string; modifications: string | null; }
-interface Source { url: string; title?: string }
+// Plain anon client — no cookies needed for public reads
+function db() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  );
+}
+
+interface MenuItem { name: string; status: 'safe' | 'modify' | 'avoid'; reason: string; modifications: string | null }
+interface Source   { url: string; title?: string }
 interface Analysis { summary: string; items: MenuItem[]; sources?: Source[] }
 
 const STATUS = {
-  safe:   { label: 'Safe',   Icon: CheckCircle,   bg: 'bg-emerald-50', border: 'border-emerald-200', text: 'text-emerald-700', badge: 'bg-emerald-100 text-emerald-700' },
-  modify: { label: 'Modify', Icon: AlertTriangle,  bg: 'bg-amber-50',   border: 'border-amber-200',   text: 'text-amber-700',   badge: 'bg-amber-100 text-amber-700'   },
-  avoid:  { label: 'Avoid',  Icon: Ban,            bg: 'bg-red-50',     border: 'border-red-200',     text: 'text-red-700',     badge: 'bg-red-100 text-red-700'       },
+  safe:   { label: 'Safe',   Icon: CheckCircle,  bg: 'bg-emerald-50', border: 'border-emerald-200', text: 'text-emerald-700', badge: 'bg-emerald-100 text-emerald-700' },
+  modify: { label: 'Modify', Icon: AlertTriangle, bg: 'bg-amber-50',   border: 'border-amber-200',   text: 'text-amber-700',   badge: 'bg-amber-100 text-amber-700'   },
+  avoid:  { label: 'Avoid',  Icon: Ban,           bg: 'bg-red-50',     border: 'border-red-200',     text: 'text-red-700',     badge: 'bg-red-100 text-red-700'       },
 };
 
+function safePathLabel(url: string) {
+  try { const u = new URL(url); return `${u.host}${u.pathname}`; } catch { return url; }
+}
+
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const supabase = createClient();
-  const { data } = await supabase.from('menu_scans').select('restaurant').eq('slug', params.slug).single();
+  const { data } = await db().from('menu_scans').select('restaurant').eq('slug', params.slug).maybeSingle();
   const name = data?.restaurant ?? 'Menu scan';
-  return { title: `${name} — Gutsy FODMAP menu scan` };
+  return {
+    title: `${name} — Gutsy FODMAP menu scan`,
+    description: `Low-FODMAP dish-by-dish breakdown for ${name}, powered by Gutsy.`,
+  };
 }
 
 export default async function SharePage({ params }: { params: { slug: string } }) {
-  const supabase = createClient();
-  const { data } = await supabase
+  const { data, error } = await db()
     .from('menu_scans')
     .select('*')
     .eq('slug', params.slug)
     .eq('is_public', true)
-    .single();
+    .maybeSingle();
 
+  if (error) {
+    console.error('share page fetch error:', error);
+    notFound();
+  }
   if (!data) notFound();
 
-  const analysis = data.analysis as Analysis;
-  const safe   = analysis.items.filter(i => i.status === 'safe');
-  const modify = analysis.items.filter(i => i.status === 'modify');
-  const avoid  = analysis.items.filter(i => i.status === 'avoid');
+  const analysis = (data.analysis ?? {}) as Partial<Analysis>;
+  const items    = Array.isArray(analysis.items) ? analysis.items : [];
+  const sources  = Array.isArray(analysis.sources) ? analysis.sources : [];
+
+  const safe   = items.filter(i => i.status === 'safe');
+  const modify = items.filter(i => i.status === 'modify');
+  const avoid  = items.filter(i => i.status === 'avoid');
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -48,7 +68,6 @@ export default async function SharePage({ params }: { params: { slug: string } }
             src={data.image_url}
             alt={data.restaurant ?? ''}
             className="w-full h-48 object-cover rounded-2xl shadow-sm"
-            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
           />
         )}
 
@@ -64,13 +83,13 @@ export default async function SharePage({ params }: { params: { slug: string } }
         {/* Summary banner */}
         <div className="bg-brand-900 rounded-xl p-5">
           <p className="text-xs font-semibold text-brand-400 uppercase tracking-widest mb-1">Overall assessment</p>
-          <p className="text-sm text-brand-100 leading-relaxed">{analysis.summary}</p>
+          <p className="text-sm text-brand-100 leading-relaxed">{analysis.summary ?? 'No summary available.'}</p>
 
-          {analysis.sources && analysis.sources.length > 0 && (
+          {sources.length > 0 && (
             <div className="mt-3 pt-3 border-t border-white/10">
               <p className="text-2xs font-semibold text-brand-400 uppercase tracking-widest mb-1.5">Sources</p>
               <ul className="space-y-1">
-                {analysis.sources.slice(0, 4).map((s, i) => (
+                {sources.slice(0, 4).map((s, i) => (
                   <li key={i}>
                     <a href={s.url} target="_blank" rel="noopener noreferrer"
                       className="inline-flex items-center gap-1 text-xs text-brand-200 hover:text-white hover:underline underline-offset-2 break-all">
@@ -98,16 +117,16 @@ export default async function SharePage({ params }: { params: { slug: string } }
         </div>
 
         {/* Dishes */}
-        {([
+        {[
           { items: safe,   title: 'Safe to order'      },
           { items: modify, title: 'Order with changes' },
           { items: avoid,  title: 'Avoid'              },
-        ] as const).map(({ items, title }) => items.length > 0 && (
+        ].map(({ items: group, title }) => group.length > 0 && (
           <div key={title}>
             <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">{title}</h2>
             <div className="space-y-2">
-              {items.map((item, i) => {
-                const cfg = STATUS[item.status];
+              {group.map((item, i) => {
+                const cfg = STATUS[item.status] ?? STATUS.avoid;
                 const Icon = cfg.Icon;
                 return (
                   <div key={i} className={clsx('border rounded-xl p-4', cfg.bg, cfg.border)}>
@@ -137,7 +156,7 @@ export default async function SharePage({ params }: { params: { slug: string } }
 
         {/* Footer CTA */}
         <div className="text-center pt-4 pb-8">
-          <p className="text-sm text-gray-500 mb-3">Scan any menu for free with Gutsy</p>
+          <p className="text-sm text-gray-500 mb-3">Scan any restaurant menu for free with Gutsy</p>
           <a
             href="https://gutsy.freedible.co.uk/menu"
             className="inline-flex items-center gap-2 bg-brand-700 hover:bg-brand-800 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors"
@@ -148,13 +167,4 @@ export default async function SharePage({ params }: { params: { slug: string } }
       </div>
     </div>
   );
-}
-
-function safePathLabel(url: string): string {
-  try {
-    const u = new URL(url);
-    return `${u.host}${u.pathname}`;
-  } catch {
-    return url;
-  }
 }
