@@ -90,6 +90,14 @@ export default function ArticlePage({ params }: { params: { slug: string } }) {
       { id: 'temperature',  label: 'Temperature and pH sensitivity' },
       { id: 'bottom-line',  label: 'The bottom line' },
     ],
+    'ttg-iga-celiac-testing': [
+      { id: 'what-it-measures',        label: 'What tTG-IgA actually tests for' },
+      { id: 'gluten-first',            label: 'You must be eating gluten first' },
+      { id: 'iga-deficiency',          label: 'The false negative: IgA deficiency' },
+      { id: 'reading-results',         label: 'What the numbers mean' },
+      { id: 'after-positive',          label: 'What happens after a positive result' },
+      { id: 'already-gone-gluten-free',label: 'If you\'ve already gone gluten-free' },
+    ],
     'psyllium-husk': [
       { id: 'standout-study',     label: 'The standout study' },
       { id: 'soluble-vs-insoluble', label: 'Soluble vs insoluble' },

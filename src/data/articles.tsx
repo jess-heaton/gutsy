@@ -508,6 +508,189 @@ export const articles: Article[] = [
   },
 ];
 
+  {
+    slug: 'ttg-iga-celiac-testing',
+    title: 'The tTG-IgA Test: How to Properly Test for Coeliac Disease',
+    subtitle: 'The blood test most people get told to take — and the critical mistake that makes it come back falsely negative. A plain-English guide to doing this properly.',
+    excerpt: 'The tTG-IgA blood test is the standard first step for diagnosing coeliac disease — but if you\'ve already cut out gluten, it will almost certainly come back negative even if you have coeliac. Here\'s what you need to know before you test.',
+    date: '2026-04-20',
+    readTime: '8 min',
+    tags: ['coeliac', 'testing', 'science'],
+    category: 'Science',
+    keywords: [
+      'tTG-IgA test', 'coeliac disease test', 'celiac blood test', 'how to test for coeliac',
+      'anti-tissue transglutaminase', 'IgA deficiency coeliac', 'gluten challenge', 'coeliac vs IBS',
+      'coeliac diagnosis UK', 'false negative coeliac test',
+    ],
+    heroImage: 'https://images.unsplash.com/photo-1631549916768-4119b2e5f926?auto=format&fit=crop&w=1600&q=80',
+    heroAlt: 'Blood sample vials in a clinical laboratory',
+    heroCredit: 'Photo via Unsplash',
+    author: AUTHOR_EDITORIAL,
+    reviewer: AUTHOR_DIETITIAN_REVIEW,
+    takeaways: [
+      'You must be eating gluten daily for at least 6 weeks before the tTG-IgA test — otherwise it will likely come back falsely negative.',
+      'Around 1 in 30 people have IgA deficiency, which can make the tTG-IgA test misleading — a total IgA level should always be checked at the same time.',
+      'A positive tTG-IgA is not a diagnosis on its own — a specialist referral and usually a biopsy is needed to confirm.',
+      'If you\'ve already gone gluten-free, you can still get tested, but you\'ll need to do a formal gluten challenge first.',
+      'Genetic testing (HLA-DQ2/DQ8) can rule coeliac out completely — if you don\'t carry those genes, coeliac is essentially impossible.',
+    ],
+    references: [
+      {
+        label: 'NICE — Coeliac disease: recognition, assessment and management (NG20)',
+        journal: 'National Institute for Health and Care Excellence',
+        year: 2015,
+        url: 'https://www.nice.org.uk/guidance/ng20',
+      },
+      {
+        label: 'Rubio-Tapia et al. — ACG Clinical Guidelines: Diagnosis and Management of Celiac Disease',
+        authors: 'Rubio-Tapia A, Hill ID, Kelly CP, et al.',
+        journal: 'American Journal of Gastroenterology',
+        year: 2013,
+        url: 'https://pubmed.ncbi.nlm.nih.gov/23609613/',
+      },
+      {
+        label: 'Catassi C, Fasano A — Celiac disease diagnosis: simple rules are better than complicated algorithms',
+        authors: 'Catassi C, Fasano A',
+        journal: 'American Journal of Medicine',
+        year: 2010,
+        url: 'https://pubmed.ncbi.nlm.nih.gov/20399314/',
+      },
+      {
+        label: 'Volta et al. — IgA anti-tissue transglutaminase antibodies as predictors of silent coeliac disease',
+        authors: 'Volta U, Molinaro N, De Franceschi L, et al.',
+        journal: 'Scandinavian Journal of Gastroenterology',
+        year: 1998,
+        url: 'https://pubmed.ncbi.nlm.nih.gov/9517537/',
+      },
+      {
+        label: 'Rashid M, Lee J — Serologic testing in coeliac disease',
+        authors: 'Rashid M, Lee J',
+        journal: 'Canadian Family Physician',
+        year: 2016,
+        url: 'https://pubmed.ncbi.nlm.nih.gov/27606794/',
+      },
+      {
+        label: 'Leffler DA, Schuppan D — Update on serologic testing in celiac disease',
+        authors: 'Leffler DA, Schuppan D',
+        journal: 'American Journal of Gastroenterology',
+        year: 2010,
+        url: 'https://pubmed.ncbi.nlm.nih.gov/20485286/',
+      },
+    ],
+    content: (
+      <>
+        <P>
+          If you've been having gut symptoms — bloating, chronic diarrhoea, stomach pain, unexplained fatigue — your GP will probably suggest a blood test for coeliac disease. The test is called the tTG-IgA. It's widely available, relatively cheap, and a good first step.
+        </P>
+        <P>
+          But there's a catch that a surprising number of people — and even some GPs — don't mention: if you've already cut gluten out of your diet, the test will almost certainly come back negative even if you have coeliac disease. That false negative can follow someone for years, leaving them without a proper diagnosis and without knowing whether they need to be strictly gluten-free for life.
+        </P>
+        <P>
+          This article explains what the tTG-IgA test actually measures, how to make sure you do it correctly, and what to do if the situation is more complicated.
+        </P>
+
+        <H2 id="what-it-measures">What tTG-IgA actually tests for</H2>
+        <P>
+          Let's start with the basics. Coeliac disease is an autoimmune condition — not a food intolerance. When someone with coeliac disease eats gluten (the protein found in wheat, rye and barley), their immune system treats it as an attack and produces antibodies against it.
+        </P>
+        <P>
+          One of those antibodies targets an enzyme in the gut wall called <Em>tissue transglutaminase</Em> (tTG). The blood test measures how much anti-tTG antibody is present in your blood. The "IgA" part refers to the class of antibody being measured — IgA is the type the immune system typically produces in the gut lining.
+        </P>
+        <P>
+          In plain terms: the test detects whether your immune system is actively fighting something it thinks is being caused by gluten in your gut. If there's no gluten coming in, there's nothing for the immune system to react to — and the antibody levels fall. That's why eating gluten before the test is non-negotiable.
+        </P>
+
+        <Callout variant="warning" title="The most common mistake">
+          Many people suspect coeliac disease, cut out gluten to see if they feel better, feel better (for various reasons), and then get tested — and get a negative result. That negative result does not mean they don't have coeliac. It means the test couldn't detect it.
+        </Callout>
+
+        <H2 id="gluten-first">You must be eating gluten before the test</H2>
+        <P>
+          Current UK guidelines (NICE NG20) and international guidelines both require that you eat a normal gluten-containing diet for at least <Em>6 weeks</Em> before a tTG-IgA blood test. This means actual gluten, every day — bread, pasta, cereals — not just occasional exposure.
+        </P>
+        <P>
+          The exact amount recommended is roughly <Em>2 slices of regular wheat bread per day</Em> (or equivalent). Less than this and antibody levels may not be reliably elevated, even in someone with active coeliac disease.
+        </P>
+
+        <Callout variant="tip" title="What counts as gluten exposure">
+          Gluten is found in: wheat (bread, pasta, cereals, pizza, biscuits), rye (rye bread, some crispbreads), and barley (beer, malt vinegar, some soups). Oats are naturally gluten-free but are often contaminated — for testing purposes, stick to regular wheat products.
+        </Callout>
+
+        <P>
+          If you've been eating gluten normally and your symptoms prompted you to get tested — brilliant, you don't need to change anything before the test. The problem arises when people have already changed their diet before seeking a diagnosis.
+        </P>
+
+        <H2 id="iga-deficiency">The false negative nobody warns you about: IgA deficiency</H2>
+        <P>
+          Even if you've been eating gluten consistently, the tTG-IgA test can still come back falsely negative in one important scenario: IgA deficiency.
+        </P>
+        <P>
+          Around 1 in 30 people have lower-than-normal levels of IgA antibodies in their blood — not because of any problem, just natural variation. If you can't produce enough IgA, you can't produce enough anti-tTG IgA — so the test will look negative even if coeliac disease is present.
+        </P>
+        <P>
+          This is why the tTG-IgA test should <Em>always</Em> be ordered alongside a <Em>total serum IgA</Em> level. The total IgA tells you whether your body is even capable of producing IgA antibodies in meaningful quantities. If IgA comes back low, the tTG-IgA result is unreliable, and the doctor should order a different test — usually a tTG-IgG or DGP-IgG antibody test instead.
+        </P>
+        <P>
+          Ask your GP directly: <Em>"Are you testing my total IgA as well?"</Em> If they only order the tTG-IgA alone, you could get a false all-clear.
+        </P>
+
+        <H2 id="reading-results">What the numbers mean</H2>
+        <P>
+          The result will usually come back as a number with a reference range — something like "12 U/mL (normal: below 7 U/mL)". Different labs use different units and thresholds, so what matters is how your result compares to your lab's normal range, not the raw number.
+        </P>
+        <Ul>
+          <Li><strong>Clearly positive (more than 10× the upper limit of normal)</strong> — This is strongly suggestive of coeliac disease. In children, guidelines now allow a diagnosis without biopsy at this level. In adults, a referral and biopsy is still usually needed.</Li>
+          <Li><strong>Mildly elevated (just above normal)</strong> — Borderline results need further investigation. They could indicate coeliac, early coeliac, or something else. Don't ignore a borderline result.</Li>
+          <Li><strong>Normal (within reference range)</strong> — If you've been eating gluten consistently for 6+ weeks and your total IgA is also normal, a negative result makes coeliac unlikely. Not impossible, but unlikely.</Li>
+        </Ul>
+
+        <Callout variant="tip" title="A positive blood test is not a diagnosis">
+          A raised tTG-IgA gets you referred to a gastroenterologist — it doesn't confirm coeliac on its own. The definitive diagnosis in adults still usually requires an endoscopy with small bowel biopsies, which look directly at whether gluten has damaged the gut lining.
+        </Callout>
+
+        <H2 id="after-positive">What happens after a positive result</H2>
+        <P>
+          A positive tTG-IgA should trigger a referral to a gastroenterologist or specialist. From there, you'll usually be offered a gastroscopy (endoscopy) — a camera passed down through your mouth into the small intestine, with tiny biopsy samples taken from the gut lining.
+        </P>
+        <P>
+          The biopsies look for characteristic damage called <Em>villous atrophy</Em> — the tiny finger-like projections lining the gut wall become blunted or worn away in coeliac disease, reducing the surface area for nutrient absorption. This damage is what causes the symptoms and the long-term complications of undiagnosed coeliac (anaemia, bone density loss, fertility problems, and others).
+        </P>
+        <P>
+          Critically: you need to keep eating gluten until after the biopsy. Going gluten-free between your blood test and your endoscopy will allow the gut lining to start healing, which can make the biopsy look normal even if you have coeliac.
+        </P>
+
+        <H2 id="already-gone-gluten-free">If you've already gone gluten-free</H2>
+        <P>
+          This is a common situation. You cut out gluten, felt better, then discovered you should have tested first. You have options — but none of them are simple.
+        </P>
+        <P>
+          The standard approach is a <Em>gluten challenge</Em>: reintroducing a set amount of gluten daily for a minimum of 6 weeks before retesting with the blood test, or 2 weeks before an endoscopy biopsy. For many people, this is unpleasant — you're deliberately triggering symptoms you've worked to avoid — but it's the only way to get a reliable result if you want a confirmed diagnosis.
+        </P>
+        <P>
+          A confirmed diagnosis matters for several reasons:
+        </P>
+        <Ul>
+          <Li>If you have coeliac disease, trace exposure (cross-contamination, hidden gluten in sauces) matters medically — not just as a preference</Li>
+          <Li>Family members should be screened if you have confirmed coeliac — it's strongly genetic</Li>
+          <Li>You may be eligible for NHS dietitian support and monitoring</Li>
+          <Li>It changes how seriously you and others need to take your dietary needs in medical and social contexts</Li>
+        </Ul>
+
+        <P>
+          If you genuinely can't or won't do a gluten challenge, genetic testing offers a partial answer.
+        </P>
+        <P>
+          Coeliac disease is almost always associated with specific gene variants called HLA-DQ2 and HLA-DQ8. If you test negative for both, coeliac disease is essentially ruled out — the negative predictive value is very high. This test doesn't diagnose coeliac, but it can confirm you don't have the genetic predisposition needed for it to develop.
+        </P>
+
+        <Callout variant="success" title="When to suspect coeliac vs IBS vs something else">
+          Coeliac and IBS overlap significantly in symptoms — both cause bloating, pain, and altered bowel habits. Pointers that make coeliac more likely: symptoms that started after significant gut illness, unexplained iron-deficiency or B12 deficiency, osteoporosis younger than expected, a first-degree relative with confirmed coeliac, or symptoms that have never improved even on a strict low-FODMAP diet. Any of these alongside gut symptoms warrants testing before assuming IBS.
+        </Callout>
+      </>
+    ),
+  },
+];
+
 export function getArticle(slug: string): Article | undefined {
   return articles.find((a) => a.slug === slug);
 }
