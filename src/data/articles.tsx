@@ -1919,8 +1919,8 @@ export const articles: Article[] = [
         <P>Having to give up chocolate entirely would make an already restrictive diet feel punishing. Fortunately, the Monash data offers good news: dark chocolate is low FODMAP at a real portion of 30 g.</P>
         <H2 id="rating">FODMAP status at a glance</H2>
         <Ul>
-          <Li>Dark chocolate, >70% cocoa (30 g): <Em>low FODMAP</Em></Li>
-          <Li>Dark chocolate, >70% cocoa (50 g): <Em>moderate–high FODMAP</Em></Li>
+          <Li>Dark chocolate, &gt;70% cocoa (30 g): <Em>low FODMAP</Em></Li>
+          <Li>Dark chocolate, &gt;70% cocoa (50 g): <Em>moderate–high FODMAP</Em></Li>
           <Li>Milk chocolate (30 g): <Em>moderate FODMAP</Em> — lactose content</Li>
           <Li>White chocolate: <Em>high FODMAP</Em> — primarily milk solids</Li>
           <Li>Cocoa powder, 1 tbsp: <Em>low FODMAP</Em></Li>
