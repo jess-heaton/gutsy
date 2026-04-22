@@ -202,7 +202,7 @@ export default function ArticlePage({ params }: { params: { slug: string } }) {
 
             <References items={article.references} />
             <Disclaimer />
-            <AuthorCard author={article.author} reviewer={article.reviewer} />
+            <AuthorCard />
 
             {/* Share / CTA */}
             <div className="mt-12 pt-8 border-t border-gray-100 flex flex-wrap items-center justify-between gap-4">
