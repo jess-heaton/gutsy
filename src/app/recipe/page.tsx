@@ -280,6 +280,7 @@ export default function RecipePage() {
   const [saving, setSaving] = useState(false);
   const [saveStep, setSaveStep] = useState<'saving' | 'imaging' | 'done' | null>(null);
   const [saved, setSaved] = useState(false);
+  const [makePublic, setMakePublic] = useState(false);
 
   const [cards, setCards] = useState<SavedCard[]>([]);
 
@@ -340,6 +341,7 @@ export default function RecipePage() {
           confidence: result.lowFodmapConfidence,
           sourceUrl: mode === 'url' ? url : null,
           originalText: mode === 'recipe' ? recipe : mode === 'describe' ? describe : mode === 'fridge' ? fridge : null,
+          isPublic: makePublic,
         }),
       });
       const data = await res.json();
@@ -512,23 +514,39 @@ export default function RecipePage() {
                     {result.servings && <span className="flex items-center gap-1"><Users className="w-3.5 h-3.5" />serves {result.servings}</span>}
                   </div>
                 </div>
-                <button
-                  onClick={save}
-                  disabled={saving || saved}
-                  className={clsx(
-                    'flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all flex-shrink-0',
-                    saved ? 'bg-emerald-50 text-emerald-700' : 'bg-brand-700 text-white hover:bg-brand-800',
+                <div className="flex flex-col items-end gap-2 flex-shrink-0">
+                  <button
+                    onClick={save}
+                    disabled={saving || saved}
+                    className={clsx(
+                      'flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all',
+                      saved ? 'bg-emerald-50 text-emerald-700' : 'bg-brand-700 text-white hover:bg-brand-800',
+                    )}
+                  >
+                    {saved
+                      ? <><BookmarkCheck className="w-3.5 h-3.5" />Saved</>
+                      : saveStep === 'imaging'
+                        ? <><Sparkles className="w-3.5 h-3.5 animate-pulse" />Generating image…</>
+                        : saving
+                          ? <><Bookmark className="w-3.5 h-3.5" />Saving…</>
+                          : <><Bookmark className="w-3.5 h-3.5" />Save</>
+                    }
+                  </button>
+                  {!saved && (
+                    <button
+                      onClick={() => setMakePublic(p => !p)}
+                      className={clsx(
+                        'flex items-center gap-1.5 text-2xs font-medium px-2 py-1 rounded-lg border transition-colors',
+                        makePublic
+                          ? 'border-brand-300 bg-brand-50 text-brand-700'
+                          : 'border-gray-200 text-gray-400 hover:text-gray-600',
+                      )}
+                    >
+                      <span className={clsx('w-2.5 h-2.5 rounded-full border-2 flex-shrink-0', makePublic ? 'bg-brand-600 border-brand-600' : 'border-gray-300')} />
+                      {makePublic ? 'Public (shared with community)' : 'Private'}
+                    </button>
                   )}
-                >
-                  {saved
-                    ? <><BookmarkCheck className="w-3.5 h-3.5" />Saved</>
-                    : saveStep === 'imaging'
-                      ? <><Sparkles className="w-3.5 h-3.5 animate-pulse" />Generating image…</>
-                      : saving
-                        ? <><Bookmark className="w-3.5 h-3.5" />Saving…</>
-                        : <><Bookmark className="w-3.5 h-3.5" />Save</>
-                  }
-                </button>
+                </div>
               </div>
               {result.tags && result.tags.length > 0 && (
                 <div className="flex flex-wrap gap-1.5 mt-3">

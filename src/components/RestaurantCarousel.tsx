@@ -52,7 +52,7 @@ export default function RestaurantCarousel() {
       >
         {scans.map((scan, idx) => {
           const { safe, modify, avoid } = pills(scan.analysis?.items);
-          const imgSrc = scan.image_url ?? FALLBACK_IMAGES[idx % FALLBACK_IMAGES.length];
+          const imgSrc = FALLBACK_IMAGES[idx % FALLBACK_IMAGES.length];
           return (
             <Link
               key={scan.slug}

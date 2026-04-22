@@ -25,6 +25,7 @@ export async function POST(req: NextRequest) {
   const {
     title, emoji, accent, tags, totalTime, servings,
     recipe, swaps, notes, confidence, sourceUrl, originalText,
+    isPublic, displayName,
   } = body;
 
   if (!title || !recipe) return Response.json({ error: 'Missing recipe' }, { status: 400 });
@@ -43,6 +44,8 @@ export async function POST(req: NextRequest) {
     notes: notes ?? [],
     confidence: confidence ?? null,
     source_url: sourceUrl ?? null,
+    is_public: isPublic ?? false,
+    display_name: isPublic ? (displayName ?? user.email ?? 'Anonymous') : null,
   }).select('id').single();
 
   if (error) return Response.json({ error: error.message }, { status: 500 });

@@ -15,16 +15,15 @@ export async function POST(req: NextRequest) {
   if (!process.env.OPENAI_API_KEY) return Response.json({ error: 'OPENAI_API_KEY not set' }, { status: 500 });
 
   try {
-    const tagLine = tags?.length ? ` (${tags.join(', ')})` : '';
+    const tagLine = tags?.length ? `, a ${tags.join(' and ')} dish` : '';
     const prompt =
-      `Hyperrealistic food photograph of "${title}"${tagLine}, shot on a Sony A7R V with an 85mm f/1.4 lens. ` +
-      `The dish is perfectly plated on a matte ceramic plate, resting on a natural linen tablecloth. ` +
-      `Soft north-facing window light from the left, subtle fill on the right, golden-hour colour temperature. ` +
-      `Bokeh background reveals a blurred kitchen. Every ingredient is sharply in focus on the food itself. ` +
-      `Garnished like a Michelin-starred restaurant: a drizzle of olive oil catching the light, fresh herb sprigs, ` +
-      `a crack of black pepper. The food looks freshly cooked, steaming slightly. ` +
-      `Shot from 40-degree angle. No text, no watermarks, no people, no hands, no AI artefacts. ` +
-      `Indistinguishable from a real food magazine photograph.`;
+      `A real, photographic image of "${title}"${tagLine} for a professional recipe book. ` +
+      `This must look exactly like a real photograph taken by a food photographer — not AI-generated, not illustrated. ` +
+      `The dish is freshly cooked and beautifully plated on a ceramic plate or bowl on a clean surface. ` +
+      `Overhead or 45-degree angle. Soft natural window light. Every ingredient is visible and recognisable. ` +
+      `Garnished with fresh herbs or a light drizzle of olive oil. Shallow depth of field, bokeh background. ` +
+      `Shot on a full-frame DSLR. The food fills most of the frame. ` +
+      `Absolutely no text, no watermarks, no people, no hands, no borders, no illustrations.`;
 
     const genRes = await fetch('https://api.openai.com/v1/images/generations', {
       method: 'POST',
@@ -32,7 +31,13 @@ export async function POST(req: NextRequest) {
         Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ model: 'dall-e-3', prompt, n: 1, size: '1024x1024', quality: 'standard' }),
+      body: JSON.stringify({
+        model: 'gpt-image-1',
+        prompt,
+        n: 1,
+        size: '1024x1024',
+        quality: 'high',
+      }),
     });
 
     if (!genRes.ok) {
@@ -41,12 +46,20 @@ export async function POST(req: NextRequest) {
     }
 
     const genData = await genRes.json();
-    const tempUrl: string | undefined = genData.data?.[0]?.url;
-    if (!tempUrl) throw new Error('No image URL in response');
 
-    // Download then upload to Supabase Storage for a permanent URL
-    const imgRes = await fetch(tempUrl);
-    const buffer = await imgRes.arrayBuffer();
+    // gpt-image-1 returns base64 by default
+    const b64: string | undefined = genData.data?.[0]?.b64_json;
+    const tempUrl: string | undefined = genData.data?.[0]?.url;
+
+    let buffer: ArrayBuffer;
+    if (b64) {
+      const bin = Buffer.from(b64, 'base64');
+      buffer = bin.buffer.slice(bin.byteOffset, bin.byteOffset + bin.byteLength);
+    } else if (tempUrl) {
+      buffer = await fetch(tempUrl).then(r => r.arrayBuffer());
+    } else {
+      throw new Error('No image data in response');
+    }
 
     const path = `${user.id}/${recipeId}.png`;
     const { error: uploadErr } = await supa.storage
