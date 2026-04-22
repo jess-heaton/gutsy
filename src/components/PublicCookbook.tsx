@@ -36,7 +36,7 @@ function RecipeTile({ r }: { r: PublicRecipe }) {
 
   return (
     <Link
-      href={`/cookbook/${r.id}`}
+      href={`/recipe/${r.id}`}
       className="group block rounded-2xl overflow-hidden bg-white border border-gray-100 hover:border-brand-200 hover:shadow-lifted transition-all hover:-translate-y-0.5"
     >
       <div className="h-44 relative overflow-hidden">
