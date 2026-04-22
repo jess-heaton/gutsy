@@ -12,9 +12,9 @@ const EXAMPLES = [
   'Scan the Nando\'s menu for me',
   'Make carbonara low-FODMAP',
   'I have chicken, rice and spinach in my fridge',
-  'Log celery with peanut butter',
+  'Can I have hummus with Fodzyme?',
   'Is sourdough OK for IBS?',
-  'What can I eat at an Italian restaurant?',
+  'What can I eat at Wagamama?',
   'Swap high-FODMAP ingredients in banana bread',
 ];
 
@@ -25,6 +25,16 @@ const QUICK_ACTIONS = [
   { icon: Refrigerator, label: 'Fridge → recipe', href: '/recipe?mode=fridge' },
 ];
 
+// Common restaurant/chain keywords — triggers menu scanner even without the word "restaurant"
+const RESTAURANT_CHAINS = [
+  'nando', 'wagamama', 'pizza express', 'pizza hut', 'domino', 'subway', 'mcdonald', "mcdonald's",
+  'burger king', 'kfc', 'pret', 'itsu', 'wasabi', 'leon', 'honest burger', 'five guys', 'shake shack',
+  'chipotle', 'côte', 'cote brasserie', 'zizzi', 'bella italia', 'prezzo', 'ask italian', 'giraffe',
+  'harvester', 'toby carvery', 'beefeater', 'wetherspoon', 'spoons', 'caffe nero', 'starbucks',
+  'costa', 'greggs', 'tortilla', 'byron', 'patty & bun', 'bill\'s', 'bills', 'the ivy', 'carluccio',
+  'franco manca', 'youngs', 'mitchells', 'brewdog', 'wahaca', 'rosa\'s thai', 'thai', 'sushi',
+];
+
 type Intent = { route: string; label: string; cta: string; icon: React.ElementType; };
 
 function matchIntent(text: string): Intent {
@@ -33,19 +43,40 @@ function matchIntent(text: string): Intent {
   const l = t.toLowerCase();
   const has = (...words: string[]) => words.some(w => l.includes(w));
 
-  if (has('menu', 'restaurant', 'cafe', 'takeaway', 'eating out', 'nando', 'pizza express'))
-    return { route: `/menu?q=${q}`, label: 'Menu', cta: 'Full menu scan', icon: ScanLine };
-  if (has('fridge', 'have ', 'got ', 'leftover', 'in my kitchen', 'what can i cook', 'what can i make'))
-    return { route: `/recipe?mode=fridge&q=${q}`, label: 'Fridge', cta: 'Build the recipe', icon: Refrigerator };
-  if (has('recipe', 'bake', 'cook', 'make this', 'fix this', 'swap', 'carbonara', 'bread', 'pasta', 'curry'))
-    return { route: `/recipe?q=${q}`, label: 'Recipe', cta: 'Fix the recipe', icon: ChefHat };
-  if (has('log', 'add ', 'ate ', 'had ', 'track this', 'track my'))
+  // URL → always menu scanner, auto-scan
+  if (/^https?:\/\//i.test(t))
+    return { route: `/menu?q=${q}&auto=1`, label: 'Menu scanner', cta: 'View full scan', icon: ScanLine };
+
+  // Named restaurant chain → menu scanner, auto-scan
+  if (RESTAURANT_CHAINS.some(c => l.includes(c)))
+    return { route: `/menu?q=${q}&auto=1`, label: 'Menu scanner', cta: 'Scan the menu', icon: ScanLine };
+
+  // Explicit restaurant/eating-out context → menu scanner, auto-scan
+  if (has('restaurant', 'cafe', 'café', 'takeaway', 'takeout', 'eating out', 'eat out', 'menu', 'dine'))
+    return { route: `/menu?q=${q}&auto=1`, label: 'Menu scanner', cta: 'Scan the menu', icon: ScanLine };
+
+  // Fridge / pantry → recipe fridge mode
+  if (has('fridge', 'freezer', 'pantry', 'leftover', 'in my kitchen', 'what can i cook', 'what can i make', 'what should i make'))
+    return { route: `/recipe?mode=fridge&q=${q}`, label: 'Fridge → recipe', cta: 'Build the recipe', icon: Refrigerator };
+
+  // Have X, got X (ingredient lists) → fridge mode
+  if (/i('ve)? (have|got) .{3,}/.test(l) && !has('ibs', 'symptom', 'pain', 'bloat'))
+    return { route: `/recipe?mode=fridge&q=${q}`, label: 'Fridge → recipe', cta: 'Build the recipe', icon: Refrigerator };
+
+  // Recipe fixing
+  if (has('recipe', 'bake', 'cook', 'make this', 'fix this', 'swap', 'substitute', 'carbonara', 'bread', 'pasta', 'curry', 'low-fodmap version', 'fodmap safe version', 'fodmap-safe'))
+    return { route: `/recipe?q=${q}`, label: 'Recipe fixer', cta: 'Fix the recipe', icon: ChefHat };
+
+  // Logging
+  if (has('log', 'ate ', 'just ate', 'just had', 'track this', 'track my', 'add to my log', 'diary'))
     return { route: `/dashboard?quicklog=${q}`, label: 'Log', cta: 'Open the tracker', icon: Pen };
-  if (has('elimination', 'reintroduction', 'just got diagnosed', 'diagnosed', 'phase', 'starting'))
-    return { route: `/signup?intent=${q}`, label: 'Start', cta: 'Create your account', icon: PlayCircle };
-  if (has('safe', 'can i eat', 'is ', 'high fodmap', 'low fodmap', 'fodmap'))
-    return { route: `/foods?q=${q}`, label: 'Food guide', cta: 'Open the food guide', icon: Sparkles };
-  return { route: `/dashboard?quicklog=${q}`, label: 'Gutsy', cta: 'Open Gutsy', icon: Sparkles };
+
+  // Onboarding / starting out
+  if (has('elimination', 'reintroduction', 'just got diagnosed', 'diagnosed', 'starting the diet', 'new to fodmap', 'where do i start', 'just started', 'beginning'))
+    return { route: `/signup?intent=${q}`, label: 'Get started', cta: 'Create your account', icon: PlayCircle };
+
+  // Default: food/FODMAP question, meds question, anything else → food guide
+  return { route: `/foods?q=${q}`, label: 'Food guide', cta: 'Open the food guide', icon: Sparkles };
 }
 
 export default function HeroPrompt() {

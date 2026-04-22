@@ -153,12 +153,27 @@ function MenuInner() {
   const [search, setSearch]           = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
 
+  const autoScanRef = useRef(false);
+
   useEffect(() => {
     const q = params.get('q');
+    const auto = params.get('auto') === '1';
     if (!q) return;
     if (/^https?:\/\//i.test(q)) { setMode('url'); setUrl(q); }
     else { setMode('text'); setText(q); }
+    if (auto) autoScanRef.current = true;
   }, [params]);
+
+  // Trigger auto-scan after state has settled from the param effect
+  useEffect(() => {
+    if (!autoScanRef.current) return;
+    const t = setTimeout(() => {
+      autoScanRef.current = false;
+      scan();
+    }, 80);
+    return () => clearTimeout(t);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, url, text]);
 
   useEffect(() => {
     fetch('/api/public-scans')

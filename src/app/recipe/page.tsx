@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import {
   ChefHat, AlertCircle, ArrowRight, CheckCircle, AlertTriangle,
   ClipboardList, Link2, Sparkles, Refrigerator, Camera, X,
@@ -264,6 +265,11 @@ function RecipeDetail({ id, onClose, onDeleted }: { id: string; onClose: () => v
 }
 
 export default function RecipePage() {
+  return <Suspense fallback={null}><RecipePageInner /></Suspense>;
+}
+
+function RecipePageInner() {
+  const params = useSearchParams();
   const [mode, setMode] = useState<InputMode>('recipe');
   const [recipe, setRecipe] = useState('');
   const [url, setUrl] = useState('');
@@ -286,6 +292,19 @@ export default function RecipePage() {
   const [togglingPublic, setTogglingPublic] = useState(false);
 
   const [cards, setCards] = useState<SavedCard[]>([]);
+
+  // Pre-fill from hero prompt routing (?q= and ?mode=)
+  useEffect(() => {
+    const q = params.get('q');
+    const m = params.get('mode') as InputMode | null;
+    if (m && ['recipe', 'url', 'describe', 'fridge', 'photo'].includes(m)) setMode(m);
+    if (q) {
+      const targetMode = m ?? 'describe';
+      if (targetMode === 'fridge')   setFridge(q);
+      else if (targetMode === 'url') setUrl(q);
+      else                           setDescribe(q);
+    }
+  }, [params]);
 
   const loadCards = () => fetch('/api/recipes').then(r => r.json()).then(d => setCards(d.recipes ?? []));
   useEffect(() => { loadCards(); }, []);
