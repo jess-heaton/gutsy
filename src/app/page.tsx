@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { ArrowRight, ScanLine, ChefHat, Activity, BarChart2, BookOpen, CheckCircle, Utensils } from 'lucide-react';
 import HeroPrompt from '@/components/HeroPrompt';
 import RestaurantCarousel from '@/components/RestaurantCarousel';
+import PublicCookbook from '@/components/PublicCookbook';
 
 const SITE_URL = 'https://gutsy.freedible.co.uk';
 
@@ -160,6 +161,23 @@ export default function HomePage() {
               Scan your restaurant
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* ── Community cookbook ── */}
+      <section className="py-20 bg-gray-50">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="flex items-end justify-between mb-8">
+            <div>
+              <p className="text-xs font-semibold text-brand-600 uppercase tracking-widest mb-2">Community</p>
+              <h2 className="text-2xl font-bold text-gray-900">Community cookbook</h2>
+              <p className="text-sm text-gray-500 mt-1">Low-FODMAP recipes fixed and shared by Gutsy users.</p>
+            </div>
+            <Link href="/recipe" className="hidden md:flex items-center gap-1.5 text-sm font-semibold text-brand-700 hover:text-brand-900 flex-shrink-0">
+              Fix a recipe <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+          <PublicCookbook />
         </div>
       </section>
 

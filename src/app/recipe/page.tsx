@@ -280,7 +280,10 @@ export default function RecipePage() {
   const [saving, setSaving] = useState(false);
   const [saveStep, setSaveStep] = useState<'saving' | 'imaging' | 'done' | null>(null);
   const [saved, setSaved] = useState(false);
+  const [savedId, setSavedId] = useState<string | null>(null);
   const [makePublic, setMakePublic] = useState(false);
+  const [isPublic, setIsPublic] = useState(false);
+  const [togglingPublic, setTogglingPublic] = useState(false);
 
   const [cards, setCards] = useState<SavedCard[]>([]);
 
@@ -356,6 +359,8 @@ export default function RecipePage() {
       }).catch(() => {}); // silently ignore if image gen fails
 
       setSaved(true);
+      setSavedId(data.id);
+      setIsPublic(makePublic);
       setSaveStep('done');
       loadCards();
     } catch (err: unknown) {
@@ -364,6 +369,19 @@ export default function RecipePage() {
     } finally {
       setSaving(false);
     }
+  };
+
+  const togglePublic = async () => {
+    if (!savedId || togglingPublic) return;
+    setTogglingPublic(true);
+    const next = !isPublic;
+    await fetch('/api/recipes', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: savedId, isPublic: next }),
+    }).catch(() => {});
+    setIsPublic(next);
+    setTogglingPublic(false);
   };
 
   const canRun =
@@ -502,9 +520,7 @@ export default function RecipePage() {
         <div className="space-y-6 animate-slide-up">
           {/* Hero card */}
           <div className={clsx('rounded-2xl overflow-hidden shadow-card')}>
-            <div className={clsx('h-36 bg-gradient-to-br flex items-center justify-center', resultAccent.from, resultAccent.to)}>
-              <span className="text-6xl drop-shadow" aria-hidden>{result.emoji ?? '🍽️'}</span>
-            </div>
+            <div className={clsx('h-36 bg-gradient-to-br', resultAccent.from, resultAccent.to)} />
             <div className="bg-white p-5">
               <div className="flex items-start justify-between gap-3">
                 <div>
@@ -532,7 +548,21 @@ export default function RecipePage() {
                           : <><Bookmark className="w-3.5 h-3.5" />Save</>
                     }
                   </button>
-                  {!saved && (
+                  {saved ? (
+                    <button
+                      onClick={togglePublic}
+                      disabled={togglingPublic}
+                      className={clsx(
+                        'flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-xl border-2 transition-all',
+                        isPublic
+                          ? 'border-brand-400 bg-brand-50 text-brand-700 hover:bg-brand-100'
+                          : 'border-gray-200 bg-white text-gray-500 hover:border-brand-300 hover:text-brand-600',
+                      )}
+                    >
+                      <span className={clsx('w-3 h-3 rounded-full border-2 flex-shrink-0 transition-colors', isPublic ? 'bg-brand-600 border-brand-600' : 'border-gray-300')} />
+                      {togglingPublic ? 'Updating…' : isPublic ? 'Public — in community cookbook' : 'Make public'}
+                    </button>
+                  ) : (
                     <button
                       onClick={() => setMakePublic(p => !p)}
                       className={clsx(

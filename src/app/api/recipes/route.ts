@@ -52,6 +52,23 @@ export async function POST(req: NextRequest) {
   return Response.json({ id: data.id });
 }
 
+export async function PATCH(req: NextRequest) {
+  const supa = createClient();
+  const { data: { user } } = await supa.auth.getUser();
+  if (!user) return Response.json({ error: 'Not signed in' }, { status: 401 });
+
+  const { id, isPublic } = await req.json();
+  if (!id) return Response.json({ error: 'Missing id' }, { status: 400 });
+
+  const { error } = await supa.from('recipes').update({
+    is_public: isPublic,
+    display_name: isPublic ? (user.email ?? 'Anonymous') : null,
+  }).eq('id', id).eq('user_id', user.id);
+
+  if (error) return Response.json({ error: error.message }, { status: 500 });
+  return Response.json({ ok: true });
+}
+
 export async function DELETE(req: NextRequest) {
   const supa = createClient();
   const { data: { user } } = await supa.auth.getUser();

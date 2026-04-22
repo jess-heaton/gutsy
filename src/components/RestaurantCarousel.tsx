@@ -6,9 +6,9 @@ import Link from 'next/link';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const FALLBACK_IMAGES = [
-  '/ChatGPT%20Image%20Apr%2022%2C%202026%2C%2012_55_26%20AM.png',
-  '/ChatGPT%20Image%20Apr%2022%2C%202026%2C%2012_55_31%20AM.png',
-  '/ChatGPT%20Image%20Apr%2022%2C%202026%2C%2012_55_39%20AM.png',
+  '/restaurant-1.png',
+  '/restaurant-2.png',
+  '/restaurant-3.png',
 ];
 
 interface Scan {
