@@ -23,7 +23,6 @@ const QUICK_ACTIONS = [
   { icon: ScanLine,     label: 'Scan a menu',    href: '/menu' },
   { icon: ChefHat,      label: 'Fix a recipe',   href: '/recipe' },
   { icon: Refrigerator, label: 'Fridge → recipe', href: '/recipe?mode=fridge' },
-  { icon: Pen,          label: 'Quick log',      href: '/dashboard?quicklog=1' },
 ];
 
 type Intent = { route: string; label: string; cta: string; icon: React.ElementType; };

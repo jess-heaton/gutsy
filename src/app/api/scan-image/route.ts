@@ -6,25 +6,18 @@ export async function POST(req: NextRequest) {
   const { data: { user } } = await supa.auth.getUser();
   if (!user) return Response.json({ error: 'Not signed in' }, { status: 401 });
 
-  const { recipeId, title, tags } = await req.json() as {
-    recipeId: string;
-    title: string;
-    tags?: string[];
-  };
-  if (!recipeId || !title) return Response.json({ error: 'Missing params' }, { status: 400 });
+  const { slug, restaurant } = await req.json() as { slug: string; restaurant?: string };
+  if (!slug) return Response.json({ error: 'Missing slug' }, { status: 400 });
   if (!process.env.OPENAI_API_KEY) return Response.json({ error: 'OPENAI_API_KEY not set' }, { status: 500 });
 
   try {
-    const tagLine = tags?.length ? ` (${tags.join(', ')})` : '';
+    const name = restaurant ?? 'a restaurant';
     const prompt =
-      `Hyperrealistic food photograph of "${title}"${tagLine}, shot on a Sony A7R V with an 85mm f/1.4 lens. ` +
-      `The dish is perfectly plated on a matte ceramic plate, resting on a natural linen tablecloth. ` +
-      `Soft north-facing window light from the left, subtle fill on the right, golden-hour colour temperature. ` +
-      `Bokeh background reveals a blurred kitchen. Every ingredient is sharply in focus on the food itself. ` +
-      `Garnished like a Michelin-starred restaurant: a drizzle of olive oil catching the light, fresh herb sprigs, ` +
-      `a crack of black pepper. The food looks freshly cooked, steaming slightly. ` +
-      `Shot from 40-degree angle. No text, no watermarks, no people, no hands, no AI artefacts. ` +
-      `Indistinguishable from a real food magazine photograph.`;
+      `A warm, inviting restaurant card image for "${name}". ` +
+      `Photorealistic overhead shot of a beautifully set table with a signature dish from this type of cuisine, ` +
+      `soft candlelight ambiance, linen napkins, elegant crockery. ` +
+      `Shallow depth of field, editorial food photography style. ` +
+      `No text, no logos, no watermarks, no people.`;
 
     const genRes = await fetch('https://api.openai.com/v1/images/generations', {
       method: 'POST',
@@ -44,11 +37,10 @@ export async function POST(req: NextRequest) {
     const tempUrl: string | undefined = genData.data?.[0]?.url;
     if (!tempUrl) throw new Error('No image URL in response');
 
-    // Download then upload to Supabase Storage for a permanent URL
     const imgRes = await fetch(tempUrl);
     const buffer = await imgRes.arrayBuffer();
 
-    const path = `${user.id}/${recipeId}.png`;
+    const path = `scans/${slug}.png`;
     const { error: uploadErr } = await supa.storage
       .from('recipe-images')
       .upload(path, buffer, { contentType: 'image/png', upsert: true });
@@ -56,12 +48,12 @@ export async function POST(req: NextRequest) {
 
     const { data: { publicUrl } } = supa.storage.from('recipe-images').getPublicUrl(path);
 
-    await supa.from('recipes').update({ image_url: publicUrl }).eq('id', recipeId).eq('user_id', user.id);
+    await supa.from('menu_scans').update({ image_url: publicUrl }).eq('slug', slug).eq('user_id', user.id);
 
     return Response.json({ imageUrl: publicUrl });
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'Failed';
-    console.error('[recipe-image]', msg);
+    console.error('[scan-image]', msg);
     return Response.json({ error: msg }, { status: 500 });
   }
 }

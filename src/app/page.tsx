@@ -107,10 +107,6 @@ export default function HomePage() {
       <section className="relative bg-brand-950 overflow-hidden min-h-[88vh] flex items-center">
         <HeroBg />
         <div className="relative z-10 max-w-4xl mx-auto px-6 py-24 w-full flex flex-col items-center text-center">
-          <div className="inline-flex items-center gap-2 bg-brand-900/80 border border-brand-700 rounded-full px-4 py-1.5 mb-8">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-xs font-semibold text-brand-300 tracking-wide">Free · no account needed for most tools</span>
-          </div>
           <h1 className="text-5xl lg:text-[4rem] font-bold text-white leading-[1.05] tracking-tight mb-5">
             Eating out with IBS<br />
             <span className="text-brand-400">doesn't have to be stressful.</span>
@@ -378,7 +374,7 @@ export default function HomePage() {
                 'Restaurant menu scanner',
                 'Recipe FODMAP fixer',
                 'FODMAP food guide',
-                'Browser extension for quick logging',
+                'FODMAP food guide',
               ],
             },
             {

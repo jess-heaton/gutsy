@@ -13,7 +13,6 @@ const NAV = [
   { href: '/recipe',    label: 'Recipe fixer' },
   { href: '/foods',     label: 'Food guide' },
   { href: '/blog',      label: 'Blog' },
-  { href: '/extension', label: 'Extension' },
 ];
 
 export default function TopNav() {

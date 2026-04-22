@@ -115,6 +115,13 @@ export default function QuickLogWidget() {
               </button>
             ))}
           </div>
+          <div className="grid grid-cols-7 gap-1 mt-0.5">
+            {[1, 2, 3, 4, 5, 6, 7].map(n => (
+              <p key={n} className="text-center text-[9px] text-gray-600 leading-none">
+                {n === 1 ? 'Hard' : n === 4 ? 'Regular' : n === 7 ? 'Watery' : ''}
+              </p>
+            ))}
+          </div>
         </div>
 
         <div>

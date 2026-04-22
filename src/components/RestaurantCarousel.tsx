@@ -5,6 +5,12 @@ import React from 'react';
 import Link from 'next/link';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
+const FALLBACK_IMAGES = [
+  '/ChatGPT%20Image%20Apr%2022%2C%202026%2C%2012_55_26%20AM.png',
+  '/ChatGPT%20Image%20Apr%2022%2C%202026%2C%2012_55_31%20AM.png',
+  '/ChatGPT%20Image%20Apr%2022%2C%202026%2C%2012_55_39%20AM.png',
+];
+
 interface Scan {
   slug: string;
   restaurant: string | null;
@@ -44,8 +50,9 @@ export default function RestaurantCarousel() {
         className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory scroll-smooth"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' } as React.CSSProperties}
       >
-        {scans.map(scan => {
+        {scans.map((scan, idx) => {
           const { safe, modify, avoid } = pills(scan.analysis?.items);
+          const imgSrc = scan.image_url ?? FALLBACK_IMAGES[idx % FALLBACK_IMAGES.length];
           return (
             <Link
               key={scan.slug}
@@ -53,14 +60,12 @@ export default function RestaurantCarousel() {
               className="group flex-shrink-0 w-56 snap-start bg-white border border-gray-100 rounded-2xl overflow-hidden hover:border-brand-200 hover:shadow-lifted transition-all"
             >
               <div className="h-32 relative bg-gradient-to-br from-brand-900 to-brand-700 overflow-hidden">
-                {scan.image_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={scan.image_url}
-                    alt=""
-                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                ) : null}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={imgSrc}
+                  alt=""
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
                 <div className="absolute bottom-2 left-2 flex gap-1.5">
                   {safe > 0   && <span className="text-2xs font-bold bg-emerald-500/90 text-white px-1.5 py-0.5 rounded-full">{safe} safe</span>}
                   {modify > 0 && <span className="text-2xs font-bold bg-amber-500/90 text-white px-1.5 py-0.5 rounded-full">{modify} modify</span>}

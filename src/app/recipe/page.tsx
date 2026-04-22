@@ -106,51 +106,51 @@ function Spinner({ label }: { label: string }) {
   );
 }
 
-function RecipeCard({ r, onOpen, onDelete }: { r: SavedCard; onOpen: () => void; onDelete: () => void }) {
+function RecipeCard({ r, onDelete }: { r: SavedCard; onDelete: () => void }) {
   const a = accent(r.accent);
   const [imgFailed, setImgFailed] = useState(false);
   return (
-    <button
-      onClick={onOpen}
-      className="group relative text-left rounded-2xl overflow-hidden bg-white shadow-card hover:shadow-lifted transition-all hover:-translate-y-0.5"
-    >
-      <div className="h-36 relative overflow-hidden">
-        {!imgFailed ? (
-          <img
-            src={r.image_url ?? foodImageUrl(r.title, r.tags)}
-            alt={r.title}
-            className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-            onError={() => setImgFailed(true)}
-          />
-        ) : (
-          <div className={clsx('absolute inset-0 bg-gradient-to-br flex items-center justify-center', a.from, a.to)}>
-            <span className="text-5xl drop-shadow-sm" aria-hidden>{r.emoji ?? '🍽️'}</span>
-          </div>
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-        <button
-          onClick={e => { e.stopPropagation(); onDelete(); }}
-          className="absolute top-2 right-2 w-7 h-7 rounded-full bg-white/80 backdrop-blur flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white text-gray-600 hover:text-red-600"
-          aria-label="Delete recipe"
-        >
-          <Trash2 className="w-3.5 h-3.5" />
-        </button>
-      </div>
-      <div className="p-3.5">
-        <p className="text-sm font-semibold text-gray-900 line-clamp-2 leading-snug">{r.title}</p>
-        <div className="flex items-center gap-3 mt-2 text-2xs text-gray-500">
-          {r.total_time && <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{r.total_time}</span>}
-          {r.servings && <span className="flex items-center gap-1"><Users className="w-3 h-3" />{r.servings}</span>}
+    <div className="group relative rounded-2xl overflow-hidden bg-white shadow-card hover:shadow-lifted transition-all hover:-translate-y-0.5">
+      <a href={`/recipe/${r.id}`} className="block">
+        <div className="h-36 relative overflow-hidden">
+          {!imgFailed ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={r.image_url ?? foodImageUrl(r.title, r.tags)}
+              alt={r.title}
+              className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              onError={() => setImgFailed(true)}
+            />
+          ) : (
+            <div className={clsx('absolute inset-0 bg-gradient-to-br flex items-center justify-center', a.from, a.to)}>
+              <span className="text-5xl drop-shadow-sm" aria-hidden>{r.emoji ?? '🍽️'}</span>
+            </div>
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
         </div>
-        {r.tags && r.tags.length > 0 && (
-          <div className="flex flex-wrap gap-1 mt-2">
-            {r.tags.slice(0, 3).map((t, i) => (
-              <span key={i} className={clsx('text-2xs font-medium px-1.5 py-0.5 rounded-full', a.chip)}>{t}</span>
-            ))}
+        <div className="p-3.5">
+          <p className="text-sm font-semibold text-gray-900 line-clamp-2 leading-snug">{r.title}</p>
+          <div className="flex items-center gap-3 mt-2 text-2xs text-gray-500">
+            {r.total_time && <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{r.total_time}</span>}
+            {r.servings && <span className="flex items-center gap-1"><Users className="w-3 h-3" />{r.servings}</span>}
           </div>
-        )}
-      </div>
-    </button>
+          {r.tags && r.tags.length > 0 && (
+            <div className="flex flex-wrap gap-1 mt-2">
+              {r.tags.slice(0, 3).map((t, i) => (
+                <span key={i} className={clsx('text-2xs font-medium px-1.5 py-0.5 rounded-full', a.chip)}>{t}</span>
+              ))}
+            </div>
+          )}
+        </div>
+      </a>
+      <button
+        onClick={e => { e.preventDefault(); onDelete(); }}
+        className="absolute top-2 right-2 w-7 h-7 rounded-full bg-white/80 backdrop-blur flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white text-gray-600 hover:text-red-600"
+        aria-label="Delete recipe"
+      >
+        <Trash2 className="w-3.5 h-3.5" />
+      </button>
+    </div>
   );
 }
 
@@ -282,7 +282,6 @@ export default function RecipePage() {
   const [saved, setSaved] = useState(false);
 
   const [cards, setCards] = useState<SavedCard[]>([]);
-  const [openId, setOpenId] = useState<string | null>(null);
 
   const loadCards = () => fetch('/api/recipes').then(r => r.json()).then(d => setCards(d.recipes ?? []));
   useEffect(() => { loadCards(); }, []);
@@ -603,13 +602,11 @@ export default function RecipePage() {
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {cards.map(c => (
-              <RecipeCard key={c.id} r={c} onOpen={() => setOpenId(c.id)} onDelete={() => deleteCard(c.id)} />
+              <RecipeCard key={c.id} r={c} onDelete={() => deleteCard(c.id)} />
             ))}
           </div>
         )}
       </div>
-
-      {openId && <RecipeDetail id={openId} onClose={() => setOpenId(null)} onDeleted={() => { setOpenId(null); loadCards(); }} />}
     </div>
   );
 }
