@@ -14,22 +14,22 @@ interface Reel {
 // Update titles/descriptions to match your actual videos
 const REELS: Reel[] = [
   {
-    src: '/204e8b72ef60f1b340bbaafe034b6e63_1_1776929811_1106.mp4',
+    src: '/reel-1.mp4',
     title: 'Creamy pasta',
     description: 'a creamy low-FODMAP pasta with chicken and spinach',
   },
   {
-    src: '/dce09ace38586e3c18377be2738a2c9b_1_1776934729_8331.mp4',
+    src: '/reel-2.mp4',
     title: 'Buddha bowl',
     description: 'a nourishing low-FODMAP buddha bowl with roasted vegetables and tahini',
   },
   {
-    src: '/9ac6fbe5a9f70aab95876ea1a153b06a_1_1776935006_7064.mp4',
+    src: '/reel-3.mp4',
     title: 'Stir fry',
     description: 'a quick low-FODMAP stir fry with rice noodles and tofu',
   },
   {
-    src: '/0d0f6d5bf9492f70d3ecba5f72b9bfc9_1_1776935233_1828.mp4',
+    src: '/reel-4.mp4',
     title: 'Salmon tray bake',
     description: 'a simple low-FODMAP salmon tray bake with roasted courgette and lemon',
   },
