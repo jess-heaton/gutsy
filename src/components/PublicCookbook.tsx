@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Clock, Users } from 'lucide-react';
+import { reelRecipes } from '@/data/reel-recipes';
 
 interface PublicRecipe {
   id: string;
@@ -14,6 +15,7 @@ interface PublicRecipe {
   servings: string | null;
   image_url: string | null;
   display_name: string | null;
+  href: string;
 }
 
 const ACCENTS: Record<string, { from: string; to: string }> = {
@@ -32,11 +34,11 @@ function RecipeTile({ r }: { r: PublicRecipe }) {
   const a = ACCENTS[r.accent ?? 'amber'] ?? ACCENTS.amber;
   const who = r.display_name
     ? r.display_name.includes('@') ? r.display_name.split('@')[0] : r.display_name
-    : 'community';
+    : 'Gutsy';
 
   return (
     <Link
-      href={`/recipe/${r.id}`}
+      href={r.href}
       className="group block rounded-2xl overflow-hidden bg-white border border-gray-100 hover:border-brand-200 hover:shadow-lifted transition-all hover:-translate-y-0.5"
     >
       <div className="h-44 relative overflow-hidden">
@@ -67,21 +69,36 @@ function RecipeTile({ r }: { r: PublicRecipe }) {
   );
 }
 
+// Static reel recipes shown as community recipes
+const REEL_TILES: PublicRecipe[] = reelRecipes.map(r => ({
+  id: r.slug,
+  title: r.title,
+  emoji: r.emoji,
+  accent: r.accent,
+  tags: r.tags,
+  total_time: r.totalTime,
+  servings: r.servings,
+  image_url: r.heroImage,
+  display_name: 'Gutsy',
+  href: `/reel/${r.slug}`,
+}));
+
 export default function PublicCookbook() {
-  const [recipes, setRecipes] = useState<PublicRecipe[]>([]);
+  const [dbRecipes, setDbRecipes] = useState<PublicRecipe[]>([]);
 
   useEffect(() => {
     fetch('/api/public-recipes')
       .then(r => r.json())
-      .then(d => setRecipes(d.recipes ?? []))
+      .then(d => setDbRecipes((d.recipes ?? []).map((r: Omit<PublicRecipe, 'href'>) => ({ ...r, href: `/recipe/${r.id}` }))))
       .catch(() => {});
   }, []);
 
-  if (recipes.length === 0) return null;
+  const all = [...REEL_TILES, ...dbRecipes].slice(0, 12);
+  if (all.length === 0) return null;
 
   return (
     <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      {recipes.map(r => <RecipeTile key={r.id} r={r} />)}
+      {all.map(r => <RecipeTile key={r.id} r={r} />)}
     </div>
   );
 }

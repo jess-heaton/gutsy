@@ -9,9 +9,9 @@ import AuthorByline from '@/components/blog/AuthorByline';
 import KeyTakeaways from '@/components/blog/KeyTakeaways';
 import References from '@/components/blog/References';
 import TableOfContents from '@/components/blog/TableOfContents';
-import AuthorCard from '@/components/blog/AuthorCard';
 import Disclaimer from '@/components/blog/Disclaimer';
 import ArticleViewTracker from '@/components/blog/ArticleViewTracker';
+
 
 const SITE_URL = 'https://gutsy.freedible.co.uk';
 
@@ -204,7 +204,6 @@ export default function ArticlePage({ params }: { params: { slug: string } }) {
 
             <References items={article.references} />
             <Disclaimer />
-            <AuthorCard />
 
             {/* Share / CTA */}
             <div className="mt-12 pt-8 border-t border-gray-100 flex flex-wrap items-center justify-between gap-4">

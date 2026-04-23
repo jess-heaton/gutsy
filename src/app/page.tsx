@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowRight, ScanLine, ChefHat, Activity, BarChart2, BookOpen, CheckCircle, Utensils } from 'lucide-react';
+import { ArrowRight, ScanLine, ChefHat, Activity, Search, Share2, Users, BarChart2, BookOpen, CheckCircle, Utensils, QrCode } from 'lucide-react';
 import HeroPrompt from '@/components/HeroPrompt';
 import RestaurantCarousel from '@/components/RestaurantCarousel';
 import PublicCookbook from '@/components/PublicCookbook';
@@ -177,92 +177,119 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Community cookbook ── */}
-      <section className="py-20 bg-gray-50">
+      {/* ── You are not alone ── */}
+      <section className="py-20 bg-brand-950 overflow-hidden">
         <div className="max-w-6xl mx-auto px-6">
-          <div className="flex items-end justify-between mb-8">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Text */}
             <div>
-              <p className="text-xs font-semibold text-brand-600 uppercase tracking-widest mb-2">Community</p>
-              <h2 className="text-2xl font-bold text-gray-900">Community cookbook</h2>
-              <p className="text-sm text-gray-500 mt-1">Low-FODMAP recipes fixed and shared by Gutsy users.</p>
+              <p className="text-xs font-semibold text-brand-400 uppercase tracking-widest mb-5">Community</p>
+              <h2 className="text-5xl lg:text-6xl font-bold text-white leading-[1.05] mb-6">
+                You are<br />not alone.
+              </h2>
+              <p className="text-brand-200 text-lg leading-relaxed mb-4">
+                We started Gutsy because we know what it's like living with IBS — the anxiety before every restaurant, the mental load of scanning every ingredient, the awkward explanations to friends.
+              </p>
+              <p className="text-brand-300 text-base leading-relaxed mb-8">
+                Over 1 in 7 people live with it. Most just quietly stop going out. Gutsy gives you the tools to live freely — without IBS defining your social life.
+              </p>
+              <Link
+                href="/mission"
+                className="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-500 text-white font-semibold px-5 py-2.5 rounded-xl transition-colors"
+              >
+                Our mission <ArrowRight className="w-4 h-4" />
+              </Link>
             </div>
-            <Link href="/recipe" className="hidden md:flex items-center gap-1.5 text-sm font-semibold text-brand-700 hover:text-brand-900 flex-shrink-0">
-              Fix a recipe <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
-          <PublicCookbook />
-        </div>
-      </section>
 
-      {/* ── Hope section ── */}
-      <section className="py-20 bg-brand-950">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <p className="text-xs font-semibold text-brand-400 uppercase tracking-widest mb-4">You're not alone</p>
-          <h2 className="text-3xl lg:text-4xl font-bold text-white leading-tight mb-6">
-            IBS affects 1 in 7 people.<br />
-            <span className="text-brand-400">Most of them just stop going out.</span>
-          </h2>
-          <p className="text-brand-200 text-lg leading-relaxed max-w-2xl mx-auto mb-10">
-            Gutsy exists because navigating menus with IBS is exhausting — mentally scanning every ingredient, asking awkward questions, hoping nothing goes wrong. The low-FODMAP diet works, but applying it in the real world is hard. We built the tools to make it easy.
-          </p>
-          <div className="grid sm:grid-cols-3 gap-6 text-left">
-            {[
-              { stat: '75%', label: 'of IBS sufferers see improvement on low-FODMAP', sub: 'Monash University research' },
-              { stat: '15–25', label: 'dishes rated per menu scan', sub: 'safe, modify, or avoid' },
-              { stat: 'Free', label: 'menu scanner, recipe fixer & food guide', sub: 'no account needed' },
-            ].map(({ stat, label, sub }) => (
-              <div key={stat} className="bg-brand-900/50 border border-brand-800 rounded-2xl p-6">
-                <p className="text-3xl font-bold text-brand-400 mb-1">{stat}</p>
-                <p className="text-sm font-semibold text-white leading-snug mb-1">{label}</p>
-                <p className="text-xs text-brand-500">{sub}</p>
+            {/* Kodak disposable photo */}
+            <div className="flex justify-center lg:justify-end">
+              <div
+                className="relative bg-white p-2.5 pb-10 shadow-2xl"
+                style={{ borderRadius: '4px 24px 4px 24px', transform: 'rotate(-1.5deg)' }}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/ingredient-check.png"
+                  alt="Friends checking ingredients in a grocery store"
+                  className="w-72 h-80 object-cover"
+                  style={{ borderRadius: '2px 18px 2px 18px' }}
+                />
+                <p className="absolute bottom-2 left-0 right-0 text-center text-xs text-gray-400 font-medium tracking-wide" style={{ fontFamily: 'monospace' }}>
+                  gut check ✓
+                </p>
               </div>
-            ))}
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ── What it does ── */}
-      <section className="py-24 bg-white">
+      {/* ── Tools you need ── */}
+      <section className="py-20 bg-brand-950 border-t border-brand-900">
         <div className="max-w-6xl mx-auto px-6">
-          <div className="mb-14">
-            <p className="text-xs font-semibold text-brand-600 uppercase tracking-widest mb-3">What Gutsy does</p>
-            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 leading-tight max-w-xl">
-              Three tools. One goal: actually enjoying food.
+          <div className="mb-8">
+            <p className="text-xs font-semibold text-brand-400 uppercase tracking-widest mb-3">What we built</p>
+            <h2 className="text-3xl lg:text-4xl font-bold text-white leading-tight">
+              The tools you need to be Gutsy.
             </h2>
           </div>
-          <div className="grid md:grid-cols-3 gap-6">
+
+          {/* Horizontal scrollable glassmorphism tiles */}
+          <div className="flex gap-4 overflow-x-auto pb-4" style={{ scrollbarWidth: 'none' }}>
             {[
               {
                 icon: ScanLine,
-                title: 'Scan any restaurant menu',
-                desc: 'Paste a URL and Gutsy finds the real menu automatically — even if you give it the homepage. Every dish comes back safe, modify, or avoid with specific words to use when ordering.',
-                note: 'Free · no account',
+                title: 'Scan a menu',
+                desc: 'Paste any restaurant URL. Gutsy finds the real menu and rates every dish safe, modify, or avoid — with exact words to use when ordering.',
+                badge: 'Free · no account',
                 href: '/menu',
               },
               {
                 icon: ChefHat,
-                title: 'Fix any recipe',
-                desc: 'Paste a recipe and get a rewritten version with every high-FODMAP ingredient swapped for something practical. The method is rewritten around the swaps, not just flagged.',
-                note: 'Free · no account',
+                title: 'Fix a recipe',
+                desc: 'Paste any recipe and get a fully rewritten FODMAP-safe version with practical swaps, not just a list of things to remove.',
+                badge: 'Free · no account',
                 href: '/recipe',
               },
               {
                 icon: Activity,
-                title: 'Track meals and symptoms',
-                desc: 'Log what you eat, how you feel, and bowel movements. Charts reveal your FODMAP intake and symptom patterns so you know your actual triggers — not just the common ones.',
-                note: 'Free tracker',
+                title: 'Track your gut',
+                desc: 'Log meals, symptoms, and bowel movements. Charts show your FODMAP intake and symptom patterns so you find your real triggers.',
+                badge: 'Free tracker',
                 href: '/dashboard',
               },
-            ].map(({ icon: Icon, title, desc, note, href }) => (
-              <Link key={title} href={href} className="group block">
-                <div className="border border-gray-100 rounded-2xl p-6 hover:border-brand-200 hover:shadow-lifted transition-all h-full bg-gray-50 hover:bg-white">
-                  <div className="w-10 h-10 bg-brand-700 rounded-xl flex items-center justify-center mb-5">
-                    <Icon className="w-5 h-5 text-white" />
-                  </div>
-                  <h3 className="text-base font-bold text-gray-900 mb-2">{title}</h3>
-                  <p className="text-sm text-gray-600 leading-relaxed mb-5">{desc}</p>
-                  <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700">{note}</span>
+              {
+                icon: Search,
+                title: 'Search foods',
+                desc: 'Instant low / moderate / high FODMAP lookup for 200+ foods with serving sizes and category breakdowns — based on Monash research.',
+                badge: 'Free · no account',
+                href: '/foods',
+              },
+              {
+                icon: Share2,
+                title: 'Share with your dietitian',
+                desc: 'Generate a clean summary of your logs, flares, and patterns to bring to your next gastro or dietitian appointment.',
+                badge: 'Coming soon',
+                href: '/share/dietitian',
+              },
+              {
+                icon: QrCode,
+                title: 'Share with friends',
+                desc: "Going to a friend's for dinner? Share a QR code with your sensitivities, safe foods, and favourite recipes — so they can cook for you with confidence.",
+                badge: 'Coming soon',
+                href: '/share/friends',
+              },
+            ].map(({ icon: Icon, title, desc, badge, href }) => (
+              <Link
+                key={title}
+                href={href}
+                className="group flex-shrink-0 w-64 bg-white/8 backdrop-blur-md border border-white/10 rounded-2xl p-5 hover:bg-white/12 hover:border-white/20 transition-all"
+              >
+                <div className="w-10 h-10 rounded-xl bg-brand-600/30 border border-brand-500/30 flex items-center justify-center mb-4">
+                  <Icon className="w-5 h-5 text-brand-300" />
                 </div>
+                <h3 className="text-sm font-bold text-white mb-2">{title}</h3>
+                <p className="text-xs text-brand-300 leading-relaxed mb-4">{desc}</p>
+                <span className="text-2xs font-semibold px-2 py-0.5 rounded-full bg-white/10 text-white/60">{badge}</span>
               </Link>
             ))}
           </div>
