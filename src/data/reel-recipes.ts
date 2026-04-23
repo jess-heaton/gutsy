@@ -72,7 +72,7 @@ METHOD
   },
   {
     slug: 'avocado-toast',
-    videoSrc: '/avocado-toast.mp4',
+    videoSrc: '/avo-toast.mp4',
     title: 'Avocado Toast',
     emoji: '🥑',
     accent: 'lime',
@@ -374,7 +374,7 @@ METHOD
   },
   {
     slug: 'tzatziki',
-    videoSrc: '/tzatziki.mp4',
+    videoSrc: '/tsatziki.mp4',
     title: 'Tzatziki',
     emoji: '🥒',
     accent: 'teal',

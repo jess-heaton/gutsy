@@ -1,9 +1,10 @@
 import Link from 'next/link';
-import { ArrowRight, ScanLine, ChefHat, Activity, Search, Share2, Users, BarChart2, BookOpen, CheckCircle, Utensils, QrCode } from 'lucide-react';
+import { ArrowRight, ScanLine, CheckCircle, Utensils } from 'lucide-react';
 import HeroPrompt from '@/components/HeroPrompt';
 import RestaurantCarousel from '@/components/RestaurantCarousel';
 import PublicCookbook from '@/components/PublicCookbook';
 import RecipeReels from '@/components/RecipeReels';
+import ToolsCarousel from '@/components/ToolsCarousel';
 
 const SITE_URL = 'https://gutsy.freedible.co.uk';
 
@@ -110,11 +111,11 @@ export default function HomePage() {
         <HeroBg />
         <div className="relative z-10 max-w-4xl mx-auto px-6 py-24 w-full flex flex-col items-center text-center">
           <h1 className="text-5xl lg:text-[4rem] font-bold text-white leading-[1.05] tracking-tight mb-5">
-            Eating out with IBS<br />
-            <span className="text-brand-400">doesn't have to be stressful.</span>
+            Stop guessing what<br />
+            <span className="text-brand-400">you can eat with IBS.</span>
           </h1>
           <p className="text-lg text-brand-200 leading-relaxed mb-10 max-w-xl">
-            Gutsy scans restaurant menus dish by dish, fixes your favourite recipes, and tracks your gut — all built around the Monash low-FODMAP diet.
+            Gutsy tracks your gut, scans restaurant menus dish by dish, and fixes your favourite recipes — all built around the Monash low-FODMAP diet.
           </p>
           <HeroPrompt />
         </div>
@@ -126,9 +127,8 @@ export default function HomePage() {
           <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-2.5">
             {[
               'Built on Monash University FODMAP research',
-              'Menu scanner finds the right menu automatically',
               'Free to use · no account needed',
-              'Works with any restaurant URL, PDF, or text',
+              'Works with real menus & recipes',
             ].map(item => (
               <div key={item} className="flex items-center gap-2">
                 <CheckCircle className="w-3.5 h-3.5 text-brand-500 flex-shrink-0" />
@@ -204,19 +204,16 @@ export default function HomePage() {
             {/* Kodak disposable photo */}
             <div className="flex justify-center lg:justify-end">
               <div
-                className="relative bg-white p-2.5 pb-10 shadow-2xl"
-                style={{ borderRadius: '4px 24px 4px 24px', transform: 'rotate(-1.5deg)' }}
+                className="relative bg-white p-3 shadow-2xl"
+                style={{ borderRadius: '4px 28px 4px 28px', transform: 'rotate(-1.5deg)' }}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/ingredient-check.png"
                   alt="Friends checking ingredients in a grocery store"
-                  className="w-72 h-80 object-cover"
-                  style={{ borderRadius: '2px 18px 2px 18px' }}
+                  className="w-96 h-[420px] object-cover"
+                  style={{ borderRadius: '2px 22px 2px 22px' }}
                 />
-                <p className="absolute bottom-2 left-0 right-0 text-center text-xs text-gray-400 font-medium tracking-wide" style={{ fontFamily: 'monospace' }}>
-                  gut check ✓
-                </p>
               </div>
             </div>
           </div>
@@ -232,67 +229,7 @@ export default function HomePage() {
               The tools you need to be Gutsy.
             </h2>
           </div>
-
-          {/* Horizontal scrollable glassmorphism tiles */}
-          <div className="flex gap-4 overflow-x-auto pb-4" style={{ scrollbarWidth: 'none' }}>
-            {[
-              {
-                icon: ScanLine,
-                title: 'Scan a menu',
-                desc: 'Paste any restaurant URL. Gutsy finds the real menu and rates every dish safe, modify, or avoid — with exact words to use when ordering.',
-                badge: 'Free · no account',
-                href: '/menu',
-              },
-              {
-                icon: ChefHat,
-                title: 'Fix a recipe',
-                desc: 'Paste any recipe and get a fully rewritten FODMAP-safe version with practical swaps, not just a list of things to remove.',
-                badge: 'Free · no account',
-                href: '/recipe',
-              },
-              {
-                icon: Activity,
-                title: 'Track your gut',
-                desc: 'Log meals, symptoms, and bowel movements. Charts show your FODMAP intake and symptom patterns so you find your real triggers.',
-                badge: 'Free tracker',
-                href: '/dashboard',
-              },
-              {
-                icon: Search,
-                title: 'Search foods',
-                desc: 'Instant low / moderate / high FODMAP lookup for 200+ foods with serving sizes and category breakdowns — based on Monash research.',
-                badge: 'Free · no account',
-                href: '/foods',
-              },
-              {
-                icon: Share2,
-                title: 'Share with your dietitian',
-                desc: 'Generate a clean summary of your logs, flares, and patterns to bring to your next gastro or dietitian appointment.',
-                badge: 'Coming soon',
-                href: '/share/dietitian',
-              },
-              {
-                icon: QrCode,
-                title: 'Share with friends',
-                desc: "Going to a friend's for dinner? Share a QR code with your sensitivities, safe foods, and favourite recipes — so they can cook for you with confidence.",
-                badge: 'Coming soon',
-                href: '/share/friends',
-              },
-            ].map(({ icon: Icon, title, desc, badge, href }) => (
-              <Link
-                key={title}
-                href={href}
-                className="group flex-shrink-0 w-64 bg-white/8 backdrop-blur-md border border-white/10 rounded-2xl p-5 hover:bg-white/12 hover:border-white/20 transition-all"
-              >
-                <div className="w-10 h-10 rounded-xl bg-brand-600/30 border border-brand-500/30 flex items-center justify-center mb-4">
-                  <Icon className="w-5 h-5 text-brand-300" />
-                </div>
-                <h3 className="text-sm font-bold text-white mb-2">{title}</h3>
-                <p className="text-xs text-brand-300 leading-relaxed mb-4">{desc}</p>
-                <span className="text-2xs font-semibold px-2 py-0.5 rounded-full bg-white/10 text-white/60">{badge}</span>
-              </Link>
-            ))}
-          </div>
+          <ToolsCarousel />
         </div>
       </section>
 
@@ -341,57 +278,6 @@ export default function HomePage() {
       </section>
 
       {/* ── The tracker ── */}
-      <section className="py-24 bg-white">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="mb-16">
-            <p className="text-xs font-semibold text-brand-600 uppercase tracking-widest mb-3">The tracker</p>
-            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 leading-tight max-w-xl">
-              Know your triggers, not just the common ones
-            </h2>
-            <p className="text-gray-500 text-sm mt-3 max-w-lg">Everyone's gut is different. The tracker helps you find your personal FODMAP threshold — so you're not avoiding things you don't need to.</p>
-          </div>
-          <div className="grid md:grid-cols-3 gap-10">
-            {[
-              {
-                num: '01',
-                icon: Activity,
-                title: 'Log meals and symptoms',
-                desc: 'One-tap logging for meals, symptoms, and bowel movements. Search from the FODMAP database or free-type anything.',
-              },
-              {
-                num: '02',
-                icon: BarChart2,
-                title: 'Spot the patterns',
-                desc: 'Symptom charts and FODMAP intake graphs across your elimination and reintroduction phases — all in one place.',
-              },
-              {
-                num: '03',
-                icon: BookOpen,
-                title: 'Read the research',
-                desc: 'Plain-English articles on enzymes, supplements, and the FODMAP science — written without the noise.',
-              },
-            ].map(({ num, icon: Icon, title, desc }) => (
-              <div key={title} className="flex gap-5">
-                <span className="text-4xl font-bold text-gray-100 leading-none flex-shrink-0 font-mono tabular-nums">{num}</span>
-                <div>
-                  <Icon className="w-5 h-5 text-brand-600 mb-3" />
-                  <h3 className="text-base font-bold text-gray-900 mb-2">{title}</h3>
-                  <p className="text-sm text-gray-600 leading-relaxed">{desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="mt-14">
-            <Link
-              href="/dashboard"
-              className="inline-flex items-center gap-2 px-6 py-3.5 bg-brand-700 text-white font-semibold rounded-xl hover:bg-brand-800 transition-colors text-sm"
-            >
-              Open the tracker <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
-        </div>
-      </section>
-
       {/* ── FAQ ── */}
       <section className="py-24 bg-white border-t border-gray-100">
         <div className="max-w-3xl mx-auto px-6">
