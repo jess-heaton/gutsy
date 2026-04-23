@@ -40,7 +40,6 @@ export default function RecipeDetailPage({ params }: { params: { id: string } })
   const router = useRouter();
   const [r, setR] = useState<Recipe | null>(null);
   const [loading, setLoading] = useState(true);
-  const [imgFailed, setImgFailed] = useState(false);
 
   useEffect(() => {
     fetch(`/api/recipes/${params.id}`)
@@ -87,35 +86,19 @@ export default function RecipeDetailPage({ params }: { params: { id: string } })
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Hero image */}
-      <div className="h-64 sm:h-80 relative overflow-hidden">
-        {!imgFailed && r.image_url ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={r.image_url}
-            alt={r.title}
-            className="absolute inset-0 w-full h-full object-cover"
-            onError={() => setImgFailed(true)}
-          />
-        ) : (
-          <div className={clsx('absolute inset-0 bg-gradient-to-br flex items-center justify-center', a.from, a.to)}>
-            <span className="text-8xl drop-shadow" aria-hidden>{r.emoji ?? '🍽️'}</span>
-          </div>
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-
+      {/* Compact gradient header */}
+      <div className={clsx('h-40 relative flex items-center justify-center bg-gradient-to-br', a.from, a.to)}>
+        <span className="text-7xl drop-shadow" aria-hidden>{r.emoji ?? '🍽️'}</span>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
         <button
           onClick={() => router.back()}
-          className="absolute top-4 left-4 flex items-center gap-1.5 bg-black/40 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-sm font-medium hover:bg-black/60 transition-colors"
+          className="absolute top-4 left-4 flex items-center gap-1.5 bg-black/30 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-sm font-medium hover:bg-black/50 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" /> Back
         </button>
-
-        <div className="absolute bottom-5 left-5 right-5">
-          <h1 className="text-2xl sm:text-3xl font-bold text-white leading-tight drop-shadow-sm">
-            {r.title}
-          </h1>
-          <div className="flex items-center gap-3 mt-2 text-sm text-white/80">
+        <div className="absolute bottom-4 left-5 right-5">
+          <h1 className="text-xl sm:text-2xl font-bold text-white leading-tight drop-shadow-sm">{r.title}</h1>
+          <div className="flex items-center gap-3 mt-1 text-sm text-white/80">
             {r.total_time && <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" />{r.total_time}</span>}
             {r.servings && <span className="flex items-center gap-1"><Users className="w-3.5 h-3.5" />{r.servings}</span>}
           </div>

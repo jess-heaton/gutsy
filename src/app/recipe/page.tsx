@@ -5,8 +5,9 @@ import { useSearchParams } from 'next/navigation';
 import {
   ChefHat, AlertCircle, ArrowRight, CheckCircle, AlertTriangle,
   ClipboardList, Link2, Sparkles, Refrigerator, Camera, X,
-  BookOpen, Clock, Users, Trash2, Bookmark, BookmarkCheck,
+  BookOpen, Clock, Users, Trash2, Bookmark, BookmarkCheck, Globe,
 } from 'lucide-react';
+import PublicCookbook from '@/components/PublicCookbook';
 import clsx from 'clsx';
 import { trackEvent } from '@/lib/gtag';
 
@@ -38,37 +39,7 @@ interface SavedCard {
   created_at: string;
 }
 
-const FOOD_PHOTO_MAP: { keys: string[]; id: string }[] = [
-  { keys: ['pasta','spaghetti','noodle','linguine','penne','fettuccine','tagliatelle','orzo','rigatoni'], id: '1621996346565-e3dbc646d9a9' },
-  { keys: ['salad','greens','lettuce','coleslaw','slaw','cobb'], id: '1512621776951-a57141f2eefd' },
-  { keys: ['soup','stew','broth','chowder','bisque','minestrone','ramen'], id: '1547592166-23ac45744acd' },
-  { keys: ['chicken','turkey','poultry'], id: '1598103442097-8b74394b95c1' },
-  { keys: ['salmon','fish','tuna','cod','seafood','prawn','shrimp','mackerel','halibut','trout'], id: '1580476262798-bddd9f4b7369' },
-  { keys: ['curry','masala','tikka','dal','dhal','indian','thai','korma'], id: '1565557623262-b51c2513a641' },
-  { keys: ['oat','porridge','granola','muesli'], id: '1517686469429-8bdb88b9f907' },
-  { keys: ['bread','toast','sandwich','sourdough','wrap'], id: '1509440159596-0249088772ff' },
-  { keys: ['rice','risotto','pilaf','paella','congee','biryani'], id: '1536304929831-ee1ca9d44906' },
-  { keys: ['egg','omelette','frittata','scrambled','shakshuka','quiche'], id: '1525351484163-7529414344d8' },
-  { keys: ['steak','beef','meat','pork','lamb','venison','mince','meatball'], id: '1544025162-d76694265947' },
-  { keys: ['smoothie','juice','shake','blend'], id: '1505252585461-04db1eb84625' },
-  { keys: ['bowl','buddha','grain bowl','power bowl'], id: '1546069901-ba9599a7e63c' },
-  { keys: ['pizza'], id: '1565299624946-b28f40a0ae38' },
-  { keys: ['burger','patty'], id: '1568901346375-23c9450c58cd' },
-  { keys: ['taco','burrito','mexican','quesadilla','enchilada'], id: '1565299585323-38d6b0865b47' },
-  { keys: ['cake','dessert','sweet','muffin','cookie','biscuit','brownie','chocolate','pudding'], id: '1578985545062-69928b1d9587' },
-  { keys: ['stir','wok','asian','chinese','japanese','korean'], id: '1563379926898-05f4575a45d8' },
-  { keys: ['vegetable','veg','roast','aubergine','courgette','carrot','plant'], id: '1540420773420-3366772f4999' },
-];
 
-function foodImageUrl(title: string, tags: string[] | null): string {
-  const hay = [title, ...(tags ?? [])].join(' ').toLowerCase();
-  for (const { keys, id } of FOOD_PHOTO_MAP) {
-    if (keys.some(k => hay.includes(k))) {
-      return `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=800&q=80`;
-    }
-  }
-  return `https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80`;
-}
 
 const ACCENTS: Record<string, { from: string; to: string; ring: string; chip: string }> = {
   amber:   { from: 'from-amber-200',   to: 'to-orange-300',  ring: 'ring-amber-300',   chip: 'bg-amber-100 text-amber-800' },
@@ -110,35 +81,24 @@ function Spinner({ label }: { label: string }) {
 
 function RecipeCard({ r, onDelete }: { r: SavedCard; onDelete: () => void }) {
   const a = accent(r.accent);
-  const [imgFailed, setImgFailed] = useState(false);
   return (
-    <div className="group relative rounded-2xl overflow-hidden bg-white shadow-card hover:shadow-lifted transition-all hover:-translate-y-0.5">
+    <div className="group relative rounded-2xl overflow-hidden bg-white border border-gray-100 shadow-sm hover:shadow-lifted hover:-translate-y-0.5 transition-all">
       <a href={`/recipe/${r.id}`} className="block">
-        <div className="h-36 relative overflow-hidden">
-          {!imgFailed ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={r.image_url ?? foodImageUrl(r.title, r.tags)}
-              alt={r.title}
-              className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-              onError={() => setImgFailed(true)}
-            />
-          ) : (
-            <div className={clsx('absolute inset-0 bg-gradient-to-br flex items-center justify-center', a.from, a.to)}>
-              <span className="text-5xl drop-shadow-sm" aria-hidden>{r.emoji ?? '🍽️'}</span>
-            </div>
-          )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+        <div className={clsx('h-28 relative flex items-center justify-center bg-gradient-to-br', a.from, a.to)}>
+          <span className="text-5xl drop-shadow-sm group-hover:scale-110 transition-transform duration-300" aria-hidden>
+            {r.emoji ?? '🍽️'}
+          </span>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
         </div>
         <div className="p-3.5">
           <p className="text-sm font-semibold text-gray-900 line-clamp-2 leading-snug">{r.title}</p>
-          <div className="flex items-center gap-3 mt-2 text-2xs text-gray-500">
+          <div className="flex items-center gap-3 mt-2 text-2xs text-gray-400">
             {r.total_time && <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{r.total_time}</span>}
             {r.servings && <span className="flex items-center gap-1"><Users className="w-3 h-3" />{r.servings}</span>}
           </div>
           {r.tags && r.tags.length > 0 && (
             <div className="flex flex-wrap gap-1 mt-2">
-              {r.tags.slice(0, 3).map((t, i) => (
+              {r.tags.slice(0, 2).map((t, i) => (
                 <span key={i} className={clsx('text-2xs font-medium px-1.5 py-0.5 rounded-full', a.chip)}>{t}</span>
               ))}
             </div>
@@ -159,7 +119,6 @@ function RecipeCard({ r, onDelete }: { r: SavedCard; onDelete: () => void }) {
 function RecipeDetail({ id, onClose, onDeleted }: { id: string; onClose: () => void; onDeleted: () => void }) {
   const [r, setR] = useState<(SavedCard & { fixed_text: string; swaps: Swap[]; notes: string[]; source_url: string | null }) | null>(null);
   const [loading, setLoading] = useState(true);
-  const [imgFailed, setImgFailed] = useState(false);
 
   useEffect(() => {
     fetch(`/api/recipes/${id}`).then(r => r.json()).then(d => { setR(d.recipe); setLoading(false); });
@@ -176,22 +135,11 @@ function RecipeDetail({ id, onClose, onDeleted }: { id: string; onClose: () => v
   return (
     <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-start sm:items-center justify-center p-0 sm:p-4 overflow-y-auto" onClick={onClose}>
       <div className="bg-white w-full sm:max-w-2xl rounded-none sm:rounded-2xl my-0 sm:my-8 overflow-hidden shadow-lifted animate-slide-up" onClick={e => e.stopPropagation()}>
-        <div className="h-48 relative overflow-hidden">
-          {r && !imgFailed ? (
-            <img
-              src={r.image_url ?? foodImageUrl(r.title, r.tags)}
-              alt={r.title}
-              className="absolute inset-0 w-full h-full object-cover"
-              onError={() => setImgFailed(true)}
-            />
-          ) : (
-            <div className={clsx('absolute inset-0 bg-gradient-to-br flex items-center justify-center', a.from, a.to)}>
-              <span className="text-6xl drop-shadow" aria-hidden>{r?.emoji ?? '🍽️'}</span>
-            </div>
-          )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
+        <div className={clsx('h-32 relative flex items-center justify-center bg-gradient-to-br', a.from, a.to)}>
+          <span className="text-6xl drop-shadow" aria-hidden>{r?.emoji ?? '🍽️'}</span>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
           {r && (
-            <p className="absolute bottom-4 left-5 text-white font-bold text-lg drop-shadow-sm leading-tight max-w-[80%]">
+            <p className="absolute bottom-3 left-5 text-white font-bold text-base drop-shadow-sm leading-tight max-w-[80%]">
               {r.title}
             </p>
           )}
@@ -271,7 +219,7 @@ export default function RecipePage() {
 
 function RecipePageInner() {
   const params = useSearchParams();
-  const [mode, setMode] = useState<InputMode>('recipe');
+  const [mode, setMode] = useState<InputMode>('describe');
   const [recipe, setRecipe] = useState('');
   const [url, setUrl] = useState('');
   const [describe, setDescribe] = useState('');
@@ -285,7 +233,7 @@ function RecipePageInner() {
   const [error, setError] = useState('');
   const [result, setResult] = useState<RecipeResult | null>(null);
   const [saving, setSaving] = useState(false);
-  const [saveStep, setSaveStep] = useState<'saving' | 'imaging' | 'done' | null>(null);
+  const [saveStep, setSaveStep] = useState<'saving' | 'done' | null>(null);
   const [saved, setSaved] = useState(false);
   const [savedId, setSavedId] = useState<string | null>(null);
   const [makePublic, setMakePublic] = useState(false);
@@ -372,14 +320,6 @@ function RecipePageInner() {
       const data = await res.json();
       if (!res.ok || data.error) throw new Error(data.error ?? 'Save failed');
 
-      // Generate AI image (non-blocking on failure)
-      setSaveStep('imaging');
-      await fetch('/api/recipe-image', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ recipeId: data.id, title: result.title, tags: result.tags }),
-      }).catch(() => {}); // silently ignore if image gen fails
-
       setSaved(true);
       setSavedId(data.id);
       setIsPublic(makePublic);
@@ -395,7 +335,7 @@ function RecipePageInner() {
   };
 
   const togglePublic = async () => {
-    if (!savedId || togglingPublic) return;
+    if (!savedId || togglingPublic || !result) return;
     setTogglingPublic(true);
     const next = !isPublic;
     await fetch('/api/recipes', {
@@ -403,6 +343,14 @@ function RecipePageInner() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: savedId, isPublic: next }),
     }).catch(() => {});
+    if (next) {
+      // Generate image only when publishing to community
+      await fetch('/api/recipe-image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ recipeId: savedId, title: result.title, tags: result.tags }),
+      }).catch(() => {});
+    }
     setIsPublic(next);
     setTogglingPublic(false);
     trackEvent('recipe_toggle_public', { is_public: next });
@@ -565,11 +513,9 @@ function RecipePageInner() {
                   >
                     {saved
                       ? <><BookmarkCheck className="w-3.5 h-3.5" />Saved</>
-                      : saveStep === 'imaging'
-                        ? <><Sparkles className="w-3.5 h-3.5 animate-pulse" />Generating image…</>
-                        : saving
-                          ? <><Bookmark className="w-3.5 h-3.5" />Saving…</>
-                          : <><Bookmark className="w-3.5 h-3.5" />Save</>
+                      : saving
+                        ? <><Bookmark className="w-3.5 h-3.5" />Saving…</>
+                        : <><Bookmark className="w-3.5 h-3.5" />Save</>
                     }
                   </button>
                   {saved ? (
@@ -659,7 +605,7 @@ function RecipePageInner() {
         </div>
       )}
 
-      {/* Cookbook gallery */}
+      {/* Private cookbook gallery */}
       <div className="pt-4 border-t border-gray-100">
         <div className="flex items-center gap-2 mb-4">
           <BookOpen className="w-4 h-4 text-brand-700" />
@@ -678,6 +624,15 @@ function RecipePageInner() {
             ))}
           </div>
         )}
+      </div>
+
+      {/* Community recipes */}
+      <div className="pt-6 border-t border-gray-100">
+        <div className="flex items-center gap-2 mb-5">
+          <Globe className="w-4 h-4 text-brand-700" />
+          <h2 className="text-sm font-bold text-gray-900">Community recipes</h2>
+        </div>
+        <PublicCookbook />
       </div>
     </div>
   );

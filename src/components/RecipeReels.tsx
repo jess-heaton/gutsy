@@ -6,7 +6,7 @@ import { Play, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
 import clsx from 'clsx';
 import { reelRecipes as allReels, type ReelRecipe } from '@/data/reel-recipes';
 
-const REEL_ORDER = ['avocado-toast', 'protein-bowl', 'tzatziki', 'brownie', 'chicken-caesar-wrap', 'air-fry-chicken-bites'];
+const REEL_ORDER = ['avocado-toast', 'protein-bowl', 'korean-beef-stir-fry', 'tzatziki', 'brownie', 'chicken-caesar-wrap', 'air-fry-chicken-bites'];
 const reelRecipes = REEL_ORDER.map(slug => allReels.find(r => r.slug === slug)!).filter(Boolean);
 
 function ReelCard({ reel, onClick }: { reel: ReelRecipe; onClick: () => void }) {

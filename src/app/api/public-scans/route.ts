@@ -13,7 +13,10 @@ export async function GET() {
       .limit(24);
 
     if (error) return Response.json({ error: error.message }, { status: 500 });
-    return Response.json(data ?? []);
+    const filtered = (data ?? []).filter((s: { restaurant: string | null }) =>
+      !s.restaurant?.toLowerCase().includes('boathouse')
+    );
+    return Response.json(filtered);
   } catch (err) {
     return Response.json({ error: err instanceof Error ? err.message : 'Error' }, { status: 500 });
   }

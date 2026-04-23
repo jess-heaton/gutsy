@@ -19,15 +19,35 @@ const FAQS = [
   },
   {
     q: 'Do you use real Monash FODMAP data?',
-    a: 'Yes. Gutsy is built around Monash University FODMAP research and follows their three-phase protocol. We\'re not affiliated with Monash and don\'t republish their proprietary database. For definitive per-serving thresholds, use the official Monash app alongside Gutsy.',
+    a: "Yes. Gutsy is built around Monash University FODMAP research and follows their three-phase protocol. We're not affiliated with Monash and don't republish their proprietary database. For definitive per-serving thresholds, use the official Monash app alongside Gutsy.",
   },
   {
     q: 'How does the menu scanner work?',
-    a: 'Paste a restaurant URL, upload their PDF, or paste the menu text. Gutsy fetches the actual menu from the restaurant\'s site, then rates every dish safe, modify, or avoid — with the exact words to use when ordering.',
+    a: "Paste a restaurant URL, upload their PDF, or paste the menu text. Gutsy fetches the actual menu from the restaurant's site, then rates every dish safe, modify, or avoid — with the exact words to use when ordering.",
   },
   {
     q: 'Can Gutsy replace my dietitian?',
-    a: 'No. Gutsy helps you track, log and stay consistent between appointments — but the low-FODMAP diet should be done under a qualified dietitian\'s guidance, especially during reintroduction.',
+    a: "No. Gutsy helps you track, log and stay consistent between appointments — but the low-FODMAP diet should be done under a qualified dietitian's guidance, especially during reintroduction.",
+  },
+  {
+    q: 'Can I use Gutsy during the reintroduction phase?',
+    a: "Yes. The food search tool shows FODMAP categories and serving thresholds, which is especially useful during reintroduction when you're testing one FODMAP group at a time. The symptom tracker helps you log reactions against specific meals and FODMAP loads.",
+  },
+  {
+    q: 'Are garlic and onion really that bad?',
+    a: "For most people with IBS, yes — garlic and onion are two of the highest-FODMAP foods and among the most common triggers. The good news: garlic-infused oil is completely safe (fructans are water-soluble, not oil-soluble), and the green tops of spring onions are low FODMAP. Gutsy's recipe fixer makes these swaps automatically.",
+  },
+  {
+    q: 'How accurate is the recipe fixer?',
+    a: "Gutsy uses Claude AI to identify high-FODMAP ingredients and suggest evidence-based swaps grounded in Monash research. It flags its own confidence level — high, medium, or low — so you always know when to double-check with the Monash app or your dietitian.",
+  },
+  {
+    q: 'I have coeliac disease as well as IBS. Does Gutsy help?',
+    a: "Gutsy focuses on FODMAP content rather than gluten content specifically, but the two often overlap — gluten-free versions of bread, pasta and crackers are frequently also low FODMAP (at appropriate serving sizes). Always check certified GF labels if you have coeliac disease, as cross-contamination rules still apply.",
+  },
+  {
+    q: 'What if a restaurant does not have their menu online?',
+    a: "You can paste the menu text directly into the scanner — from a photo, a PDF copy, or typed out from a paper menu. Gutsy analyses whatever text you give it, not just URLs.",
   },
 ];
 
@@ -191,7 +211,8 @@ export default function HomePage() {
                 We started Gutsy because we know what it's like living with IBS — the anxiety before every restaurant, the mental load of scanning every ingredient, the awkward explanations to friends.
               </p>
               <p className="text-brand-300 text-base leading-relaxed mb-8">
-                Over 1 in 7 people live with it. Most just quietly stop going out. Gutsy gives you the tools to live freely — without IBS defining your social life.
+                Over 1 in 7 people live with it. Lots just quietly stop going out.<br /><br />
+                Gutsy gives you the tools to live freely.
               </p>
               <Link
                 href="/mission"
