@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Link2, Upload, ClipboardList, X, AlertCircle, CheckCircle, AlertTriangle, Ban, ExternalLink, Share2, Copy, Check } from 'lucide-react';
+import { trackEvent } from '@/lib/gtag';
 import clsx from 'clsx';
 import RestaurantLogo from '@/components/RestaurantLogo';
 
@@ -204,6 +205,7 @@ function MenuInner() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? 'Failed to save');
       setShareSlug(data.slug);
+      trackEvent('menu_scan_shared', { restaurant: result.restaurant ?? 'unknown' });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not save scan');
     } finally {
@@ -219,6 +221,7 @@ function MenuInner() {
 
   async function scan() {
     setError(''); setResult(null); setLoading(true); setShareSlug(null);
+    trackEvent('menu_scan_start', { mode });
     try {
       const body: Record<string, string> = {};
       if (mode === 'url')  body.url       = url;
@@ -228,8 +231,16 @@ function MenuInner() {
       const data = await res.json();
       if (!res.ok || data.error) throw new Error(data.error ?? 'Scan failed');
       setResult(data);
+      trackEvent('menu_scan_complete', {
+        restaurant: data.restaurant ?? 'unknown',
+        item_count: data.items?.length ?? 0,
+        safe_count: data.items?.filter((i: { status: string }) => i.status === 'safe').length ?? 0,
+        mode,
+      });
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Something went wrong');
+      const msg = err instanceof Error ? err.message : 'Something went wrong';
+      setError(msg);
+      trackEvent('menu_scan_error', { mode, error: msg.slice(0, 100) });
     } finally {
       setLoading(false);
     }

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { X, Pen } from 'lucide-react';
 import { addEntry, generateId, getTodayKey, getNowTime } from '@/lib/store';
+import { trackEvent } from '@/lib/gtag';
 import { BristolType } from '@/lib/types';
 import clsx from 'clsx';
 
@@ -39,11 +40,13 @@ export default function QuickLogWidget() {
     const t = text.trim();
     if (!t) return;
     addEntry({ ...base(), type: 'meal', mealType: 'snack', foods: [], freeText: t });
+    trackEvent('quick_log', { type: 'meal' });
     flash('✓ Meal logged');
   };
 
   const logBristol = (n: number) => {
     addEntry({ ...base(), type: 'bowel', bristolType: n as BristolType, urgency: 'normal', pain: 0 });
+    trackEvent('quick_log', { type: 'bowel', bristol: n });
     flash(`✓ Bristol ${n} — ${BRISTOL_LABELS[n]}`);
   };
 
@@ -52,12 +55,14 @@ export default function QuickLogWidget() {
     if (med.key === 'lactase' || med.key === 'fodzyme') {
       if (t) {
         addEntry({ ...base(), type: 'meal', mealType: 'snack', foods: [], freeText: `${t} (with ${med.label.toLowerCase()})` });
+        trackEvent('quick_log', { type: 'med_with_meal', med: med.key });
         flash(`✓ Logged with ${med.label}`);
         return;
       }
     }
     const noteText = t ? `${med.label} — ${t}` : `Took ${med.label}`;
     addEntry({ ...base(), type: 'note', text: noteText });
+    trackEvent('quick_log', { type: 'med', med: med.key });
     flash(`✓ ${med.label} logged`);
   };
 

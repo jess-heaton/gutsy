@@ -6,6 +6,7 @@ import clsx from 'clsx';
 import {
   ArrowRight, ScanLine, ChefHat, Refrigerator, PlayCircle, Pen, Sparkles, Loader2,
 } from 'lucide-react';
+import { trackEvent } from '@/lib/gtag';
 
 const EXAMPLES = [
   "I'm starting the elimination diet",
@@ -132,6 +133,7 @@ export default function HeroPrompt() {
     setIntent(matched);
     setAnswer('');
     setStreaming(true);
+    trackEvent('hero_submit', { intent: matched.label, query_length: text.length });
 
     const ctrl = new AbortController();
     abortRef.current = ctrl;
@@ -161,7 +163,10 @@ export default function HeroPrompt() {
 
   function goToIntent() {
     abortRef.current?.abort();
-    if (intent) router.push(intent.route);
+    if (intent) {
+      trackEvent('hero_cta_click', { intent: intent.label });
+      router.push(intent.route);
+    }
   }
 
   function reset() {

@@ -11,6 +11,7 @@ import References from '@/components/blog/References';
 import TableOfContents from '@/components/blog/TableOfContents';
 import AuthorCard from '@/components/blog/AuthorCard';
 import Disclaimer from '@/components/blog/Disclaimer';
+import ArticleViewTracker from '@/components/blog/ArticleViewTracker';
 
 const SITE_URL = 'https://gutsy.freedible.co.uk';
 
@@ -149,6 +150,7 @@ export default function ArticlePage({ params }: { params: { slug: string } }) {
 
   return (
     <div className="bg-white">
+      <ArticleViewTracker slug={article.slug} category={article.category} />
       {/* Hero */}
       <header className="relative">
         <HeroImage src={article.heroImage} alt={article.heroAlt} priority aspect="aspect-[21/9] sm:aspect-[21/8]" />

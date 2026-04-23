@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Search, X, ChevronDown, ChevronUp, Info } from 'lucide-react';
 import { foods, searchFoods, categoryLabels, categoryEmojis } from '@/data/foods';
+import { trackEvent } from '@/lib/gtag';
 import { FoodItem } from '@/lib/types';
 import FODMAPBadge, { FODMAPCategoryGrid } from '@/components/FODMAPBadge';
 import clsx from 'clsx';
@@ -64,11 +65,22 @@ function FoodsInner() {
   const [query,    setQuery]    = useState('');
   const [fodmap,   setFodmap]   = useState<'all'|'low'|'moderate'|'high'>('all');
   const [category, setCategory] = useState('all');
+  const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const q = params.get('q');
     if (q) setQuery(q);
   }, [params]);
+
+  const handleSearch = (q: string) => {
+    setQuery(q);
+    if (searchTimer.current) clearTimeout(searchTimer.current);
+    if (q.trim().length >= 2) {
+      searchTimer.current = setTimeout(() => {
+        trackEvent('food_search', { query: q.trim().toLowerCase(), result_count: searchFoods(q).length });
+      }, 800);
+    }
+  };
 
   let results = query ? searchFoods(query) : foods;
   if (fodmap !== 'all')    results = results.filter(f => f.fodmap.overall === fodmap);
@@ -116,7 +128,7 @@ function FoodsInner() {
           type="text"
           placeholder="Search foods…"
           value={query}
-          onChange={e => setQuery(e.target.value)}
+          onChange={e => handleSearch(e.target.value)}
           className="w-full pl-9 pr-9 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
         />
         {query && (

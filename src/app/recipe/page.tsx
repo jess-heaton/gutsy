@@ -8,6 +8,7 @@ import {
   BookOpen, Clock, Users, Trash2, Bookmark, BookmarkCheck,
 } from 'lucide-react';
 import clsx from 'clsx';
+import { trackEvent } from '@/lib/gtag';
 
 type InputMode = 'recipe' | 'url' | 'describe' | 'fridge' | 'photo';
 
@@ -323,6 +324,7 @@ function RecipePageInner() {
 
   const analyse = async () => {
     setError(''); setResult(null); setSaved(false); setLoading(true);
+    trackEvent('recipe_analyse_start', { mode });
     try {
       const body: Record<string, unknown> = { mode };
       if (mode === 'recipe')   body.recipe = recipe;
@@ -335,6 +337,7 @@ function RecipePageInner() {
       const data = await res.json();
       if (!res.ok || data.error) throw new Error(data.error ?? 'Analysis failed');
       setResult(data);
+      trackEvent('recipe_analyse_complete', { mode, confidence: data.lowFodmapConfidence ?? 'unknown', swap_count: data.swaps?.length ?? 0 });
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Something went wrong');
     } finally {
@@ -382,6 +385,7 @@ function RecipePageInner() {
       setIsPublic(makePublic);
       setSaveStep('done');
       loadCards();
+      trackEvent('recipe_saved', { is_public: makePublic, title: result.title });
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Save failed');
       setSaveStep(null);
@@ -401,6 +405,7 @@ function RecipePageInner() {
     }).catch(() => {});
     setIsPublic(next);
     setTogglingPublic(false);
+    trackEvent('recipe_toggle_public', { is_public: next });
   };
 
   const canRun =
