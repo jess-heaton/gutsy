@@ -64,15 +64,15 @@ export default function MissionPage() {
             {[
               {
                 title: 'Science first, noise second.',
-                body: 'Everything in Gutsy is grounded in Monash University FODMAP research. We don't guess, and we don't sell the idea that everyone needs to avoid everything.',
+                body: "Everything in Gutsy is grounded in Monash University FODMAP research. We don't guess, and we don't sell the idea that everyone needs to avoid everything.",
               },
               {
                 title: 'Practical beats perfect.',
-                body: 'A FODMAP-safe recipe that actually tastes good and uses ingredients you can buy is worth more than a technically correct one you won't make. We optimise for what you'll actually do.',
+                body: "A FODMAP-safe recipe that actually tastes good and uses ingredients you can buy is worth more than a technically correct one you won't make. We optimise for what you'll actually do.",
               },
               {
-                title: 'IBS shouldn't shrink your world.',
-                body: 'The goal of the low-FODMAP diet is to do the elimination, find your triggers, and then eat as widely as possible within those limits. It's a route to more freedom, not less.',
+                title: "IBS shouldn't shrink your world.",
+                body: "The goal of the low-FODMAP diet is to do the elimination, find your triggers, and then eat as widely as possible within those limits. It's a route to more freedom, not less.",
               },
               {
                 title: 'Free where it matters.',
