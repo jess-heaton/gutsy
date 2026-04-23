@@ -3,6 +3,7 @@ import { ArrowRight, ScanLine, ChefHat, Activity, BarChart2, BookOpen, CheckCirc
 import HeroPrompt from '@/components/HeroPrompt';
 import RestaurantCarousel from '@/components/RestaurantCarousel';
 import PublicCookbook from '@/components/PublicCookbook';
+import RecipeReels from '@/components/RecipeReels';
 
 const SITE_URL = 'https://gutsy.freedible.co.uk';
 
@@ -135,6 +136,18 @@ export default function HomePage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ── Recipe reels ── */}
+      <section className="py-16 bg-white overflow-hidden">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="mb-6">
+            <p className="text-xs font-semibold text-brand-600 uppercase tracking-widest mb-2">Recipe inspiration</p>
+            <h2 className="text-2xl font-bold text-gray-900">Recipes you can make FODMAP-safe</h2>
+            <p className="text-sm text-gray-500 mt-1">Tap any reel — we'll fix the recipe for you instantly.</p>
+          </div>
+          <RecipeReels />
         </div>
       </section>
 
