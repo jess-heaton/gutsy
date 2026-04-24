@@ -11,6 +11,12 @@ const FALLBACK_IMAGES = [
   '/restaurant-3.png',
 ];
 
+// Pinned cards always shown first
+const PINNED = [
+  { slug: 'chipotle', restaurant: 'Chipotle', image_url: '/chipotle.png', href: '/menu?q=Chipotle&auto=1', summary: 'Bowls and salads are highly customisable. Skip the beans and choose rice, grilled protein, and fajita veg.' },
+  { slug: 'jamba',    restaurant: 'Jamba',    image_url: '/jamba.png',    href: '/menu?q=Jamba+Juice&auto=1', summary: "Smoothies can be modified — skip mango and watermelon bases. Ask about apple juice-free options." },
+];
+
 interface Scan {
   slug: string;
   restaurant: string | null;
@@ -33,15 +39,13 @@ export default function RestaurantCarousel() {
   useEffect(() => {
     fetch('/api/public-scans')
       .then(r => r.json())
-      .then(d => setScans(Array.isArray(d) ? d.filter(s => s.restaurant) : []))
+      .then(d => setScans(Array.isArray(d) ? d.filter(s => s.restaurant && !s.restaurant.toLowerCase().includes('starbucks')) : []))
       .catch(() => {});
   }, []);
 
   function scroll(dir: 1 | -1) {
     ref.current?.scrollBy({ left: dir * 300, behavior: 'smooth' });
   }
-
-  if (scans.length === 0) return null;
 
   return (
     <div className="relative">
@@ -50,6 +54,25 @@ export default function RestaurantCarousel() {
         className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory scroll-smooth"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' } as React.CSSProperties}
       >
+        {/* Pinned featured restaurants */}
+        {PINNED.map(p => (
+          <Link
+            key={p.slug}
+            href={p.href}
+            className="group flex-shrink-0 w-56 snap-start bg-white border border-gray-100 rounded-2xl overflow-hidden hover:border-brand-200 hover:shadow-lifted transition-all"
+          >
+            <div className="h-32 relative bg-gray-100 overflow-hidden">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={p.image_url} alt={p.restaurant} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+            </div>
+            <div className="p-3">
+              <p className="text-sm font-semibold text-gray-900 truncate">{p.restaurant}</p>
+              <p className="text-xs text-gray-500 mt-0.5 line-clamp-2 leading-relaxed">{p.summary}</p>
+            </div>
+          </Link>
+        ))}
+
+        {/* DB scans */}
         {scans.map((scan, idx) => {
           const { safe, modify, avoid } = pills(scan.analysis?.items);
           const imgSrc = FALLBACK_IMAGES[idx % FALLBACK_IMAGES.length];
@@ -61,11 +84,7 @@ export default function RestaurantCarousel() {
             >
               <div className="h-32 relative bg-gradient-to-br from-brand-900 to-brand-700 overflow-hidden">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={imgSrc}
-                  alt=""
-                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
+                <img src={imgSrc} alt="" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                 <div className="absolute bottom-2 left-2 flex gap-1.5">
                   {safe > 0   && <span className="text-2xs font-bold bg-emerald-500/90 text-white px-1.5 py-0.5 rounded-full">{safe} safe</span>}
                   {modify > 0 && <span className="text-2xs font-bold bg-amber-500/90 text-white px-1.5 py-0.5 rounded-full">{modify} modify</span>}

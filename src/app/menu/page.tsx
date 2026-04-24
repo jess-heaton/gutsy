@@ -6,6 +6,7 @@ import { Search, Upload, ClipboardList, X, AlertCircle, CheckCircle, AlertTriang
 import { trackEvent } from '@/lib/gtag';
 import clsx from 'clsx';
 import RestaurantLogo from '@/components/RestaurantLogo';
+import AIDisclaimer from '@/components/AIDisclaimer';
 
 type InputMode = 'search' | 'pdf' | 'text';
 type Status    = 'safe' | 'modify' | 'avoid';
@@ -263,6 +264,8 @@ function MenuInner() {
           Type a restaurant name, paste a URL, upload a PDF, or paste the menu — get a dish-by-dish FODMAP breakdown in seconds.
         </p>
       </div>
+
+      <AIDisclaimer tool="Menu scanner" />
 
       {/* Input mode tabs */}
       <div className="flex border-b border-gray-200">

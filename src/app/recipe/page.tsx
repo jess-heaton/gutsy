@@ -8,6 +8,7 @@ import {
   BookOpen, Clock, Users, Trash2, Bookmark, BookmarkCheck, Globe,
 } from 'lucide-react';
 import PublicCookbook from '@/components/PublicCookbook';
+import AIDisclaimer from '@/components/AIDisclaimer';
 import clsx from 'clsx';
 import { trackEvent } from '@/lib/gtag';
 
@@ -380,6 +381,8 @@ function RecipePageInner() {
           Paste a recipe, drop a link, describe a meal, or tell me what's in the fridge — I'll make it FODMAP-safe and save it to your cookbook.
         </p>
       </div>
+
+      <AIDisclaimer tool="Recipe fixer" />
 
       {/* Input mode tabs */}
       <div className="grid grid-cols-5 gap-1.5 bg-gray-100 p-1 rounded-2xl">

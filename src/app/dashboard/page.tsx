@@ -7,6 +7,7 @@ import { Flame, Trash2, ChevronRight, Plus, ExternalLink } from 'lucide-react';
 import { DayEntry, MealEntry, SymptomEntry, BowelEntry } from '@/lib/types';
 import { getEntriesForDate, deleteEntry, getStreak, getTodayKey, getSettings } from '@/lib/store';
 import FODMAPBadge from '@/components/FODMAPBadge';
+import AIDisclaimer from '@/components/AIDisclaimer';
 import clsx from 'clsx';
 
 const MEAL_LABEL: Record<string, string> = {
@@ -164,6 +165,7 @@ export default function DashboardPage() {
 
   return (
     <div className="max-w-content mx-auto px-4 sm:px-6 py-8 lg:py-12 pb-20 lg:pb-12 space-y-7">
+      <AIDisclaimer tool="FODMAP tracking data" />
       <div className="flex items-start justify-between">
         <div>
           <p className="text-sm text-gray-400 font-medium">{dateStr}</p>

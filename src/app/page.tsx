@@ -376,9 +376,9 @@ export default function HomePage() {
           </div>
           <div className="grid md:grid-cols-3 gap-5">
             {[
-              { image: 'https://images.unsplash.com/photo-1615486511484-92e172cc4fe0?auto=format&fit=crop&w=1000&q=80', alt: 'Fresh garlic and onions', tag: 'Supplements', title: 'FODzyme: can you actually eat garlic and onion again?', href: '/blog/fodzyme' },
-              { image: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=1000&q=80', alt: 'A glass of milk', tag: 'Supplements', title: 'The Milkaid thing nobody tells you', href: '/blog/milkaid' },
-              { image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=1000&q=80', alt: 'Fresh sourdough bread', tag: 'Science', title: 'It was probably the fructans, not the gluten', href: '/blog/fructan-vs-gluten' },
+              { image: '/FODZYME-Pasta-2.png', alt: 'FODMAP-safe pasta with FODzyme', tag: 'Supplements', title: 'FODzyme: can you actually eat garlic and onion again?', href: '/blog/fodzyme' },
+              { image: '/almond-milk.png', alt: 'Glass of milk', tag: 'Supplements', title: 'The Milkaid thing nobody tells you', href: '/blog/milkaid' },
+              { image: '/garlic.png', alt: 'Garlic bulbs', tag: 'Science', title: 'It was probably the fructans, not the gluten', href: '/blog/fructan-vs-gluten' },
             ].map(({ image, alt, tag, title, href }) => (
               <Link key={href} href={href} className="group bg-white border border-gray-200 rounded-2xl overflow-hidden hover:border-brand-200 hover:shadow-lifted transition-all">
                 <div className="aspect-[4/3] relative overflow-hidden bg-gradient-to-br from-brand-900 to-brand-700">

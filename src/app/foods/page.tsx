@@ -7,6 +7,7 @@ import { foods, searchFoods, categoryLabels, categoryEmojis } from '@/data/foods
 import { trackEvent } from '@/lib/gtag';
 import { FoodItem } from '@/lib/types';
 import FODMAPBadge, { FODMAPCategoryGrid } from '@/components/FODMAPBadge';
+import AIDisclaimer from '@/components/AIDisclaimer';
 import clsx from 'clsx';
 
 const FODMAP_FILTERS = [
@@ -98,6 +99,8 @@ function FoodsInner() {
           {lowCount} safe foods, {highCount} to avoid. Based on Monash University research.
         </p>
       </div>
+
+      <AIDisclaimer tool="Food guide" />
 
       {/* Traffic light filter */}
       <div className="grid grid-cols-3 gap-2">
