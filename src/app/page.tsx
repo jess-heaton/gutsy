@@ -6,7 +6,7 @@ import PublicCookbook from '@/components/PublicCookbook';
 import RecipeReels from '@/components/RecipeReels';
 import ToolsCarousel from '@/components/ToolsCarousel';
 
-const SITE_URL = 'https://gutsy.freedible.co.uk';
+const SITE_URL = 'https://www.mygutsy.co.uk';
 
 const FAQS = [
   {

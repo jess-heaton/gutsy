@@ -6,7 +6,7 @@ import BottomNav from '@/components/BottomNav';
 import QuickLogWidget from '@/components/QuickLogWidget';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://gutsy.freedible.co.uk'),
+  metadataBase: new URL('https://www.mygutsy.co.uk'),
   title: {
     default: 'Gutsy — IBS diary and low-FODMAP tracker',
     template: '%s — Gutsy',

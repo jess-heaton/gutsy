@@ -174,8 +174,12 @@ export async function POST(req: NextRequest) {
           `I tried that page and common menu paths on the same domain (/menu, /food, /food-drink, etc) and could not extract a dish list. Use web_search to find the actual menu for this restaurant. Start with site-specific queries ("site:${safeHost(targetUrl)} menu") and fall back to "<restaurant name> menu". Every item you return MUST come from real source text. Set "menu_source_url" to where you found the menu.`;
       }
     } else if (text?.trim()) {
-      if (text.trim().length < 200) {
-        userContent = `The user asked about: "${text.trim()}". Use web_search to find this restaurant's actual menu (prefer their own website), then analyse it. Every item you return MUST come from real source text. Set "menu_source_url" to the URL where you found the menu.`;
+      if (text.trim().length < 300 && !text.trim().includes('\n')) {
+        const q = text.trim();
+        const isUrl = /^https?:\/\//i.test(q);
+        userContent = isUrl
+          ? `The user gave this URL: ${q}\n\nI did not fetch it in advance. Use web_search to find the menu for this restaurant (try the URL, site: queries, and "<restaurant name> menu"). Every item you return MUST come from real source text. Set "menu_source_url" to the URL where you found the menu.`
+          : `The user typed: "${q}". This is a restaurant name (possibly with location). Use web_search to find this restaurant's real menu — try queries like "${q} menu", "${q} food menu", and prefer their own website. Then analyse it dish by dish for FODMAP safety. Every item you return MUST appear in the source text you found. Set "menu_source_url" to the URL where you found the menu. If you cannot find a specific menu for this restaurant, say so clearly in the summary and return an empty items array.`;
       } else {
         userContent = `Analyse this pasted menu for FODMAP safety. Every item in your output must appear in this text:\n\n${text}`;
       }

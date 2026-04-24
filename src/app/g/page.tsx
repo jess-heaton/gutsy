@@ -169,7 +169,7 @@ export default function GuestCardPage() {
           >
             Explore Gutsy <ArrowRight className="w-4 h-4" />
           </Link>
-          <p className="text-xs text-gray-400 mt-4">Built on Monash University FODMAP research · gutsy.mygutsy.co.uk</p>
+          <p className="text-xs text-gray-400 mt-4">Built on Monash University FODMAP research · www.mygutsy.co.uk</p>
         </div>
       </div>
     </div>

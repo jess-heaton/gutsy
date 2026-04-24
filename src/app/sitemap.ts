@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next';
 import { articles } from '@/data/articles';
 
-const SITE = 'https://gutsy.freedible.co.uk';
+const SITE = 'https://www.mygutsy.co.uk';
 
 const STATIC_PATHS = [
   { path: '',            priority: 1.0, changeFrequency: 'weekly' as const },

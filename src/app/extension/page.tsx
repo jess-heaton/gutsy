@@ -73,7 +73,7 @@ export default function ExtensionPage() {
           <li>Visit <code className="bg-white px-1.5 py-0.5 rounded border border-gray-200">chrome://extensions</code></li>
           <li>Toggle on <b>Developer mode</b> (top-right).</li>
           <li>Click <b>Load unpacked</b> and pick the unzipped folder.</li>
-          <li>Sign in once at <Link href="/login" className="text-brand-700 font-medium">gutsy.freedible.co.uk</Link> — the pill now works everywhere.</li>
+          <li>Sign in once at <Link href="/login" className="text-brand-700 font-medium">www.mygutsy.co.uk</Link> — the pill now works everywhere.</li>
         </ol>
         <p className="text-xs text-gray-500 mt-4">
           This path requires Developer mode and is intended for early users. Normal install will be one click once approved.

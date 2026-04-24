@@ -2,12 +2,12 @@
 
 import { useState, useRef, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Link2, Upload, ClipboardList, X, AlertCircle, CheckCircle, AlertTriangle, Ban, ExternalLink, Share2, Copy, Check } from 'lucide-react';
+import { Search, Upload, ClipboardList, X, AlertCircle, CheckCircle, AlertTriangle, Ban, ExternalLink, Share2, Copy, Check } from 'lucide-react';
 import { trackEvent } from '@/lib/gtag';
 import clsx from 'clsx';
 import RestaurantLogo from '@/components/RestaurantLogo';
 
-type InputMode = 'url' | 'pdf' | 'text';
+type InputMode = 'search' | 'pdf' | 'text';
 type Status    = 'safe' | 'modify' | 'avoid';
 
 interface MenuItem {
@@ -139,8 +139,8 @@ export default function MenuPage() {
 
 function MenuInner() {
   const params = useSearchParams();
-  const [mode, setMode]     = useState<InputMode>('url');
-  const [url, setUrl]       = useState('');
+  const [mode, setMode]     = useState<InputMode>('search');
+  const [searchQ, setSearchQ] = useState('');
   const [text, setText]     = useState('');
   const [pdfName, setPdfName] = useState('');
   const [pdfB64, setPdfB64]   = useState('');
@@ -160,8 +160,8 @@ function MenuInner() {
     const q = params.get('q');
     const auto = params.get('auto') === '1';
     if (!q) return;
-    if (/^https?:\/\//i.test(q)) { setMode('url'); setUrl(q); }
-    else { setMode('text'); setText(q); }
+    if (/^https?:\/\//i.test(q)) { setMode('search'); setSearchQ(q); }
+    else { setMode('search'); setSearchQ(q); }
     if (auto) autoScanRef.current = true;
   }, [params]);
 
@@ -174,7 +174,7 @@ function MenuInner() {
     }, 80);
     return () => clearTimeout(t);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mode, url, text]);
+  }, [mode, searchQ, text]);
 
   useEffect(() => {
     fetch('/api/public-scans')
@@ -224,9 +224,9 @@ function MenuInner() {
     trackEvent('menu_scan_start', { mode });
     try {
       const body: Record<string, string> = {};
-      if (mode === 'url')  body.url       = url;
-      if (mode === 'text') body.text      = text;
-      if (mode === 'pdf')  body.pdfBase64 = pdfB64;
+      if (mode === 'search') body.text    = searchQ;
+      if (mode === 'text')   body.text    = text;
+      if (mode === 'pdf')    body.pdfBase64 = pdfB64;
       const res  = await fetch('/api/scan-menu', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
       const data = await res.json();
       if (!res.ok || data.error) throw new Error(data.error ?? 'Scan failed');
@@ -246,7 +246,7 @@ function MenuInner() {
     }
   }
 
-  const canScan = (mode === 'url' && url.trim()) || (mode === 'text' && text.trim()) || (mode === 'pdf' && pdfB64);
+  const canScan = (mode === 'search' && searchQ.trim()) || (mode === 'text' && text.trim()) || (mode === 'pdf' && pdfB64);
   const safe   = result?.items.filter(i => i.status === 'safe')   ?? [];
   const modify = result?.items.filter(i => i.status === 'modify') ?? [];
   const avoid  = result?.items.filter(i => i.status === 'avoid')  ?? [];
@@ -260,16 +260,16 @@ function MenuInner() {
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Menu scanner</h1>
         <p className="text-sm text-gray-500 mt-1">
-          Paste a restaurant URL, upload a PDF menu, or paste the menu text — and get a dish-by-dish FODMAP breakdown.
+          Type a restaurant name, paste a URL, upload a PDF, or paste the menu — get a dish-by-dish FODMAP breakdown in seconds.
         </p>
       </div>
 
       {/* Input mode tabs */}
       <div className="flex border-b border-gray-200">
         {([
-          { id: 'url',  icon: Link2,        label: 'URL'        },
-          { id: 'pdf',  icon: Upload,        label: 'PDF'        },
-          { id: 'text', icon: ClipboardList, label: 'Paste text' },
+          { id: 'search', icon: Search,       label: 'Search'     },
+          { id: 'pdf',    icon: Upload,        label: 'PDF'        },
+          { id: 'text',   icon: ClipboardList, label: 'Paste text' },
         ] as { id: InputMode; icon: React.ElementType; label: string }[]).map(({ id, icon: Icon, label }) => (
           <button
             key={id}
@@ -286,18 +286,18 @@ function MenuInner() {
 
       {/* Input area */}
       <div className="space-y-3">
-        {mode === 'url' && (
+        {mode === 'search' && (
           <div>
-            <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Restaurant or menu URL</label>
+            <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Restaurant name or URL</label>
             <input
-              type="url"
-              placeholder="https://restaurantname.com  or  https://restaurantname.com/menu"
-              value={url}
-              onChange={e => setUrl(e.target.value)}
+              type="text"
+              placeholder="e.g. Nando's, or The Boathouse Instow, or https://restaurantname.com"
+              value={searchQ}
+              onChange={e => setSearchQ(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter') scan(); }}
               className="w-full px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
             />
-            <p className="text-xs text-gray-400 mt-1.5">Paste the homepage or menu page — Gutsy crawls common menu paths and web-searches if needed. For PDF-only menus use the PDF tab.</p>
+            <p className="text-xs text-gray-400 mt-1.5">Type any restaurant name — Gutsy searches for the real menu itself. For chains just use the name; for local restaurants add the town.</p>
           </div>
         )}
         {mode === 'pdf' && (

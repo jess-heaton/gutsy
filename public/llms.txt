@@ -16,13 +16,13 @@ Gutsy is built on Monash University FODMAP research and follows their three-phas
 
 ## Key URLs
 
-- Home: https://gutsy.freedible.co.uk/
-- Menu scanner (free, no account): https://gutsy.freedible.co.uk/menu
-- Recipe fixer (free, no account): https://gutsy.freedible.co.uk/recipe
-- FODMAP food guide: https://gutsy.freedible.co.uk/foods
-- Blog: https://gutsy.freedible.co.uk/blog
-- Browser extension: https://gutsy.freedible.co.uk/extension
-- Privacy: https://gutsy.freedible.co.uk/privacy
+- Home: https://www.mygutsy.co.uk/
+- Menu scanner (free, no account): https://www.mygutsy.co.uk/menu
+- Recipe fixer (free, no account): https://www.mygutsy.co.uk/recipe
+- FODMAP food guide: https://www.mygutsy.co.uk/foods
+- Blog: https://www.mygutsy.co.uk/blog
+- Browser extension: https://www.mygutsy.co.uk/extension
+- Privacy: https://www.mygutsy.co.uk/privacy
 
 ## Typical user questions
 
@@ -34,4 +34,4 @@ Gutsy is built on Monash University FODMAP research and follows their three-phas
 
 ## Contact
 
-hi@gutsy.freedible.co.uk
+hi@www.mygutsy.co.uk

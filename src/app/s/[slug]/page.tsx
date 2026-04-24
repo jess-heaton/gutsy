@@ -76,7 +76,7 @@ export default async function SharePage({ params }: { params: { slug: string } }
           <h1 className="text-2xl font-bold text-gray-900">{data.restaurant ?? 'Menu scan'}</h1>
           <p className="text-xs text-gray-400 mt-1">
             Low-FODMAP analysis by{' '}
-            <a href="https://gutsy.freedible.co.uk" className="text-brand-600 hover:underline">Gutsy</a>
+            <a href="https://www.mygutsy.co.uk" className="text-brand-600 hover:underline">Gutsy</a>
           </p>
         </div>
 
@@ -158,7 +158,7 @@ export default async function SharePage({ params }: { params: { slug: string } }
         <div className="text-center pt-4 pb-8">
           <p className="text-sm text-gray-500 mb-3">Scan any restaurant menu for free with Gutsy</p>
           <a
-            href="https://gutsy.freedible.co.uk/menu"
+            href="https://www.mygutsy.co.uk/menu"
             className="inline-flex items-center gap-2 bg-brand-700 hover:bg-brand-800 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors"
           >
             Try the menu scanner

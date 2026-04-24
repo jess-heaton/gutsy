@@ -13,7 +13,7 @@ import Disclaimer from '@/components/blog/Disclaimer';
 import ArticleViewTracker from '@/components/blog/ArticleViewTracker';
 
 
-const SITE_URL = 'https://gutsy.freedible.co.uk';
+const SITE_URL = 'https://www.mygutsy.co.uk';
 
 const CATEGORY_COLORS: Record<string, string> = {
   Supplements: 'bg-indigo-100 text-indigo-700',

@@ -5,7 +5,7 @@ import clsx from 'clsx';
 import { articles } from '@/data/articles';
 import HeroImage from '@/components/blog/HeroImage';
 
-const SITE_URL = 'https://gutsy.freedible.co.uk';
+const SITE_URL = 'https://www.mygutsy.co.uk';
 
 export const metadata: Metadata = {
   title: 'Blog — Evidence-based articles on IBS, FODMAPs and the gut',

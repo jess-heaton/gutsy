@@ -9,7 +9,7 @@ export default function PrivacyPage() {
       <p className="text-sm text-gray-500 mb-10">Last updated: 19 April 2026</p>
 
       <p>
-        Gutsy is an IBS tracking app at <Link href="/" className="text-brand-700">gutsy.freedible.co.uk</Link>.
+        Gutsy is an IBS tracking app at <Link href="/" className="text-brand-700">www.mygutsy.co.uk</Link>.
         This page covers both the web app and the Gutsy browser extension.
       </p>
 
@@ -75,7 +75,7 @@ export default function PrivacyPage() {
 
       <h2 className="text-2xl font-semibold mt-10 mb-3">Contact</h2>
       <p>
-        Questions: <a href="mailto:hi@gutsy.freedible.co.uk" className="text-brand-700">hi@gutsy.freedible.co.uk</a>.
+        Questions: <a href="mailto:hi@www.mygutsy.co.uk" className="text-brand-700">hi@www.mygutsy.co.uk</a>.
       </p>
     </div>
   );
