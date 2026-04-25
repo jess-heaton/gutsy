@@ -13,8 +13,14 @@ const FALLBACK_IMAGES = [
 
 // Pinned cards always shown first
 const PINNED = [
-  { slug: 'chipotle', restaurant: 'Chipotle', image_url: '/chipotle.png', href: '/menu?q=Chipotle&auto=1', summary: 'Bowls and salads are highly customisable. Skip the beans and choose rice, grilled protein, and fajita veg.' },
-  { slug: 'jamba',    restaurant: 'Jamba',    image_url: '/jamba.png',    href: '/menu?q=Jamba+Juice&auto=1', summary: "Smoothies can be modified — skip mango and watermelon bases. Ask about apple juice-free options." },
+  { slug: 'chipotle',  restaurant: 'Chipotle Mexican Grill', image_url: '/chipotle.png',  href: '/menu?q=Chipotle&auto=1',      summary: 'Bowls and salads are highly customisable. Skip the beans and choose rice, grilled protein, and fajita veg.' },
+  { slug: 'jamba',     restaurant: 'Jamba Juice',            image_url: '/jamba.png',     href: '/menu?q=Jamba+Juice&auto=1',   summary: "Smoothies can be modified — skip mango and watermelon bases. Ask about apple juice-free options." },
+  { slug: 'starbucks', restaurant: 'Starbucks',              image_url: '/starbucks.png', href: '/menu?q=Starbucks&auto=1',     summary: 'Many drinks can be made low-FODMAP. Choose lactose-free milk, skip syrups, and avoid large oat milk serves.' },
+];
+
+// Map restaurant names (lowercase, partial) to local images
+const RESTAURANT_IMAGES: { match: string; src: string }[] = [
+  { match: 'mcdonald', src: '/mcdonalds.png' },
 ];
 
 interface Scan {
@@ -39,7 +45,11 @@ export default function RestaurantCarousel() {
   useEffect(() => {
     fetch('/api/public-scans')
       .then(r => r.json())
-      .then(d => setScans(Array.isArray(d) ? d.filter(s => s.restaurant && !s.restaurant.toLowerCase().includes('starbucks')) : []))
+      .then(d => setScans(Array.isArray(d) ? d.filter(s => {
+          if (!s.restaurant) return false;
+          const n = s.restaurant.toLowerCase();
+          return !n.includes('starbucks') && !n.includes('chipotle') && !n.includes('jamba');
+        }) : []))
       .catch(() => {});
   }, []);
 
@@ -75,7 +85,9 @@ export default function RestaurantCarousel() {
         {/* DB scans */}
         {scans.map((scan, idx) => {
           const { safe, modify, avoid } = pills(scan.analysis?.items);
-          const imgSrc = FALLBACK_IMAGES[idx % FALLBACK_IMAGES.length];
+          const name = (scan.restaurant ?? '').toLowerCase();
+          const mapped = RESTAURANT_IMAGES.find(r => name.includes(r.match));
+          const imgSrc = mapped ? mapped.src : FALLBACK_IMAGES[idx % FALLBACK_IMAGES.length];
           return (
             <Link
               key={scan.slug}
