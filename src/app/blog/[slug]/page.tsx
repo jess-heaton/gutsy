@@ -153,8 +153,12 @@ export default function ArticlePage({ params }: { params: { slug: string } }) {
       <ArticleViewTracker slug={article.slug} category={article.category} />
       {/* Hero */}
       <header className="relative">
-        <HeroImage src={article.heroImage} alt={article.heroAlt} priority aspect="aspect-[21/9] sm:aspect-[21/8]" />
-        <div className="max-w-wide mx-auto px-4 sm:px-6 -mt-16 lg:-mt-24 relative z-10">
+        {article.slug.startsWith('is-') ? (
+          <div className="h-28 bg-brand-900" />
+        ) : (
+          <HeroImage src={article.heroImage} alt={article.heroAlt} priority aspect="aspect-[21/9] sm:aspect-[21/8]" />
+        )}
+        <div className={`max-w-wide mx-auto px-4 sm:px-6 relative z-10 ${article.slug.startsWith('is-') ? '-mt-10' : '-mt-16 lg:-mt-24'}`}>
           <div className="bg-white rounded-2xl shadow-lifted p-6 lg:p-10 border border-gray-100">
             {/* Breadcrumbs */}
             <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs text-gray-500 mb-5">
