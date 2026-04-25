@@ -13,9 +13,9 @@ const FALLBACK_IMAGES = [
 
 // Pinned cards always shown first
 const PINNED = [
-  { slug: 'chipotle',  restaurant: 'Chipotle Mexican Grill', image_url: '/chipotle.png',  href: '/menu?q=Chipotle&auto=1',      summary: 'Bowls and salads are highly customisable. Skip the beans and choose rice, grilled protein, and fajita veg.' },
-  { slug: 'jamba',     restaurant: 'Jamba Juice',            image_url: '/jamba.png',     href: '/menu?q=Jamba+Juice&auto=1',   summary: "Smoothies can be modified — skip mango and watermelon bases. Ask about apple juice-free options." },
-  { slug: 'starbucks', restaurant: 'Starbucks',              image_url: '/starbucks.png', href: '/menu?q=Starbucks&auto=1',     summary: 'Many drinks can be made low-FODMAP. Choose lactose-free milk, skip syrups, and avoid large oat milk serves.' },
+  { slug: 'chipotle',  restaurant: 'Chipotle Mexican Grill', image_url: '/chipotle.png',  href: '/s/chipotle-fodmap',  summary: 'Bowls and salads are highly customisable. Skip the beans and choose rice, grilled protein, and fajita veg.' },
+  { slug: 'jamba',     restaurant: 'Jamba Juice',            image_url: '/jamba.png',     href: '/s/jamba-fodmap',     summary: "Smoothies can be modified — skip mango and watermelon bases. Ask about apple juice-free options." },
+  { slug: 'starbucks', restaurant: 'Starbucks',              image_url: '/starbucks.png', href: '/s/starbucks-fodmap', summary: 'Many drinks can be made low-FODMAP. Choose lactose-free milk, skip syrups, and avoid flavoured syrups.' },
 ];
 
 // Map restaurant names (lowercase, partial) to local images
