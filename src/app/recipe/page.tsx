@@ -117,23 +117,42 @@ function RecipeCard({ r, onDelete }: { r: SavedCard; onDelete: () => void }) {
 function SaveBookmarkTile({ onSaved }: { onSaved: () => void }) {
   const [open, setOpen] = useState(false);
   const [url, setUrl] = useState('');
-  const [title, setTitle] = useState('');
-  const [saving, setSaving] = useState(false);
+  const [status, setStatus] = useState<'idle' | 'analysing' | 'saving'>('idle');
+  const [err, setErr] = useState('');
 
-  const save = async () => {
+  const run = async () => {
     const u = url.trim();
     if (!u) return;
-    setSaving(true);
-    const t = title.trim() || u;
-    await fetch('/api/recipes', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title: t, recipe: u, sourceUrl: u, swaps: [], notes: [], confidence: null }),
-    });
-    setSaving(false);
-    setUrl(''); setTitle(''); setOpen(false);
-    onSaved();
+    setErr('');
+    setStatus('analysing');
+    try {
+      const res = await fetch('/api/recipe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: 'url', url: u }),
+      });
+      const data = await res.json();
+      if (!res.ok || data.error) throw new Error(data.error ?? 'Could not read that recipe');
+      setStatus('saving');
+      await fetch('/api/recipes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: data.title, emoji: data.emoji, accent: data.accent,
+          tags: data.tags, totalTime: data.totalTime, servings: data.servings,
+          recipe: data.recipe, swaps: data.swaps, notes: data.notes,
+          confidence: data.lowFodmapConfidence, sourceUrl: u,
+        }),
+      });
+      setUrl(''); setOpen(false); setStatus('idle');
+      onSaved();
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : 'Something went wrong');
+      setStatus('idle');
+    }
   };
+
+  const busy = status !== 'idle';
 
   if (!open) return (
     <button
@@ -142,7 +161,7 @@ function SaveBookmarkTile({ onSaved }: { onSaved: () => void }) {
     >
       <Link2 className="w-5 h-5" />
       <p className="text-xs font-medium">Save a recipe</p>
-      <p className="text-2xs text-gray-300 px-4 text-center">Drop a link to store it here</p>
+      <p className="text-2xs text-gray-300 px-4 text-center">Paste a link — we'll make it low-FODMAP</p>
     </button>
   );
 
@@ -154,21 +173,16 @@ function SaveBookmarkTile({ onSaved }: { onSaved: () => void }) {
         placeholder="Recipe URL…"
         value={url}
         onChange={e => setUrl(e.target.value)}
-        className="w-full text-xs border border-gray-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white"
+        onKeyDown={e => e.key === 'Enter' && run()}
+        disabled={busy}
+        className="w-full text-xs border border-gray-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white disabled:opacity-60"
       />
-      <input
-        type="text"
-        placeholder="Title (optional)"
-        value={title}
-        onChange={e => setTitle(e.target.value)}
-        onKeyDown={e => e.key === 'Enter' && save()}
-        className="w-full text-xs border border-gray-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white"
-      />
+      {err && <p className="text-2xs text-red-500">{err}</p>}
       <div className="flex gap-1.5">
-        <button onClick={save} disabled={!url.trim() || saving} className="flex-1 text-xs bg-brand-700 text-white rounded-lg py-1.5 font-semibold disabled:opacity-50 hover:bg-brand-800 transition-colors">
-          {saving ? 'Saving…' : 'Save'}
+        <button onClick={run} disabled={!url.trim() || busy} className="flex-1 text-xs bg-brand-700 text-white rounded-lg py-1.5 font-semibold disabled:opacity-50 hover:bg-brand-800 transition-colors">
+          {status === 'analysing' ? 'Reading recipe…' : status === 'saving' ? 'Saving…' : 'Save'}
         </button>
-        <button onClick={() => { setOpen(false); setUrl(''); setTitle(''); }} className="text-xs text-gray-400 px-2 hover:text-gray-600">Cancel</button>
+        <button onClick={() => { setOpen(false); setUrl(''); setErr(''); setStatus('idle'); }} disabled={busy} className="text-xs text-gray-400 px-2 hover:text-gray-600 disabled:opacity-40">Cancel</button>
       </div>
     </div>
   );
