@@ -84,7 +84,7 @@ export const articles: Article[] = [
     keywords: ['FODzyme review', 'fructan hydrolase', 'garlic intolerance', 'onion IBS', 'FODMAP enzyme supplement', 'Kiwi Biosciences', 'alpha-galactosidase IBS'],
     heroImage: '/FODZYME-Pasta-2.png',
     heroAlt: 'Pasta dish with garlic and herbs',
-    heroCredit: null,
+    heroCredit: undefined,
     author: AUTHOR_EDITORIAL,
     reviewer: AUTHOR_DIETITIAN_REVIEW,
     takeaways: [
