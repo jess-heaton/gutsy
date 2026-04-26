@@ -23,8 +23,7 @@ export const reelRecipes: ReelRecipe[] = [
     totalTime: '25 min',
     servings: '2',
     tags: ['High Protein', 'Gluten-Free', 'Air Fryer', 'Low FODMAP'],
-    heroImage:
-      'https://images.unsplash.com/photo-1598103442097-8b74394b95c1?auto=format&fit=crop&w=800&q=80',
+    heroImage: '/chicken-bites.png',
     swaps: [
       {
         original: 'Garlic powder',
@@ -132,8 +131,7 @@ METHOD
     totalTime: '40 min',
     servings: '12',
     tags: ['Dessert', 'Gluten-Free', 'Vegetarian', 'Low FODMAP'],
-    heroImage:
-      'https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=800&q=80',
+    heroImage: '/brownie.png',
     swaps: [
       {
         original: 'Plain wheat flour',
@@ -188,8 +186,7 @@ METHOD
     totalTime: '20 min',
     servings: '2',
     tags: ['High Protein', 'Lunch', 'Gluten-Free Option', 'Low FODMAP'],
-    heroImage:
-      'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=800&q=80',
+    heroImage: '/chicken-wrap.png',
     swaps: [
       {
         original: 'Regular flour tortilla',
@@ -381,8 +378,7 @@ METHOD
     totalTime: '15 min',
     servings: '4',
     tags: ['Vegetarian', 'Gluten-Free', 'Dip', 'Low FODMAP'],
-    heroImage:
-      'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=800&q=80',
+    heroImage: '/tsatiki.png',
     swaps: [
       {
         original: 'Regular Greek yogurt',
