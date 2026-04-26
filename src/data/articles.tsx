@@ -73,89 +73,123 @@ const Em = ({ children }: { children: React.ReactNode }) => (
 export const articles: Article[] = [
   {
     slug: 'fodzyme',
-    title: 'FODzyme: Can You Actually Eat Garlic and Onion Again?',
-    subtitle: 'A fructan hydrolase enzyme that works before the damage is done — here\'s what the clinical evidence looks like and how to use it properly.',
-    excerpt: 'FODzyme is a digestive enzyme that breaks down fructans — the FODMAP in garlic, onion and wheat — before they ferment in the colon. The evidence is meaningful but has limits.',
+    title: 'FODzyme Review: What It Actually Does (and What the Evidence Really Shows)',
+    subtitle: 'Three enzymes targeting fructans, GOS, and lactose — but the clinical evidence is less robust than most reviews admit. Here\'s an honest look.',
+    excerpt: 'FODzyme contains three FODMAP-targeting enzymes including fructan hydrolase, alpha-galactosidase, and lactase. The science is promising but less settled than most reviews suggest — here\'s what\'s real.',
     date: '2024-11-12',
-    updatedDate: '2025-01-18',
-    readTime: '6 min',
+    updatedDate: '2026-04-26',
+    readTime: '7 min',
     tags: ['enzymes', 'fructans', 'supplements'],
     category: 'Supplements',
-    keywords: ['FODzyme', 'fructan hydrolase', 'garlic intolerance', 'onion IBS', 'FODMAP enzyme supplement', 'low FODMAP enzyme', 'Monash FODMAP'],
+    keywords: ['FODzyme review', 'fructan hydrolase', 'garlic intolerance', 'onion IBS', 'FODMAP enzyme supplement', 'Kiwi Biosciences', 'alpha-galactosidase IBS'],
     heroImage: '/FODZYME-Pasta-2.png',
-    heroAlt: 'Fresh garlic bulbs and red onions on a wooden board',
-    heroCredit: 'Photo via Unsplash',
+    heroAlt: 'Pasta dish with garlic and herbs',
+    heroCredit: null,
     author: AUTHOR_EDITORIAL,
     reviewer: AUTHOR_DIETITIAN_REVIEW,
     takeaways: [
-      'FODzyme uses an endo-inulinase that breaks fructan chains internally — faster than cheaper exo-type enzymes.',
-      'A 2022 double-blind crossover trial showed significantly reduced bloating, pain and flatulence vs. placebo.',
-      'It only works on fructans. Lactose, polyols, GOS and excess fructose need different strategies.',
-      'Take it at the start of the meal — not with scalding food — and treat it as a tool for unavoidable situations, not a daily licence.',
+      'FODzyme contains three enzymes: fructan hydrolase (garlic, onion, wheat), alpha-galactosidase (beans, legumes), and lactase (dairy) — not just fructans.',
+      'The best available human evidence is a 2026 open-label cohort study — there is no published double-blind placebo-controlled RCT yet.',
+      'It does not help with polyols (sorbitol, mannitol) and actually increases free fructose — caution if you have fructose malabsorption.',
+      'Denatures above 60°C / 140°F — add it just before eating, not to steaming hot food.',
     ],
     references: [
       {
-        label: 'Tuck et al. — Fructan hydrolase enzyme for IBS (2022)',
-        authors: 'Tuck CJ, Taylor KM, Gibson PR, et al.',
-        journal: 'Clinical and Translational Gastroenterology',
-        year: 2022,
-        url: 'https://pubmed.ncbi.nlm.nih.gov/35347091/',
+        label: 'Castro Ochoa et al. — In vitro efficacy of FODZYME in simulated GI environment (2023)',
+        authors: 'Castro Ochoa KF, Samant S, Liu A, et al.',
+        journal: 'Gastro Hep Advances',
+        year: 2023,
+        url: 'https://www.sciencedirect.com/science/article/pii/S2772572322001844',
       },
       {
-        label: 'Monash University — FODMAP research overview',
-        url: 'https://www.monashfodmap.com/about-fodmap-and-ibs/',
+        label: 'Kaye et al. — Real-world cohort study of FODMAP-targeting enzyme blend (2026)',
+        authors: 'Kaye G, Meyers A, Hachuel D, Wells A, Wallach T, Thor P, et al.',
+        journal: 'Gastro Hep Advances',
+        year: 2026,
+        url: 'https://www.ghadvances.org/article/S2772-5723(26)00019-1/fulltext',
       },
       {
-        label: 'Whelan et al. — Low-FODMAP diet in IBS: clinical evidence',
-        authors: 'Whelan K, Martin LD, Staudacher HM, Lomer MCE',
-        journal: 'Journal of Human Nutrition and Dietetics',
+        label: 'Monash University — FODzyme digestive enzymes for FODMAPs',
+        url: 'https://www.monashfodmap.com/blog/fodzyme-digestive-enzymes-designed-for-fodmaps/',
+      },
+      {
+        label: 'Biesiekierski et al. — Fructans, not gluten, as the cause of symptoms in non-coeliac gluten sensitivity (2018)',
+        authors: 'Biesiekierski JR, Peters SL, Newnham ED, et al.',
+        journal: 'Gastroenterology',
         year: 2018,
-        url: 'https://pubmed.ncbi.nlm.nih.gov/29336079/',
+        url: 'https://pubmed.ncbi.nlm.nih.gov/29102613/',
+      },
+      {
+        label: 'NCT06628869 — Effects of oral fructanase on GI symptoms after inulin challenge (ongoing RCT)',
+        url: 'https://clinicaltrials.gov/study/NCT06628869',
       },
     ],
     content: (
       <>
         <P>
-          Garlic and onion are in almost everything. Restaurant food, stock cubes, most sauces, family dinners you can't get out of. If fructans are one of your triggers, you've probably resigned yourself to eating them and suffering — or spending a lot of social energy explaining why you can't.
+          Garlic and onion are in almost everything. Restaurant food, stock cubes, most sauces, family dinners you can't quietly opt out of. If fructans are your trigger, you've probably resigned yourself to the choice between suffering or spending social energy explaining yourself.
         </P>
         <P>
-          FODzyme is a digestive enzyme supplement that takes a different approach: break the fructans down before they cause trouble. Take a sachet or capsule with your meal, and the enzyme — fructan hydrolase — gets to work in your small intestine, cleaving fructan chains before they reach your colon and ferment.
+          FODzyme, made by Boston-based biotech Kiwi Biosciences (Y Combinator-backed, founded 2020), takes a different approach: break the problematic molecules down before they reach your colon. Sprinkle the powder on your food at the start of the meal and the enzymes get to work in your small intestine.
         </P>
         <P>
-          It won't give you a free pass to eat garlic bread every night. But for situations where avoidance isn't realistic, it's a genuinely useful tool.
+          It's a genuinely interesting product. But a lot of what's written about it online is either inaccurate or oversimplified. Here's what the evidence actually shows.
         </P>
 
-        <H2 id="how-it-works">How it actually works</H2>
+        <H2 id="how-it-works">What's actually in it — three enzymes, not one</H2>
         <P>
-          Fructans are chains of fructose molecules. Humans don't produce an enzyme that breaks them down, so they pass through the small intestine intact and land in the large intestine, where bacteria ferment them. That fermentation produces gas, triggers cramping, and causes bloating.
+          Most reviews describe FODzyme as a "fructan enzyme." That's underselling it. The current formulation contains three separate enzymes:
+        </P>
+        <Ul>
+          <Li><Em>Fructan hydrolase</Em> — breaks down fructans found in garlic, onion, wheat, rye, leek, and asparagus</Li>
+          <Li><Em>Alpha-galactosidase</Em> — breaks down GOS (galacto-oligosaccharides) in beans, lentils, and legumes</Li>
+          <Li><Em>Lactase</Em> — breaks down lactose in dairy products</Li>
+        </Ul>
+        <P>
+          This makes it meaningfully broader than a single-enzyme product like Beano (alpha-galactosidase only) or standard lactase tablets. The fructan hydrolase is the novel piece — it's derived from <Em>Aspergillus tubingensis</Em> and has both endo and exo activity, meaning it cleaves fructan chains at internal points and at the ends.
         </P>
         <P>
-          FODzyme's fructan hydrolase (an endo-inulinase) cuts these chains internally — not from the ends — which means it breaks long chains into small fragments quickly. You've got roughly 2–4 hours in the small intestine before contents move to the colon. The endo approach works within that window.
+          One important consequence of how fructan hydrolase works: breaking down fructans releases free fructose. If fructose malabsorption is one of your triggers, that released fructose could cause problems. FODzyme is not suitable for people with fructose intolerance.
         </P>
 
         <Callout variant="tip" title="Timing matters">
-          Take it at the start of the meal, not before or after. The enzyme needs to be in the gut at the same time as the food — and well before it reaches the colon.
+          Add FODzyme to your food right before eating — not before or after. The powder form is intentional: it means the enzymes can mix directly with food in the stomach. Eat within a few minutes of adding it.
         </Callout>
 
-        <H2 id="evidence">What the research says</H2>
+        <H2 id="evidence">What the research actually shows</H2>
         <P>
-          A 2022 double-blind crossover trial gave participants either FODzyme or placebo with a high-fructan meal. The FODzyme group reported significantly lower bloating, abdominal pain, and flatulence. The effect was meaningful — not marginal.
+          This is where a lot of reviews get it wrong. FODzyme does not yet have a published randomised, double-blind, placebo-controlled clinical trial in IBS patients. The existing evidence is:
         </P>
+        <Ul>
+          <Li><Em>2023 in vitro study</Em> (Castro Ochoa et al., <Em>Gastro Hep Advances</Em>) — tested FODZYME in a validated laboratory simulator of the human GI tract (SHIME®). Found 90% of inulin degraded within 30 minutes, with reduced gas production. This is lab evidence, not human trial evidence.</Li>
+          <Li><Em>2026 real-world cohort study</Em> (Kaye et al., <Em>Gastro Hep Advances</Em>) — 118 participants who had purchased FODzyme completed surveys at baseline and 4 weeks. 78% reported clinically meaningful improvement in bloating and flatulence; 65% in abdominal pain. This was open-label (no placebo group), so placebo effect cannot be ruled out. Funded by Kiwi Biosciences, though independently analysed.</Li>
+          <Li><Em>2024 safety study</Em> — randomised, placebo-controlled, showing a good safety profile with no serious adverse events.</Li>
+          <Li><Em>Ongoing RCT</Em> (NCT06628869) — a proper double-blind crossover trial testing fructanase after a 25g inulin challenge. Results pending.</Li>
+        </Ul>
         <P>
-          That said, it's one trial. It's not a cure. And it only works on fructans specifically — not lactose, not polyols, not GOS (the FODMAP in legumes). If your triggers are mixed, it helps with one piece of the puzzle.
+          The 2026 cohort results are encouraging, and the in vitro mechanism is well-supported. But the honest summary is: we don't yet have a published gold-standard trial. The product may well work — but be appropriately sceptical of reviews that treat the current evidence as definitive.
         </P>
 
-        <H2 id="practical">Worth knowing before you buy</H2>
+        <H2 id="wheat-gluten">What about "wheat sensitivity"?</H2>
+        <P>
+          Research by Biesiekierski et al. found that many people who believe they react to gluten are actually reacting to fructans in wheat — not gluten itself. FODzyme can help that group by degrading the fructans before they ferment.
+        </P>
+        <P>
+          It does not break down gluten protein. It will not help anyone with coeliac disease and is not a substitute for a gluten-free diet in that context. The overlap between "I react to wheat" and "I react to fructans in wheat" is significant but not total.
+        </P>
+
+        <H2 id="practical">Before you buy</H2>
         <Ul>
-          <Li>Works on fructans only — onion, garlic, wheat, rye, leek and asparagus are the main food sources</Li>
-          <Li>Fructan hydrolase denatures above about 60°C — don't take it with scalding hot food or drinks</Li>
-          <Li>Not a substitute for the elimination phase — use it once you've confirmed fructans are a trigger</Li>
-          <Li>It isn't cheap. Factor it in as a supplement for social or unavoidable situations rather than daily use</Li>
-          <Li>Look for "endo-inulinase" or "fructan hydrolase" on the label — cheaper "inulinase" blends are usually slower exo enzymes</Li>
+          <Li>Denatures above 60°C / 140°F — if it's too hot to comfortably hold in your mouth, it's too hot for FODzyme. Works well with room-temperature, warm, and chilled foods.</Li>
+          <Li>Does not work on polyols (sorbitol, mannitol) — if stone fruit, mushrooms, or artificial sweeteners are triggers, FODzyme won't help with those.</Li>
+          <Li>Not for fructose malabsorption — the enzyme breaks fructans into free fructose, which may worsen symptoms if fructose is also a trigger for you.</Li>
+          <Li>Use it after your elimination and reintroduction phases, once you know what your actual triggers are — not as a shortcut through elimination.</Li>
+          <Li>The powder (jar or stick packs) works faster than capsules because it contacts food directly in the stomach. The stick packs are convenient for eating out.</Li>
+          <Li>Pricing is around £55–65 for 60 doses on subscription. At roughly £1 per meal, it's not cheap — most useful for unavoidable situations rather than every meal.</Li>
         </Ul>
 
         <Callout variant="success" title="The honest verdict">
-          If onion and garlic are your main triggers and you've confirmed this through the reintroduction phase, FODzyme is probably the most targeted thing you can take. It won't work for everyone, but when it does, it's a meaningful quality-of-life improvement.
+          FODzyme is the most targeted product available for fructan, GOS, and lactose sensitivity, and the mechanism is sound. The evidence isn't as strong as most reviews imply — there's no published RCT yet — but the real-world cohort data is promising and the safety profile is good. If you've completed reintroduction and know fructans are your main trigger, it's worth trying cautiously.
         </Callout>
       </>
     ),
