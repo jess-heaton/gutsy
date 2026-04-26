@@ -85,20 +85,17 @@ function RecipeCard({ r, onDelete }: { r: SavedCard; onDelete: () => void }) {
   return (
     <div className="group relative rounded-2xl overflow-hidden bg-white border border-gray-100 shadow-sm hover:shadow-lifted hover:-translate-y-0.5 transition-all">
       <a href={`/recipe/${r.id}`} className="block">
-        <div className={clsx('h-28 relative flex items-center justify-center bg-gradient-to-br', a.from, a.to)}>
-          <span className="text-5xl drop-shadow-sm group-hover:scale-110 transition-transform duration-300" aria-hidden>
-            {r.emoji ?? '🍽️'}
-          </span>
-          <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
+        <div className={clsx('h-28 relative bg-gradient-to-br', a.from, a.to)}>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+          <p className="absolute bottom-2 left-3 right-3 text-white text-xs font-bold leading-snug drop-shadow line-clamp-2">{r.title}</p>
         </div>
-        <div className="p-3.5">
-          <p className="text-sm font-semibold text-gray-900 line-clamp-2 leading-snug">{r.title}</p>
-          <div className="flex items-center gap-3 mt-2 text-2xs text-gray-400">
+        <div className="px-3 py-2">
+          <div className="flex items-center gap-3 text-2xs text-gray-400">
             {r.total_time && <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{r.total_time}</span>}
             {r.servings && <span className="flex items-center gap-1"><Users className="w-3 h-3" />{r.servings}</span>}
           </div>
           {r.tags && r.tags.length > 0 && (
-            <div className="flex flex-wrap gap-1 mt-2">
+            <div className="flex flex-wrap gap-1 mt-1.5">
               {r.tags.slice(0, 2).map((t, i) => (
                 <span key={i} className={clsx('text-2xs font-medium px-1.5 py-0.5 rounded-full', a.chip)}>{t}</span>
               ))}
@@ -113,6 +110,66 @@ function RecipeCard({ r, onDelete }: { r: SavedCard; onDelete: () => void }) {
       >
         <Trash2 className="w-3.5 h-3.5" />
       </button>
+    </div>
+  );
+}
+
+function SaveBookmarkTile({ onSaved }: { onSaved: () => void }) {
+  const [open, setOpen] = useState(false);
+  const [url, setUrl] = useState('');
+  const [title, setTitle] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  const save = async () => {
+    const u = url.trim();
+    if (!u) return;
+    setSaving(true);
+    const t = title.trim() || u;
+    await fetch('/api/recipes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title: t, recipe: u, sourceUrl: u, swaps: [], notes: [], confidence: null }),
+    });
+    setSaving(false);
+    setUrl(''); setTitle(''); setOpen(false);
+    onSaved();
+  };
+
+  if (!open) return (
+    <button
+      onClick={() => setOpen(true)}
+      className="min-h-[140px] w-full rounded-2xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center gap-1.5 text-gray-400 hover:border-brand-300 hover:text-brand-600 transition-colors"
+    >
+      <Link2 className="w-5 h-5" />
+      <p className="text-xs font-medium">Save a recipe</p>
+      <p className="text-2xs text-gray-300 px-4 text-center">Drop a link to store it here</p>
+    </button>
+  );
+
+  return (
+    <div className="rounded-2xl border-2 border-dashed border-brand-300 bg-brand-50 p-3 flex flex-col gap-2 min-h-[140px] justify-center">
+      <input
+        autoFocus
+        type="url"
+        placeholder="Recipe URL…"
+        value={url}
+        onChange={e => setUrl(e.target.value)}
+        className="w-full text-xs border border-gray-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white"
+      />
+      <input
+        type="text"
+        placeholder="Title (optional)"
+        value={title}
+        onChange={e => setTitle(e.target.value)}
+        onKeyDown={e => e.key === 'Enter' && save()}
+        className="w-full text-xs border border-gray-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white"
+      />
+      <div className="flex gap-1.5">
+        <button onClick={save} disabled={!url.trim() || saving} className="flex-1 text-xs bg-brand-700 text-white rounded-lg py-1.5 font-semibold disabled:opacity-50 hover:bg-brand-800 transition-colors">
+          {saving ? 'Saving…' : 'Save'}
+        </button>
+        <button onClick={() => { setOpen(false); setUrl(''); setTitle(''); }} className="text-xs text-gray-400 px-2 hover:text-gray-600">Cancel</button>
+      </div>
     </div>
   );
 }
@@ -616,15 +673,15 @@ function RecipePageInner() {
           <span className="text-2xs text-gray-400">{cards.length}</span>
         </div>
         {cards.length === 0 ? (
-          <div className="text-center py-10 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
-            <ChefHat className="w-8 h-8 text-gray-300 mx-auto mb-2" />
-            <p className="text-sm text-gray-500">Saved recipes will appear here.</p>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <SaveBookmarkTile onSaved={loadCards} />
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {cards.map(c => (
               <RecipeCard key={c.id} r={c} onDelete={() => deleteCard(c.id)} />
             ))}
+            <SaveBookmarkTile onSaved={loadCards} />
           </div>
         )}
       </div>
