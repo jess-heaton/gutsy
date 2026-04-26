@@ -197,71 +197,100 @@ export const articles: Article[] = [
 
   {
     slug: 'milkaid',
-    title: 'The Milkaid Thing Nobody Tells You',
-    subtitle: 'The pharmacy version of this lactase supplement has raspberry flavouring. The website version doesn\'t. Here\'s why that matters for IBS.',
-    excerpt: 'Milkaid is a lactase enzyme you take before dairy. What most people don\'t know: the flavoured version sold in pharmacies can add a separate trigger for IBS sufferers.',
+    title: 'MilkAid Lactase Supplement: Which Format to Buy and Why It Matters for IBS',
+    subtitle: 'The chewable tablets taste nice but contain flavourings and sweeteners that may be a problem if your gut is already sensitive. Here\'s how to choose.',
+    excerpt: 'MilkAid is a well-regarded UK lactase supplement — but the chewable formats contain additives (raspberry flavouring, sucralose) that IBS sufferers should know about before buying.',
     date: '2024-10-28',
-    updatedDate: '2025-01-10',
-    readTime: '4 min',
+    updatedDate: '2026-04-26',
+    readTime: '5 min',
     tags: ['lactase', 'dairy', 'supplements'],
     category: 'Supplements',
-    keywords: ['Milkaid', 'lactase supplement', 'lactose intolerance', 'dairy IBS', 'low FODMAP dairy', 'lactase enzyme capsules'],
-    heroImage: '/almond-milk.png',
-    heroAlt: 'A glass of milk on a wooden surface',
-    heroCredit: 'Photo via Unsplash',
+    keywords: ['MilkAid review', 'lactase supplement UK', 'lactose intolerance IBS', 'MilkAid capsules vs tablets', 'low FODMAP dairy', 'lactase enzyme IBS'],
+    heroImage: '/milkaid.png',
+    heroAlt: 'MilkAid lactase enzyme supplement',
+    heroCredit: undefined,
     author: AUTHOR_EDITORIAL,
     reviewer: AUTHOR_DIETITIAN_REVIEW,
     takeaways: [
-      'Lactase supplements like Milkaid help digest lactose, but the supermarket chewables include raspberry flavouring.',
-      'The unflavoured capsule version is only available directly from milkaid.com — same dose, no additives.',
-      'During strict elimination, lactose-free products are cleaner than relying on enzyme supplements.',
-      'Once lactose is confirmed as a trigger in reintroduction, lactase supplements become a useful day-to-day tool.',
+      'MilkAid chewable tablets come in raspberry and vanilla flavours — the vanilla version contains sucralose, which can itself cause IBS symptoms in sensitive people.',
+      'The MAX Capsules (9000 ALU) are unflavoured and additive-free — the better choice for IBS sufferers who want to avoid extra variables.',
+      'Lactose intolerance and lactose as a FODMAP are not the same thing — not all IBS sufferers need to limit lactose.',
+      'During the elimination phase, switch to naturally low-lactose foods (hard cheese, lactose-free milk) rather than relying on enzyme supplements.',
     ],
     references: [
       {
-        label: 'Misselwitz et al. — Lactose intolerance: diagnosis and management',
+        label: 'Misselwitz et al. — Lactose intolerance: mechanisms, diagnosis and management (2019)',
         authors: 'Misselwitz B, Butter M, Verbeke K, Fox MR',
         journal: 'Gut',
         year: 2019,
         url: 'https://pubmed.ncbi.nlm.nih.gov/31196878/',
       },
       {
-        label: 'Monash University — Lactose and the FODMAP diet',
-        url: 'https://www.monashfodmap.com/blog/monashs-new-lactose-app/',
+        label: 'Monash University — Lactose and dairy products on the low-FODMAP diet',
+        url: 'https://www.monashfodmap.com/blog/lactose-and-dairy-products-on-low/',
+      },
+      {
+        label: 'Vesa et al. — Lactose intolerance (2000)',
+        authors: 'Vesa TH, Marteau P, Korpela R',
+        journal: 'Journal of the American College of Nutrition',
+        year: 2000,
+        url: 'https://pubmed.ncbi.nlm.nih.gov/10759141/',
       },
     ],
     content: (
       <>
         <P>
-          Milkaid is a lactase enzyme supplement — you take it before eating dairy and it helps you digest lactose. Straightforward enough. What most people don't know: the version sold in pharmacies and supermarkets contains raspberry flavouring.
+          MilkAid is a lactase enzyme supplement made by Crosscare, a British-Irish company that also makes Colief infant drops. You take it before eating dairy and the enzyme breaks lactose down into glucose and galactose — sugars your body can actually absorb — before they reach your colon and ferment.
         </P>
         <P>
-          Raspberry flavouring. In a product designed for people with digestive issues.
-        </P>
-        <P>
-          It doesn't affect the efficacy of the enzyme itself. The flavouring is purely cosmetic — the chewable tablets taste like raspberry so they're more palatable. But for people with IBS, artificial flavourings and additives are a known irritant for some. You could be taking a supplement to reduce dairy symptoms while inadvertently adding a separate trigger every time you use it.
+          It won Pharmacy Product of the Year 2024 and is widely stocked at Boots, Tesco, and Holland &amp; Barrett. It works. But if you have IBS, there's something worth knowing before you pick up whichever box is on the shelf.
         </P>
 
-        <H2 id="fix">The fix</H2>
+        <H2 id="formats">The formats — and what's actually in them</H2>
         <P>
-          The unflavoured capsule version is only available directly from the Milkaid website. The{' '}
-          <a href="https://milkaid.com/product/milkaid-max-capsules-60s/" target="_blank" rel="noopener noreferrer">
-            Milkaid Max Capsules (60s)
-          </a>{' '}
-          contain the enzyme — nothing else added. Same dose as the Max tablets, no raspberry, no unnecessary additives.
+          MilkAid comes in four formats, and they're not all equal for IBS:
         </P>
+        <Ul>
+          <Li><Em>Raspberry chewable tablets</Em> — 3,000 ALU per tablet, raspberry flavouring, glucose syrup, magnesium stearate. The most widely sold version in pharmacies.</Li>
+          <Li><Em>Vanilla chewable tablets</Em> — 3,000 ALU per tablet, vanilla flavouring, magnesium stearate, and <Em>sucralose</Em>. Sucralose is a poorly-absorbed sweetener that causes bloating and loose stools in a meaningful proportion of IBS sufferers.</Li>
+          <Li><Em>MAX Capsules</Em> — 9,000 ALU per capsule. Unflavoured, no artificial colours, no preservatives, vegan. Three times the dose of a standard tablet in a single capsule.</Li>
+          <Li><Em>Drops</Em> — Liquid lactase you add to milk before drinking. Unflavoured. Can reduce lactose content by up to 99% when left overnight. Useful if you're cooking or want to treat a full bottle of milk rather than dosing per meal.</Li>
+        </Ul>
 
-        <Callout variant="tip" title="Flexibility bonus">
-          The capsule format also lets you titrate the dose. For a splash of milk in coffee you can open the capsule and use half. The tablets don't split cleanly.
+        <Callout variant="tip" title="For IBS: go for the MAX Capsules">
+          The capsules are additive-free and significantly higher dose. You can also open a capsule and use part of it for a small dairy portion — useful when you just want a splash of milk in coffee. Available in pharmacies and online.
         </Callout>
 
-        <H2 id="enzymes-vs-elimination">Enzymes vs the elimination diet</H2>
+        <H2 id="dosing">Dosing and timing</H2>
         <P>
-          Lactase supplements let you eat dairy without lactose symptoms, but they don't change the fact that lactose is a FODMAP. During the strict elimination phase, it's cleaner to switch to lactose-free products rather than relying on enzyme supplements — the goal of that phase is a complete baseline, and supplements add a variable.
+          Take MilkAid at the very start of your meal — with the first bite or sip of anything containing dairy. The enzyme needs to be present in your gut at the same time as the lactose, before the food moves through the small intestine.
         </P>
         <P>
-          Once you're in reintroduction and have confirmed that lactose is a trigger (or isn't), lactase supplements are a useful day-to-day tool. Capsules only, if you can manage it.
+          Underdosing is the most common reason people say lactase supplements "don't work." Standard guidance is 1–2 tablets (3,000–6,000 ALU) for a moderate dairy portion, up to a maximum of 6 tablets per meal. The MAX Capsule's 9,000 ALU single dose covers most scenarios without needing to take multiple tablets. For a large portion — say, a creamy pasta plus ice cream — you may want to supplement across courses.
         </P>
+
+        <H2 id="lactose-vs-fodmap">Lactose intolerance and IBS aren't the same thing</H2>
+        <P>
+          This is the distinction that most lactase supplement reviews miss. Lactose intolerance is a digestive condition caused by low lactase production — your gut can't break down lactose, so it ferments in the colon. IBS is a separate functional gut disorder.
+        </P>
+        <P>
+          They frequently overlap, but they're not identical. Monash University's position is clear: if you have IBS and are following the low-FODMAP diet, you only need to limit lactose if you are also lactose intolerant. Hard cheeses (cheddar, parmesan, brie) and butter contain negligible lactose and are fine for almost everyone on the FODMAP diet. Regular cow's milk in large amounts is high FODMAP — but that's because of lactose, and if your gut handles lactose fine, it's not a trigger for you.
+        </P>
+        <P>
+          If you're not sure whether lactose is a personal trigger, the only way to find out is through the formal reintroduction phase — testing regular milk in controlled amounts and noting your response.
+        </P>
+
+        <H2 id="elimination">During the elimination phase</H2>
+        <P>
+          Lactase supplements are not a clean substitute for lactose-free products during elimination. The goal of the elimination phase is a complete baseline — every variable removed. An enzyme supplement adds uncertainty: did your symptoms improve because of the diet, or because of the dose of enzyme you took? And if you underdose (which is easy to do), you've reintroduced lactose without knowing it.
+        </P>
+        <P>
+          The cleaner approach during elimination: use lactose-free milk and yoghurt, which are manufactured with lactase already added and are reliably low in lactose. Hard cheese and butter are naturally near-zero lactose and need no substitution at all.
+        </P>
+
+        <Callout variant="success" title="When MilkAid is genuinely useful">
+          Once you've completed reintroduction and confirmed that lactose is a trigger for you specifically, a lactase supplement is a practical day-to-day tool — especially eating out, where you can't control ingredients. The MAX Capsules are the right format: high dose, no additives, available everywhere.
+        </Callout>
       </>
     ),
   },
